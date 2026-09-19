@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel | Ana Julia Macena</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --areia:#efe9e1;
+    --offwhite:#fdfcfa;
+    --marrom:#a3876b;
+    --marrom-suave: rgba(163,135,107,0.14);
+    --nude:#c9b5a3;
+    --texto:#3a332c;
+    --texto-suave:#6b6058;
+    --linha: rgba(58,51,44,0.16);
+    --linha-forte: rgba(58,51,44,0.30);
+    --erro:#a3372b;
+    --erro-fundo:#f6e7e5;
+    --aviso:#a3792b;
+    --aviso-fundo:#f7eee0;
+    --ok:#3f6b4f;
+    --ok-fundo:#e9f0eb;
+    --barra-largura: 236px;
+  }
+  *,*::before,*::after{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    background:var(--areia);
+    color:var(--texto);
+    font-family:'Jost', sans-serif;
+    font-weight:300;
+    font-size:14px;
+    line-height:1.55;
+  }
+  h1,h2,h3{
+    font-family:'Tenor Sans', serif;
+    font-weight:400;
+    letter-spacing:0.03em;
+    margin:0;
+  }
+  button, input, select, textarea{ font-family:inherit; font-size:inherit; color:inherit; }
+  button{ cursor:pointer; }
+  a{ color:inherit; }
+  :focus-visible{ outline:2px solid var(--marrom); outline-offset:2px; }
+  [hidden]{ display:none !important; }
+
+  /* ===== Tela de verificação de sessão ===== */
+  #telaCarregando{
+    position:fixed; inset:0;
+    display:none;
+    align-items:center; justify-content:center;
+    background:var(--areia);
+    font-size:0.85rem;
+    color:var(--texto-suave);
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    z-index:2000;
+  }
+  body.carregando #telaCarregando{ display:flex; }
+  body.carregando #app{ display:none; }
+
+  /* ===== Layout geral ===== */
+  #app{ display:flex; min-height:100vh; }
+
+  .barra-lateral{
+    width:var(--barra-largura);
+    flex-shrink:0;
+    background:var(--offwhite);
+    border-right:1px solid var(--linha);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    position:fixed;
+    top:0; bottom:0; left:0;
+    z-index:100;
+    transition:transform 0.3s ease;
+  }
+  .marca-painel{
+    padding:26px 22px 18px;
+    font-family:'Tenor Sans', serif;
+    font-size:0.95rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    border-bottom:1px solid var(--linha);
+  }
+  .grupo-nav{ padding:18px 14px 6px; }
+  .rotulo-grupo{
+    font-size:0.65rem;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    color:var(--texto-suave);
+    padding:0 10px 8px;
+  }
+  .item-nav{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:100%;
+    text-align:left;
+    background:none;
+    border:none;
+    padding:10px 10px;
+    font-size:0.85rem;
+    color:var(--texto);
+    border-radius:2px;
+    margin-bottom:2px;
+  }
+  .item-nav svg{ width:16px; height:16px; flex-shrink:0; stroke:currentColor; fill:none; stroke-width:1.5; }
+  .item-nav:hover{ background:rgba(58,51,44,0.05); }
+  .item-nav.ativo{ background:var(--marrom-suave); color:var(--marrom); font-weight:500; }
+  .rodape-lateral{
+    border-top:1px solid var(--linha);
+    padding:16px 22px;
+    font-size:0.75rem;
+    color:var(--texto-suave);
+  }
+  .rodape-lateral .email{ display:block; margin-bottom:10px; word-break:break-all; }
+  .botao-sair{
+    background:none;
+    border:1px solid var(--linha-forte);
+    padding:8px 14px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    font-size:0.7rem;
+    color:var(--texto);
+  }
+  .botao-sair:hover{ border-color:var(--marrom); color:var(--marrom); }
+
+  .fundo-drawer{
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(58,51,44,0.4);
+    z-index:90;
+  }
+
+  .botao-hamburguer-admin{
+    display:none;
+    position:fixed;
+    top:16px; left:16px;
+    z-index:120;
+    background:var(--offwhite);
+    border:1px solid var(--linha-forte);
+    padding:9px;
+  }
+  .botao-hamburguer-admin svg{ width:18px; height:18px; stroke:var(--texto); fill:none; stroke-width:1.5; display:block; }
+
+  .conteudo-admin{
+    margin-left:var(--barra-largura);
+    flex:1;
+    padding:32px 36px 60px;
+    max-width:100%;
+    overflow-x:hidden;
+  }
+  .cabecalho-admin{
+    margin-bottom:26px;
+  }
+  .cabecalho-admin h1{
+    font-size:1.15rem;
+    text-transform:uppercase;
+  }
+
+  @media (max-width: 900px){
+    .barra-lateral{ transform:translateX(-100%); }
+    body.menu-aberto .barra-lateral{ transform:translateX(0); }
+    body.menu-aberto .fundo-drawer{ display:block; }
+    .botao-hamburguer-admin{ display:block; }
+    .conteudo-admin{ margin-left:0; padding:70px 18px 50px; }
+  }
+
+  /* ===== Utilitários ===== */
+  .aviso-caixa{
+    padding:12px 16px;
+    font-size:0.82rem;
+    border:1px solid var(--aviso);
+    background:var(--aviso-fundo);
+    color:var(--aviso);
+    margin-bottom:18px;
+  }
+  .erro-caixa{
+    padding:12px 16px;
+    font-size:0.82rem;
+    border:1px solid var(--erro);
+    background:var(--erro-fundo);
+    color:var(--erro);
+    margin-bottom:18px;
+  }
+  .ok-caixa{
+    padding:12px 16px;
+    font-size:0.82rem;
+    border:1px solid var(--ok);
+    background:var(--ok-fundo);
+    color:var(--ok);
+    margin-bottom:18px;
+  }
+  .texto-vazio{
+    padding:22px;
+    text-align:center;
+    font-size:0.85rem;
+    color:var(--texto-suave);
+    border:1px dashed var(--linha-forte);
+    background:var(--offwhite);
+  }
+  .caixa{
+    background:var(--offwhite);
+    border:1px solid var(--linha);
+    padding:20px;
+  }
+  .botao{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 18px;
+    border:1px solid var(--texto);
+    background:transparent;
+    color:var(--texto);
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    font-size:0.72rem;
+  }
+  .botao:hover{ background:var(--texto); color:var(--offwhite); }
+  .botao.principal{ background:var(--texto); color:var(--offwhite); }
+  .botao.principal:hover{ background:transparent; color:var(--texto); }
+  .botao.pequeno{ padding:6px 10px; font-size:0.68rem; }
+  .botao.contorno-suave{ border-color:var(--linha-forte); }
+  .botao.contorno-suave:hover{ background:var(--marrom); border-color:var(--marrom); color:var(--offwhite); }
+  .botao-icone{
+    background:none;
+    border:1px solid var(--linha-forte);
+    padding:6px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .botao-icone:hover{ border-color:var(--marrom); color:var(--marrom); }
+  .botao-icone svg{ width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.5; }
+  .icone{ width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.5; display:inline-block; vertical-align:-2px; }
+
+  input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="number"], input[type="url"], input[type="password"], select, textarea{
+    width:100%;
+    background:var(--offwhite);
+    border:1px solid var(--linha-forte);
+    padding:10px 12px;
+  }
+  label{ font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--texto-suave); display:block; margin-bottom:6px; }
+  .campo{ margin-bottom:16px; }
+  .linha-campos{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:600px){ .linha-campos{ grid-template-columns:1fr; } }
+
+  .pilula{
+    display:inline-block;
+    padding:3px 10px;
+    font-size:0.68rem;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    border:1px solid currentColor;
+    white-space:nowrap;
+  }
+
+  /* ===== Modal ===== */
+  .fundo-modal{
+    position:fixed; inset:0;
+    background:rgba(58,51,44,0.45);
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+    z-index:500;
+  }
+  .caixa-modal{
+    width:100%; max-width:480px;
+    max-height:88vh;
+    overflow-y:auto;
+    background:var(--offwhite);
+    border:1px solid var(--linha-forte);
+    padding:28px;
+  }
+  .cabecalho-modal{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .cabecalho-modal h2{ font-size:1rem; text-transform:uppercase; }
+  .fechar-modal{ background:none; border:none; font-size:1.3rem; line-height:1; color:var(--texto-suave); }
+  .fechar-modal:hover{ color:var(--marrom); }
+  .rodape-modal{ display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
+
+  /* ===== Faixa de estatísticas ===== */
+  .faixa-stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+    border:1px solid var(--linha);
+    background:var(--offwhite);
+    margin-bottom:22px;
+  }
+  .stat-item{ padding:16px 18px; border-right:1px solid var(--linha); }
+  .stat-item:last-child{ border-right:none; }
+  .stat-valor{ font-family:'Tenor Sans', serif; font-size:1.5rem; color:var(--marrom); display:block; }
+  .stat-rotulo{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--texto-suave); }
+  .stat-sub{ font-size:0.7rem; color:var(--texto-suave); margin-top:2px; }
+
+  /* ===== Gráfico de barras ===== */
+  .grafico-barras{
+    display:flex;
+    align-items:flex-end;
+    gap:6px;
+    height:140px;
+    padding:14px 10px 0;
+  }
+  .barra-dia{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; }
+  .barra-dia .barra{ width:100%; background:var(--nude); }
+  .barra-dia.hoje .barra{ background:var(--marrom); }
+  .barra-dia .rotulo-barra{ font-size:0.6rem; color:var(--texto-suave); margin-top:6px; }
+
+  /* ===== Tabelas ===== */
+  table{ width:100%; border-collapse:collapse; font-size:0.82rem; }
+  th, td{ text-align:left; padding:10px 12px; border-bottom:1px solid var(--linha); }
+  th{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--texto-suave); font-weight:400; white-space:nowrap; }
+  th.ordenavel{ cursor:pointer; user-select:none; }
+  th.ordenavel .seta{ opacity:0.25; margin-left:4px; font-size:0.65rem; }
+  th.ordenavel.ativa .seta{ opacity:1; color:var(--marrom); }
+  tbody tr:hover{ background:rgba(58,51,44,0.03); }
+  .tabela-scroll{ overflow-x:auto; }
+  .linha-favorita{ box-shadow: inset 3px 0 0 var(--marrom); }
+
+  /* ===== Tabela de vídeos (arrastar) ===== */
+  .linha-arrastavel{ cursor:grab; }
+  .linha-arrastavel.arrastando{ opacity:0.4; }
+  .alca-arraste{ cursor:grab; color:var(--texto-suave); }
+
+  /* ===== Marcas: topo de filtros ===== */
+  .barra-ferramentas{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:16px; }
+  .barra-ferramentas input[type="text"]{ max-width:240px; }
+  .filtros-pilula{ display:flex; gap:8px; flex-wrap:wrap; }
+  .filtro-pilula-botao{
+    padding:6px 12px;
+    border:1px solid var(--linha-forte);
+    background:transparent;
+    font-size:0.7rem;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+  .filtro-pilula-botao.ativo{ background:var(--texto); color:var(--offwhite); border-color:var(--texto); }
+  .espacador{ flex:1; }
+
+  /* ===== Calendário ===== */
+  .barra-calendario{ display:flex; align-items:center; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
+  .barra-calendario .mes-atual{ font-family:'Tenor Sans', serif; font-size:1rem; text-transform:uppercase; min-width:170px; }
+  .grade-calendario{
+    display:grid;
+    grid-template-columns:repeat(7, 1fr);
+    border-left:1px solid var(--linha);
+    border-top:1px solid var(--linha);
+  }
+  .cabecalho-dia-semana{
+    padding:8px;
+    font-size:0.65rem;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--texto-suave);
+    text-align:center;
+    border-right:1px solid var(--linha);
+    border-bottom:1px solid var(--linha);
+    background:var(--offwhite);
+  }
+  .celula-dia{
+    position:relative;
+    min-height:96px;
+    padding:6px;
+    border-right:1px solid var(--linha);
+    border-bottom:1px solid var(--linha);
+    background:var(--offwhite);
+  }
+  .celula-dia.fora-do-mes{ background:var(--areia); color:var(--texto-suave); opacity:0.6; }
+  .celula-dia.hoje{ background:var(--marrom-suave); }
+  .numero-dia{ font-size:0.75rem; margin-bottom:4px; display:block; }
+  .item-dia{
+    font-size:0.65rem;
+    padding:2px 5px;
+    margin-bottom:3px;
+    background:var(--areia);
+    border-left:2px solid var(--marrom);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .item-dia.tipo-prazo{ border-left-color:var(--aviso); }
+  .item-dia.feito{ opacity:0.5; text-decoration:line-through; }
+  .mais-itens-dia{ font-size:0.62rem; color:var(--marrom); background:none; border:none; padding:0; text-decoration:underline; }
+  .botao-add-dia{
+    position:absolute; top:4px; right:4px;
+    display:none;
+    width:18px; height:18px;
+    align-items:center; justify-content:center;
+    background:var(--offwhite);
+    border:1px solid var(--linha-forte);
+    font-size:0.8rem;
+    line-height:1;
+  }
+  .celula-dia:hover .botao-add-dia{ display:flex; }
+
+  /* ===== Badges de prazo ===== */
+  .etiqueta-prazo{ font-size:0.65rem; padding:2px 7px; margin-left:6px; white-space:nowrap; }
+  .etiqueta-prazo.atrasado{ background:var(--erro-fundo); color:var(--erro); }
+  .etiqueta-prazo.perto{ background:var(--aviso-fundo); color:var(--aviso); }
+
+  /* ===== Checklist ===== */
+  .subabas-checklist{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; border-bottom:1px solid var(--linha); padding-bottom:12px; }
+  .subaba-botao{
+    padding:8px 14px;
+    background:none;
+    border:1px solid transparent;
+    font-size:0.75rem;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--texto-suave);
+  }
+  .subaba-botao.ativo{ border-color:var(--linha-forte); color:var(--texto); background:var(--offwhite); }
+
+  .barra-progresso-fundo{ height:6px; background:var(--linha); overflow:hidden; }
+  .barra-progresso-preenchimento{ height:100%; background:var(--marrom); transition:width 0.3s ease; }
+
+  .secao-checklist{ border:1px solid var(--linha); background:var(--offwhite); margin-bottom:10px; }
+  .cabecalho-secao-checklist{
+    display:flex; align-items:center; gap:12px;
+    padding:14px 16px;
+    cursor:pointer;
+  }
+  .cabecalho-secao-checklist .emoji{ font-size:1.1rem; }
+  .cabecalho-secao-checklist .info-secao{ flex:1; }
+  .cabecalho-secao-checklist .nome-secao{ font-size:0.9rem; }
+  .cabecalho-secao-checklist .resumo-secao{ font-size:0.75rem; color:var(--texto-suave); }
+  .cabecalho-secao-checklist .progresso-secao{ font-size:0.7rem; color:var(--marrom); min-width:60px; text-align:right; }
+  .corpo-secao-checklist{ padding:0 16px 16px; }
+  .porque-secao{ font-size:0.8rem; color:var(--texto-suave); margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--linha); }
+  .item-checklist{ display:flex; gap:10px; padding:10px 0; border-bottom:1px solid var(--linha); }
+  .item-checklist:last-child{ border-bottom:none; }
+  .item-checklist input[type="checkbox"]{ width:16px; height:16px; margin-top:2px; accent-color:var(--marrom); flex-shrink:0; }
+  .item-checklist .titulo-item{ font-size:0.85rem; }
+  .item-checklist .descricao-item{ font-size:0.78rem; color:var(--texto-suave); margin-top:3px; }
+  .item-checklist.marcado .titulo-item{ color:var(--texto-suave); text-decoration:line-through; }
+
+  .grade-referencias{ display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:16px; }
+  .card-referencia{ background:var(--offwhite); border:1px solid var(--linha); cursor:pointer; }
+  .card-referencia:hover{ border-color:var(--marrom); }
+  .capa-referencia{
+    aspect-ratio:9/16;
+    background:linear-gradient(150deg, var(--nude) 0%, var(--areia) 55%, var(--marrom) 100%);
+    display:flex; align-items:center; justify-content:center;
+    font-size:2rem;
+  }
+  .info-referencia{ padding:12px; }
+  .info-referencia .titulo-referencia{ font-size:0.82rem; margin-bottom:4px; }
+  .info-referencia .meta-referencia{ font-size:0.68rem; color:var(--texto-suave); }
+
+  .ficha-referencia b{ color:var(--marrom); font-weight:500; }
+  .bloco-roteiro{ border-left:2px solid var(--marrom); padding:8px 0 8px 12px; margin-bottom:8px; font-size:0.82rem; }
+  .bloco-roteiro .tempo-roteiro{ font-size:0.68rem; text-transform:uppercase; color:var(--texto-suave); display:block; margin-bottom:3px; }
+
+  .tipo-roteiro-item{ border:1px solid var(--linha); background:var(--offwhite); margin-bottom:10px; }
+  .tipo-roteiro-cabecalho{ display:flex; gap:12px; align-items:center; padding:14px 16px; cursor:pointer; }
+  .tipo-roteiro-corpo{ padding:0 16px 16px; }
+
+  .nicho-ideias-card{ background:var(--offwhite); border:1px solid var(--linha); padding:16px; margin-bottom:14px; }
+  .nicho-ideias-card h3{ font-size:0.9rem; margin-bottom:10px; }
+  .ideia-item{ padding:8px 0; border-bottom:1px solid var(--linha); font-size:0.82rem; }
+  .ideia-item:last-child{ border-bottom:none; }
+  .ideia-item .gancho-ideia{ color:var(--texto-suave); font-style:italic; margin-top:2px; }
+
+  #areaRevisaoTexto{ min-height:140px; margin-bottom:20px; }
+
+  .lista-simples{ list-style:none; margin:0; padding:0; }
+  .lista-simples li{ padding:8px 0; border-bottom:1px solid var(--linha); font-size:0.82rem; display:flex; justify-content:space-between; gap:10px; }
+  .lista-simples li:last-child{ border-bottom:none; }
+
+  .grade-duas-colunas{ display:grid; grid-template-columns:1.3fr 1fr; gap:20px; align-items:start; }
+  @media (max-width: 980px){ .grade-duas-colunas{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body class="carregando">
+
+<div id="telaCarregando">Verificando sessão...</div>
+
+<div id="app">
+
+  <button class="botao-hamburguer-admin" id="botaoMenuMobile" aria-label="Abrir menu" aria-expanded="false">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div class="fundo-drawer" id="fundoDrawer"></div>
+
+  <aside class="barra-lateral" id="barraLateral">
+    <div>
+      <div class="marca-painel">Ana Julia Macena</div>
+
+      <nav class="grupo-nav">
+        <div class="rotulo-grupo">Meu site</div>
+        <button class="item-nav" data-secao="portfolio">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="0"/><polygon points="10,7 16,10 10,13"/></svg>
+          Portfólio
+        </button>
+        <button class="item-nav" data-secao="marcas">
+          <svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><path d="M2 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14c2.6 0 6 1.5 6 6"/></svg>
+          Marcas
+        </button>
+      </nav>
+
+      <nav class="grupo-nav">
+        <div class="rotulo-grupo">Minha rotina</div>
+        <button class="item-nav" data-secao="calendario">
+          <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="0"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="7" y1="3" x2="7" y2="7"/><line x1="17" y1="3" x2="17" y2="7"/></svg>
+          Calendário
+        </button>
+        <button class="item-nav" data-secao="campanhas">
+          <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="0"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Campanhas
+        </button>
+        <button class="item-nav" data-secao="checklist">
+          <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="0"/><polyline points="8,12 11,15 16,9"/></svg>
+          Checklist
+        </button>
+      </nav>
+    </div>
+
+    <div class="rodape-lateral">
+      <span class="email" id="emailUsuario">...</span>
+      <button class="botao-sair" id="botaoSair">Sair</button>
+    </div>
+  </aside>
+
+  <main class="conteudo-admin">
+    <header class="cabecalho-admin">
+      <h1 id="tituloSecao">Portfólio</h1>
+    </header>
+
+    <!-- ===================== PORTFÓLIO ===================== -->
+    <section class="secao-admin" id="secaoPortfolio">
+      <div id="avisosPortfolio"></div>
+
+      <div class="faixa-stats" id="faixaStatsPortfolio"></div>
+
+      <div class="grade-duas-colunas" style="margin-bottom:24px;">
+        <div class="caixa">
+          <h3 style="font-size:0.85rem; text-transform:uppercase; margin-bottom:10px;">Visitas nos últimos 14 dias</h3>
+          <div id="areaGraficoVisitas"></div>
+        </div>
+        <div class="caixa">
+          <h3 style="font-size:0.85rem; text-transform:uppercase; margin-bottom:10px;">De onde vêm as visitas</h3>
+          <div id="areaOrigemVisitas"></div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+        <h3 style="font-size:0.85rem; text-transform:uppercase;">Meus vídeos</h3>
+        <button class="botao principal" id="botaoNovoVideo">+ Adicionar vídeo</button>
+      </div>
+      <div class="tabela-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:28px;"></th>
+              <th>Título</th>
+              <th>Nicho</th>
+              <th>Marca</th>
+              <th>Destaque</th>
+              <th style="width:150px;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="corpoTabelaVideos"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== MARCAS ===================== -->
+    <section class="secao-admin" id="secaoMarcas" hidden>
+      <div id="avisosMarcas"></div>
+
+      <div class="barra-ferramentas">
+        <input type="text" id="buscaMarcas" placeholder="Buscar por nome, @ ou e-mail">
+        <div class="filtros-pilula" id="filtrosSituacao">
+          <button class="filtro-pilula-botao ativo" data-situacao="todas">Todas</button>
+          <button class="filtro-pilula-botao" data-situacao="lead">Lead</button>
+          <button class="filtro-pilula-botao" data-situacao="conversando">Conversando</button>
+          <button class="filtro-pilula-botao" data-situacao="cliente">Cliente</button>
+          <button class="filtro-pilula-botao" data-situacao="parada">Parada</button>
+        </div>
+        <div class="espacador"></div>
+        <button class="botao contorno-suave" id="botaoExportarMarcas">Baixar CSV</button>
+        <button class="botao principal" id="botaoNovaMarca">+ Adicionar marca</button>
+      </div>
+      <div class="tabela-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Marca</th>
+              <th>Instagram</th>
+              <th>E-mail</th>
+              <th>Telefone</th>
+              <th>Situação</th>
+              <th>Último contato</th>
+              <th style="width:90px;">Contato</th>
+            </tr>
+          </thead>
+          <tbody id="corpoTabelaMarcas"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== CALENDÁRIO ===================== -->
+    <section class="secao-admin" id="secaoCalendario" hidden>
+      <div id="avisosCalendario"></div>
+
+      <div class="barra-calendario">
+        <button class="botao-icone" id="botaoMesAnterior" aria-label="Mês anterior">
+          <svg viewBox="0 0 24 24"><polyline points="15,4 7,12 15,20"/></svg>
+        </button>
+        <span class="mes-atual" id="rotuloMesAtual"></span>
+        <button class="botao-icone" id="botaoProximoMes" aria-label="Próximo mês">
+          <svg viewBox="0 0 24 24"><polyline points="9,4 17,12 9,20"/></svg>
+        </button>
+        <button class="botao pequeno contorno-suave" id="botaoEsteMes">Este mês</button>
+        <div class="espacador"></div>
+        <div class="filtros-pilula" id="filtrosTipoCalendario">
+          <button class="filtro-pilula-botao ativo" data-tipo="todos">Todos</button>
+          <button class="filtro-pilula-botao" data-tipo="gravar">Gravar</button>
+          <button class="filtro-pilula-botao" data-tipo="editar">Editar</button>
+          <button class="filtro-pilula-botao" data-tipo="postar">Postar</button>
+        </div>
+      </div>
+
+      <div class="grade-calendario" id="gradeCalendario"></div>
+
+      <h3 style="font-size:0.85rem; text-transform:uppercase; margin:26px 0 12px;">Ficou pra trás</h3>
+      <div id="areaAtrasados"></div>
+    </section>
+
+    <!-- ===================== CAMPANHAS ===================== -->
+    <section class="secao-admin" id="secaoCampanhas" hidden>
+      <div id="avisosCampanhas"></div>
+
+      <div class="faixa-stats" id="faixaStatsCampanhas"></div>
+
+      <div class="barra-ferramentas">
+        <div class="filtros-pilula" id="filtrosCampanhas">
+          <button class="filtro-pilula-botao ativo" data-filtro="todas">Todas</button>
+          <button class="filtro-pilula-botao" data-filtro="ativas">Ativas</button>
+          <button class="filtro-pilula-botao" data-filtro="finalizadas">Finalizadas</button>
+        </div>
+        <input type="text" id="buscaCampanhas" placeholder="Buscar campanha ou cliente">
+        <div class="espacador"></div>
+        <button class="botao contorno-suave" id="botaoExportarCampanhas">Baixar CSV</button>
+        <button class="botao principal" id="botaoNovaCampanha">+ Adicionar campanha</button>
+      </div>
+
+      <div class="tabela-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:26px;"></th>
+              <th class="ordenavel" data-coluna="campanha">Campanha<span class="seta">▲</span></th>
+              <th class="ordenavel" data-coluna="cliente">Cliente<span class="seta">▲</span></th>
+              <th class="ordenavel" data-coluna="tipo">Tipo<span class="seta">▲</span></th>
+              <th class="ordenavel" data-coluna="status">Status<span class="seta">▲</span></th>
+              <th class="ordenavel" data-coluna="qtd">Qtd<span class="seta">▲</span></th>
+              <th class="ordenavel" data-coluna="valor">Valor<span class="seta">▲</span></th>
+              <th class="ordenavel" data-coluna="prazo">Prazo<span class="seta">▲</span></th>
+              <th class="ordenavel" data-coluna="pagamento">Pagamento<span class="seta">▲</span></th>
+            </tr>
+          </thead>
+          <tbody id="corpoTabelaCampanhas"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== CHECKLIST ===================== -->
+    <section class="secao-admin" id="secaoChecklist" hidden>
+      <div id="avisosChecklist"></div>
+
+      <div class="subabas-checklist">
+        <button class="subaba-botao ativo" data-subaba="checklist">Checklist do portfólio</button>
+        <button class="subaba-botao" data-subaba="referencias">Referências de vídeo</button>
+        <button class="subaba-botao" data-subaba="roteiros">Roteiros</button>
+        <button class="subaba-botao" data-subaba="ideias">Ideias por nicho</button>
+        <button class="subaba-botao" data-subaba="revisar">Revisar meu roteiro</button>
+      </div>
+
+      <div id="subabaChecklist">
+        <div style="margin-bottom:18px;">
+          <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--texto-suave); margin-bottom:6px;">
+            <span>Progresso geral</span>
+            <span id="rotuloProgressoGeral">0%</span>
+          </div>
+          <div class="barra-progresso-fundo"><div class="barra-progresso-preenchimento" id="barraProgressoGeral" style="width:0%"></div></div>
+        </div>
+        <div id="listaSecoesChecklist"></div>
+      </div>
+
+      <div id="subabaReferencias" hidden>
+        <div class="grade-referencias" id="grideReferencias"></div>
+      </div>
+
+      <div id="subabaRoteiros" hidden>
+        <div id="listaTipos"></div>
+      </div>
+
+      <div id="subabaIdeias" hidden>
+        <div id="listaNichos"></div>
+      </div>
+
+      <div id="subabaRevisar" hidden>
+        <label for="areaRevisaoTexto">Cole aqui o roteiro que você escreveu</label>
+        <textarea id="areaRevisaoTexto" placeholder="Cole o texto do seu roteiro aqui, só pra te ajudar a reler com calma."></textarea>
+        <div id="listaRevisao"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===================== MODAL: VÍDEO ===================== -->
+<div class="fundo-modal" id="modalVideo" hidden>
+  <div class="caixa-modal">
+    <div class="cabecalho-modal">
+      <h2 id="tituloModalVideo">Adicionar vídeo</h2>
+      <button class="fechar-modal" data-fechar="modalVideo">×</button>
+    </div>
+    <form id="formVideo">
+      <input type="hidden" id="videoId">
+      <div class="campo">
+        <label for="videoTitulo">Título</label>
+        <input type="text" id="videoTitulo" required>
+      </div>
+      <div class="campo">
+        <label for="videoLink">Link do vídeo</label>
+        <input type="url" id="videoLink" required placeholder="https://youtube.com/shorts/...">
+      </div>
+      <div class="linha-campos">
+        <div class="campo">
+          <label for="videoNicho">Nicho</label>
+          <input type="text" id="videoNicho" required placeholder="beleza, viagem, marcas...">
+        </div>
+        <div class="campo">
+          <label for="videoFormato">Formato</label>
+          <input type="text" id="videoFormato" placeholder="Vídeo vertical 9:16">
+        </div>
+      </div>
+      <div class="linha-campos">
+        <div class="campo">
+          <label for="videoMarca">Marca (se for)</label>
+          <input type="text" id="videoMarca">
+        </div>
+        <div class="campo">
+          <label for="videoDestaque">Destaque (ex: 2,4M views)</label>
+          <input type="text" id="videoDestaque">
+        </div>
+      </div>
+      <div class="campo">
+        <label style="display:flex; align-items:center; gap:8px; text-transform:none; letter-spacing:0;">
+          <input type="checkbox" id="videoVisivel" checked style="width:16px; height:16px;">
+          Visível no site
+        </label>
+      </div>
+      <div class="rodape-modal">
+        <button type="button" class="botao" data-fechar="modalVideo">Cancelar</button>
+        <button type="submit" class="botao principal">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== MODAL: MARCA ===================== -->
+<div class="fundo-modal" id="modalMarca" hidden>
+  <div class="caixa-modal">
+    <div class="cabecalho-modal">
+      <h2 id="tituloModalMarca">Adicionar marca</h2>
+      <button class="fechar-modal" data-fechar="modalMarca">×</button>
+    </div>
+    <form id="formMarca">
+      <input type="hidden" id="marcaId">
+      <div class="campo">
+        <label for="marcaNome">Nome da marca</label>
+        <input type="text" id="marcaNome" required>
+      </div>
+      <div class="linha-campos">
+        <div class="campo">
+          <label for="marcaInstagram">Instagram</label>
+          <input type="text" id="marcaInstagram" placeholder="@marca">
+        </div>
+        <div class="campo">
+          <label for="marcaTelefone">Telefone</label>
+          <input type="tel" id="marcaTelefone" placeholder="(00) 00000-0000">
+        </div>
+      </div>
+      <div class="campo">
+        <label for="marcaEmail">E-mail</label>
+        <input type="email" id="marcaEmail">
+      </div>
+      <div class="linha-campos">
+        <div class="campo">
+          <label for="marcaSituacao">Situação</label>
+          <select id="marcaSituacao">
+            <option value="lead">Lead</option>
+            <option value="conversando">Conversando</option>
+            <option value="cliente">Cliente</option>
+            <option value="parada">Parada</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="marcaUltimoContato">Último contato</label>
+          <input type="date" id="marcaUltimoContato">
+        </div>
+      </div>
+      <div class="campo">
+        <label for="marcaObs">Observação</label>
+        <textarea id="marcaObs" rows="3"></textarea>
+      </div>
+      <div class="rodape-modal">
+        <button type="button" class="botao erro-excluir" id="botaoExcluirMarca" style="margin-right:auto; border-color:var(--erro); color:var(--erro);" hidden>Apagar</button>
+        <button type="button" class="botao" data-fechar="modalMarca">Cancelar</button>
+        <button type="submit" class="botao principal">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== MODAL: CALENDÁRIO ===================== -->
+<div class="fundo-modal" id="modalCalendario" hidden>
+  <div class="caixa-modal">
+    <div class="cabecalho-modal">
+      <h2 id="tituloModalCalendario">Adicionar na agenda</h2>
+      <button class="fechar-modal" data-fechar="modalCalendario">×</button>
+    </div>
+    <form id="formCalendario">
+      <input type="hidden" id="calendarioId">
+      <div class="campo">
+        <label for="calendarioTitulo">Título</label>
+        <input type="text" id="calendarioTitulo" required>
+      </div>
+      <div class="linha-campos">
+        <div class="campo">
+          <label for="calendarioMarca">Marca (se for)</label>
+          <input type="text" id="calendarioMarca">
+        </div>
+        <div class="campo">
+          <label for="calendarioTipo">Tipo</label>
+          <select id="calendarioTipo">
+            <option value="gravar">Gravar</option>
+            <option value="editar">Editar</option>
+            <option value="postar">Postar</option>
+          </select>
+        </div>
+      </div>
+      <div class="linha-campos">
+        <div class="campo">
+          <label for="calendarioData">Data</label>
+          <input type="date" id="calendarioData" required>
+        </div>
+        <div class="campo">
+          <label for="calendarioStatus">Status</label>
+          <select id="calendarioStatus">
+            <option value="a fazer">A fazer</option>
+            <option value="feito">Feito</option>
+          </select>
+        </div>
+      </div>
+      <div class="rodape-modal">
+        <button type="button" class="botao" id="botaoExcluirCalendario" style="margin-right:auto; border-color:var(--erro); color:var(--erro);" hidden>Apagar</button>
+        <button type="button" class="botao" data-fechar="modalCalendario">Cancelar</button>
+        <button type="submit" class="botao principal">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== MODAL: DIA (mais itens) ===================== -->
+<div class="fundo-modal" id="modalDia" hidden>
+  <div class="caixa-modal">
+    <div class="cabecalho-modal">
+      <h2 id="tituloModalDia">Dia</h2>
+      <button class="fechar-modal" data-fechar="modalDia">×</button>
+    </div>
+    <div id="listaModalDia"></div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: CAMPANHA ===================== -->
+<div class="fundo-modal" id="modalCampanha" hidden>
+  <div class="caixa-modal">
+    <div class="cabecalho-modal">
+      <h2 id="tituloModalCampanha">Adicionar campanha</h2>
+      <button class="fechar-modal" data-fechar="modalCampanha">×</button>
+    </div>
+    <form id="formCampanha">
+      <input type="hidden" id="campanhaId">
+      <div class="campo">
+        <label for="campanhaNome">Campanha</label>
+        <input type="text" id="campanhaNome" required>
+      </div>
+      <div class="campo">
+        <label for="campanhaCliente">Cliente</label>
+        <input type="text" id="campanhaCliente" required>
+      </div>
+      <div class="linha-campos">
+        <div class="campo">
+          <label for="campanhaTipo">Tipo</label>
+          <select id="campanhaTipo">
+            <option value="Conteúdo">Conteúdo</option>
+            <option value="Publicidade">Publicidade</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="campanhaStatus">Status</label>
+          <select id="campanhaStatus">
+            <option>Briefing</option>
+            <option>Roteiro</option>
+            <option>Aprovação Roteiro</option>
+            <option>Gravação</option>
+            <option>Edição</option>
+            <option>Aprovado</option>
+            <option>Entregue</option>
+          </select>
+        </div>
+      </div>
+      <div class="linha-campos">
+        <div class="campo">
+          <label for="campanhaQtd">Quantidade de vídeos</label>
+          <input type="number" id="campanhaQtd" min="1" value="1">
+        </div>
+        <div class="campo">
+          <label for="campanhaValor">Valor total (R$)</label>
+          <input type="number" id="campanhaValor" min="0" step="0.01" value="0">
+        </div>
+      </div>
+      <div class="linha-campos">
+        <div class="campo">
+          <label for="campanhaPrazo">Prazo</label>
+          <input type="date" id="campanhaPrazo">
+        </div>
+        <div class="campo">
+          <label for="campanhaPagamento">Pagamento</label>
+          <select id="campanhaPagamento">
+            <option value="pendente">Pendente</option>
+            <option value="pago">Pago</option>
+          </select>
+        </div>
+      </div>
+      <div class="campo">
+        <label style="display:flex; align-items:center; gap:8px; text-transform:none; letter-spacing:0;">
+          <input type="checkbox" id="campanhaAtiva" checked style="width:16px; height:16px;">
+          Campanha ativa
+        </label>
+      </div>
+      <div class="rodape-modal">
+        <button type="button" class="botao" id="botaoExcluirCampanha" style="margin-right:auto; border-color:var(--erro); color:var(--erro);" hidden>Apagar</button>
+        <button type="button" class="botao" data-fechar="modalCampanha">Cancelar</button>
+        <button type="submit" class="botao principal">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== MODAL: FICHA DE REFERÊNCIA ===================== -->
+<div class="fundo-modal" id="modalReferencia" hidden>
+  <div class="caixa-modal" style="max-width:560px;">
+    <div class="cabecalho-modal">
+      <h2 id="tituloModalReferencia">Referência</h2>
+      <button class="fechar-modal" data-fechar="modalReferencia">×</button>
+    </div>
+    <div class="ficha-referencia" id="corpoModalReferencia"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/banco.js"></script>
+<script src="../js/biblioteca.js"></script>
+<script src="../js/admin-nucleo.js"></script>
+<script src="../js/admin-portfolio.js"></script>
+<script src="../js/admin-marcas.js"></script>
+<script src="../js/admin-calendario.js"></script>
+<script src="../js/admin-campanhas.js"></script>
+<script src="../js/admin-checklist.js"></script>
+</body>
+</html>

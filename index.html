@@ -518,6 +518,14 @@
     border-color:var(--marrom);
   }
   .card-trabalho.escondido{ display:none; }
+  .texto-vazio-trabalhos{
+    grid-column:1/-1;
+    text-align:center;
+    padding:48px 20px;
+    color:var(--texto-suave);
+    font-size:0.95rem;
+    border:1px dashed var(--linha-forte);
+  }
   .card-trabalho .midia-placeholder{ aspect-ratio:4/5; }
   .card-trabalho-info{ padding:18px 20px; }
   .card-trabalho-info .tag-nicho{
@@ -1006,11 +1014,35 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/banco.js"></script>
 <script>
 (function(){
   "use strict";
 
   var prefereReduzirMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function escaparHtml(valor){
+    if(valor === null || valor === undefined) return '';
+    return String(valor).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  // Registro simples de visita, só pra alimentar os números do
+  // painel. Não pede nada ao visitante e não usa serviço externo.
+  (function registrarVisita(){
+    if(!window.banco) return;
+    var origem = 'direto';
+    if(document.referrer){
+      try{ origem = new URL(document.referrer).hostname.replace(/^www\./, ''); }
+      catch(erro){ origem = 'direto'; }
+    }
+    window.banco.from('visitas').insert({
+      pagina: window.location.pathname || '/',
+      origem: origem
+    }).then(function(){}, function(){});
+  })();
 
   /* =====================================================
      DADOS DO PORTFÓLIO
@@ -1029,6 +1061,9 @@
   // Conteúdos de destaque: os 3 vídeos em formato vertical
   // Para trocar o VÍDEO: mude o campo "link" para a URL real (reels, tiktok, drive etc)
   // Para trocar a CAPA: troque a div com classe midia-placeholder por uma <img> ou <video poster="...">
+  // Estes 3 cards continuam editados aqui no código (não vêm do painel),
+  // porque têm campos próprios (número, rótulo, contexto) que a tabela
+  // "videos" do banco não tem.
   var destaques = [
     {
       titulo: "Rotina de skincare noturna",
@@ -1054,37 +1089,11 @@
   ];
 
   // Trabalhos por nicho (galeria com filtro)
-  // Para trocar o VÍDEO de um card: mude o campo "link" para a URL real
-  // Para trocar a CAPA: troque a div com classe midia-placeholder por uma <img> ou <video poster="...">
-  var trabalhos = [
-    { titulo: "Rotina de make no dia a dia", nicho: "beleza", formato: "Vídeo vertical 9:16", link: "#" }, // SUBSTITUA pelo link do vídeo
-    { titulo: "Resenha de batom", nicho: "beleza", formato: "Foto still 4:5", link: "#" }, // SUBSTITUA pelo link do vídeo
-    { titulo: "Rotina de skincare noturna", nicho: "skincare", formato: "Vídeo vertical 9:16", link: "#" }, // SUBSTITUA pelo link do vídeo
-    { titulo: "Antes e depois com sérum", nicho: "skincare", formato: "Foto still 4:5", link: "#" }, // SUBSTITUA pelo link do vídeo
-    { titulo: "Look do dia", nicho: "moda", formato: "Foto still 4:5", link: "#" }, // SUBSTITUA pelo link do vídeo
-    { titulo: "Try on de acessórios", nicho: "moda", formato: "Vídeo vertical 9:16", link: "#" }, // SUBSTITUA pelo link do vídeo
-    { titulo: "Treino em casa com peso corporal", nicho: "fitness", formato: "Vídeo vertical 9:16", link: "#" }, // SUBSTITUA pelo link do vídeo
-    { titulo: "Look fitness para academia", nicho: "fitness", formato: "Foto still 4:5", link: "#" }, // SUBSTITUA pelo link do vídeo
-    { titulo: "Valência", nicho: "viagem", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/wMn6O12js9I?feature=share" },
-    { titulo: "Córdoba", nicho: "viagem", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/GtXovgaC9F8?feature=share" },
-    { titulo: "Sevilha", nicho: "viagem", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/OPtVSOvBZNI" },
-    { titulo: "Itália", nicho: "viagem", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/wBNowcZuBQY?feature=share" },
-    { titulo: "Turquia", nicho: "viagem", formato: "Vídeo vertical 9:16", link: "#" }, // SUBSTITUA pelo link do vídeo
-    { titulo: "Color WoW", nicho: "marcas", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/0s6vv8fqXT0?feature=share" },
-    { titulo: "Bohems Coffee - Turquia", nicho: "marcas", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/vgkxZ5Mznds?feature=share" },
-    { titulo: "My sht - Barcelona", nicho: "marcas", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/FQgOZoKCaa8?feature=share" },
-    { titulo: "Cloud Tattoo - Barcelona", nicho: "marcas", formato: "Vídeo vertical 9:16", link: "#" } // SUBSTITUA pelo link do vídeo
-  ];
-
-  var nichos = [
-    { valor: "todos", rotulo: "Todos" },
-    { valor: "beleza", rotulo: "Beleza" },
-    { valor: "skincare", rotulo: "Skincare" },
-    { valor: "moda", rotulo: "Moda" },
-    { valor: "fitness", rotulo: "Fitness" },
-    { valor: "viagem", rotulo: "Viagem: entre destinos" },
-    { valor: "marcas", rotulo: "Trabalhos com marcas" }
-  ];
+  // Esta lista NÃO fica mais fixa aqui no código: ela vem direto da
+  // tabela "videos" no banco de dados. Para adicionar, editar, apagar
+  // ou reordenar um vídeo, use o painel em /admin, aba "Portfólio".
+  // Os filtros (as categorias) são montados sozinhos a partir dos
+  // nichos que existirem nos vídeos visíveis.
 
   // Seis serviços oferecidos
   var servicos = [
@@ -1169,38 +1178,71 @@
     grideDestaques.appendChild(card);
   });
 
-  // Filtros de nicho
+  // Filtros de nicho e galeria de trabalhos: vêm do banco de dados
   var filtrosEl = document.getElementById('filtros');
-  nichos.forEach(function(n, indice){
-    var botao = criarElemento('button', 'filtro-botao' + (indice === 0 ? ' ativo' : ''), n.rotulo);
-    botao.type = 'button';
-    botao.setAttribute('data-filtro', n.valor);
-    botao.setAttribute('aria-pressed', indice === 0 ? 'true' : 'false');
-    filtrosEl.appendChild(botao);
-  });
-
-  // Galeria de trabalhos
   var grideTrabalhos = document.getElementById('grideTrabalhos');
-  trabalhos.forEach(function(t){
-    var card = criarElemento('a', 'card-trabalho reveal');
-    card.href = t.link;
-    if(t.link && t.link !== '#'){
-      card.target = '_blank';
-      card.rel = 'noopener noreferrer';
+
+  async function carregarTrabalhosDoBanco(){
+    var videos = [];
+    try{
+      if(window.banco){
+        var resposta = await window.banco.from('videos').select('*').eq('visivel', true).order('ordem', { ascending: true });
+        if(!resposta.error) videos = resposta.data || [];
+      }
+    } catch(erro){ /* segue com a lista vazia, tratado logo abaixo */ }
+
+    if(videos.length === 0){
+      filtrosEl.innerHTML = '';
+      grideTrabalhos.innerHTML = '<p class="texto-vazio-trabalhos">Em breve, novos trabalhos por aqui.</p>';
+      return;
     }
-    card.setAttribute('data-nicho', t.nicho);
-    card.setAttribute('aria-label', t.titulo);
-    card.innerHTML =
-      '<div class="midia-placeholder" role="img" aria-label="' + t.titulo + '">' +
-        '<span class="legenda-formato">' + t.formato + '</span>' +
-        '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' +
-      '</div>' +
-      '<div class="card-trabalho-info">' +
-        '<span class="tag-nicho">' + t.nicho + '</span>' +
-        '<h3>' + t.titulo + '</h3>' +
-      '</div>';
-    grideTrabalhos.appendChild(card);
-  });
+
+    var nichosVistos = [];
+    videos.forEach(function(v){
+      if(v.nicho && nichosVistos.indexOf(v.nicho) === -1) nichosVistos.push(v.nicho);
+    });
+
+    filtrosEl.innerHTML = '';
+    var botaoTodos = criarElemento('button', 'filtro-botao ativo', 'Todos');
+    botaoTodos.type = 'button';
+    botaoTodos.setAttribute('data-filtro', 'todos');
+    botaoTodos.setAttribute('aria-pressed', 'true');
+    filtrosEl.appendChild(botaoTodos);
+    nichosVistos.forEach(function(nicho){
+      var botao = criarElemento('button', 'filtro-botao', escaparHtml(nicho));
+      botao.type = 'button';
+      botao.setAttribute('data-filtro', nicho);
+      botao.setAttribute('aria-pressed', 'false');
+      filtrosEl.appendChild(botao);
+    });
+
+    grideTrabalhos.innerHTML = '';
+    videos.forEach(function(v){
+      var card = criarElemento('a', 'card-trabalho visivel');
+      card.href = v.link || '#';
+      if(v.link && v.link !== '#'){
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
+      }
+      card.setAttribute('data-nicho', v.nicho || '');
+      card.setAttribute('aria-label', v.titulo);
+      var legendaNicho = escaparHtml(v.nicho || '');
+      if(v.marca) legendaNicho += ' · ' + escaparHtml(v.marca);
+      if(v.destaque) legendaNicho += ' · ' + escaparHtml(v.destaque);
+      card.innerHTML =
+        '<div class="midia-placeholder" role="img" aria-label="' + escaparHtml(v.titulo) + '">' +
+          '<span class="legenda-formato">' + escaparHtml(v.formato || 'Vídeo vertical 9:16') + '</span>' +
+          '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' +
+        '</div>' +
+        '<div class="card-trabalho-info">' +
+          '<span class="tag-nicho">' + legendaNicho + '</span>' +
+          '<h3>' + escaparHtml(v.titulo) + '</h3>' +
+        '</div>';
+      grideTrabalhos.appendChild(card);
+    });
+  }
+
+  carregarTrabalhosDoBanco();
 
   filtrosEl.addEventListener('click', function(evento){
     var botao = evento.target.closest('.filtro-botao');
@@ -1359,6 +1401,19 @@
       formContato.reportValidity();
       return;
     }
+
+    // Manda o contato pra tabela "marcas" do painel, já como "lead".
+    // Mesmo se o banco estiver fora do ar, mostramos a confirmação
+    // pra visitante não ficar com a sensação de que deu erro.
+    if(window.banco){
+      window.banco.from('marcas').insert({
+        nome: document.getElementById('nomeContato').value.trim(),
+        email: document.getElementById('emailContato').value.trim(),
+        obs: document.getElementById('mensagemContato').value.trim(),
+        situacao: 'lead'
+      }).then(function(){}, function(){});
+    }
+
     formContato.hidden = true;
     confirmacaoEnvio.hidden = false;
     confirmacaoEnvio.focus();

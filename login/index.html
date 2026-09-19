@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar | Painel Ana Julia Macena</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --areia:#efe9e1;
+    --offwhite:#fdfcfa;
+    --marrom:#a3876b;
+    --texto:#3a332c;
+    --texto-suave:#6b6058;
+    --linha: rgba(58,51,44,0.18);
+    --linha-forte: rgba(58,51,44,0.32);
+    --erro:#a3372b;
+    --erro-fundo:#f6e7e5;
+    --ok:#3f6b4f;
+    --ok-fundo:#e9f0eb;
+  }
+  *,*::before,*::after{ box-sizing:border-box; }
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--areia);
+    color:var(--texto);
+    font-family:'Jost', sans-serif;
+    font-weight:300;
+    padding:24px;
+  }
+  h1{
+    font-family:'Tenor Sans', serif;
+    font-weight:400;
+    letter-spacing:0.04em;
+    font-size:1.4rem;
+    margin:0 0 6px;
+    text-transform:uppercase;
+  }
+  .subtitulo{
+    font-size:0.85rem;
+    color:var(--texto-suave);
+    margin-bottom:32px;
+  }
+  .cartao{
+    width:100%;
+    max-width:380px;
+    background:var(--offwhite);
+    border:1px solid var(--linha);
+    padding:40px 36px;
+  }
+  .campo{
+    margin-bottom:20px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .campo label{
+    font-size:0.7rem;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--texto-suave);
+  }
+  .campo input{
+    background:var(--offwhite);
+    border:1px solid var(--linha-forte);
+    padding:13px 14px;
+    font-family:'Jost', sans-serif;
+    font-size:0.95rem;
+    color:var(--texto);
+  }
+  .campo input:focus-visible{ outline:2px solid var(--marrom); outline-offset:2px; }
+  button{ font-family:inherit; cursor:pointer; }
+  .botao-entrar{
+    width:100%;
+    padding:14px;
+    background:var(--texto);
+    color:var(--offwhite);
+    border:1px solid var(--texto);
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    font-size:0.8rem;
+    margin-top:8px;
+    transition:background 0.3s ease, color 0.3s ease;
+  }
+  .botao-entrar:hover, .botao-entrar:focus-visible{
+    background:transparent;
+    color:var(--texto);
+  }
+  .botao-entrar:disabled{ opacity:0.6; cursor:default; }
+  .link-esqueci{
+    display:inline-block;
+    margin-top:18px;
+    font-size:0.78rem;
+    color:var(--texto-suave);
+    text-decoration:underline;
+    background:none;
+    border:none;
+    padding:0;
+  }
+  .link-esqueci:hover, .link-esqueci:focus-visible{ color:var(--marrom); }
+  .faixa{
+    padding:12px 14px;
+    font-size:0.82rem;
+    margin-bottom:20px;
+    border:1px solid transparent;
+  }
+  .faixa.erro{ background:var(--erro-fundo); color:var(--erro); border-color:var(--erro); }
+  .faixa.ok{ background:var(--ok-fundo); color:var(--ok); border-color:var(--ok); }
+  [hidden]{ display:none !important; }
+  :focus-visible{ outline:2px solid var(--marrom); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<div class="cartao">
+  <h1>Ana Julia Macena</h1>
+  <p class="subtitulo">Entrar no painel</p>
+
+  <div id="faixaMensagem" class="faixa" role="alert" hidden></div>
+
+  <form id="formLogin">
+    <div class="campo">
+      <label for="email">E-mail</label>
+      <input type="email" id="email" name="email" required autocomplete="username">
+    </div>
+    <div class="campo">
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" name="senha" required autocomplete="current-password">
+    </div>
+    <button type="submit" class="botao-entrar" id="botaoEntrar">Entrar</button>
+  </form>
+
+  <button type="button" class="link-esqueci" id="botaoEsqueci">Esqueci minha senha</button>
+
+  <form id="formNovaSenha" hidden>
+    <div class="campo">
+      <label for="novaSenha">Digite sua nova senha</label>
+      <input type="password" id="novaSenha" name="novaSenha" required autocomplete="new-password" minlength="6">
+    </div>
+    <button type="submit" class="botao-entrar">Salvar nova senha</button>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/banco.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var faixa = document.getElementById('faixaMensagem');
+  var formLogin = document.getElementById('formLogin');
+  var formNovaSenha = document.getElementById('formNovaSenha');
+  var botaoEsqueci = document.getElementById('botaoEsqueci');
+  var botaoEntrar = document.getElementById('botaoEntrar');
+
+  function mostrarFaixa(texto, tipo) {
+    faixa.textContent = texto;
+    faixa.className = 'faixa ' + tipo;
+    faixa.hidden = false;
+  }
+
+  function estaNaTelaDeRecuperacao() {
+    return window.location.hash.indexOf('type=recovery') !== -1;
+  }
+
+  // Se o Supabase não carregou (CDN fora do ar, por exemplo),
+  // avisamos em português em vez de deixar a tela travada em silêncio.
+  if (!window.banco) {
+    mostrarFaixa('Não consegui carregar o sistema de login agora. Tente recarregar a página em alguns instantes.', 'erro');
+    formLogin.querySelectorAll('input, button').forEach(function (el) { el.disabled = true; });
+  } else {
+
+    // Se a pessoa clicou no link de "esqueci minha senha" que chegou
+    // por e-mail, a URL vem com "type=recovery": mostramos o campo
+    // de nova senha em vez do formulário de login.
+    if (estaNaTelaDeRecuperacao()) {
+      formLogin.hidden = true;
+      botaoEsqueci.hidden = true;
+      formNovaSenha.hidden = false;
+    } else {
+      // Se já existe uma sessão aberta, manda direto pro admin.
+      window.banco.auth.getSession().then(function (resposta) {
+        if (resposta.data && resposta.data.session) {
+          window.location.href = '../admin/';
+        }
+      });
+    }
+
+    formLogin.addEventListener('submit', function (evento) {
+      evento.preventDefault();
+      faixa.hidden = true;
+      botaoEntrar.disabled = true;
+      botaoEntrar.textContent = 'Entrando...';
+
+      var email = document.getElementById('email').value.trim();
+      var senha = document.getElementById('senha').value;
+
+      window.banco.auth.signInWithPassword({ email: email, password: senha }).then(function (resposta) {
+        botaoEntrar.disabled = false;
+        botaoEntrar.textContent = 'Entrar';
+        if (resposta.error) {
+          mostrarFaixa('E-mail ou senha incorretos.', 'erro');
+          return;
+        }
+        window.location.href = '../admin/';
+      });
+    });
+
+    botaoEsqueci.addEventListener('click', function () {
+      var email = document.getElementById('email').value.trim();
+      if (!email) {
+        mostrarFaixa('Digite seu e-mail no campo acima primeiro, depois clique em "Esqueci minha senha".', 'erro');
+        return;
+      }
+      var urlDeVolta = window.location.origin + window.location.pathname;
+      window.banco.auth.resetPasswordForEmail(email, { redirectTo: urlDeVolta }).then(function (resposta) {
+        if (resposta.error) {
+          mostrarFaixa('Não consegui enviar o e-mail agora. Tente de novo em instantes.', 'erro');
+          return;
+        }
+        mostrarFaixa('Se esse e-mail existir na nossa base, chega uma mensagem com o link pra trocar a senha.', 'ok');
+      });
+    });
+
+    formNovaSenha.addEventListener('submit', function (evento) {
+      evento.preventDefault();
+      var novaSenha = document.getElementById('novaSenha').value;
+      window.banco.auth.updateUser({ password: novaSenha }).then(function (resposta) {
+        if (resposta.error) {
+          mostrarFaixa('Não consegui salvar a nova senha. Peça o link de recuperação de novo.', 'erro');
+          return;
+        }
+        window.location.href = '../admin/';
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>

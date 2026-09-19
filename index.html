@@ -806,6 +806,58 @@
   }
   .modal-confirmacao.mostrar{ display:block; }
   .modal-caixa form.escondido{ display:none; }
+
+  /* ===== JANELA DE VÍDEO (assiste sem sair do site) ===== */
+  .lightbox-video{
+    position:fixed;
+    inset:0;
+    background:rgba(20,17,14,0.9);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    z-index:950;
+  }
+  .lightbox-video[hidden]{ display:none; }
+  .lightbox-video-caixa{
+    position:relative;
+    width:100%;
+    max-width:380px;
+  }
+  .lightbox-video-fechar{
+    position:absolute;
+    top:-42px;
+    right:0;
+    background:none;
+    border:1px solid var(--offwhite);
+    color:var(--offwhite);
+    width:34px;
+    height:34px;
+    font-size:1.2rem;
+    line-height:1;
+  }
+  .lightbox-video-fechar:hover, .lightbox-video-fechar:focus-visible{
+    background:var(--offwhite);
+    color:var(--texto);
+  }
+  .lightbox-video-tela{
+    width:100%;
+    aspect-ratio:9/16;
+    background:#000;
+  }
+  .lightbox-video-tela iframe{
+    width:100%;
+    height:100%;
+    border:0;
+    display:block;
+  }
+  .lightbox-video-aviso{
+    color:var(--offwhite);
+    text-align:center;
+    padding:32px 16px;
+    font-size:0.9rem;
+  }
+  .lightbox-video-aviso a{ text-decoration:underline; }
 </style>
 </head>
 <body>
@@ -993,6 +1045,14 @@
   </div>
 </footer>
 
+<!-- JANELA DE VÍDEO: assiste sem sair do site -->
+<div class="lightbox-video" id="lightboxVideo" hidden>
+  <div class="lightbox-video-caixa" role="dialog" aria-modal="true" aria-label="Vídeo">
+    <button class="lightbox-video-fechar" id="fecharLightboxVideo" aria-label="Fechar vídeo">×</button>
+    <div class="lightbox-video-tela" id="telaLightboxVideo"></div>
+  </div>
+</div>
+
 <!-- CARD DE CAPTURA DE MÍDIA KIT -->
 <div class="modal-overlay" id="modalCaptura" hidden>
   <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="tituloModal">
@@ -1027,6 +1087,71 @@
     return String(valor).replace(/[&<>"']/g, function(c){
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
     });
+  }
+
+  /* =====================================================
+     JANELA DE VÍDEO: assiste sem sair do site
+     Em vez de abrir o YouTube em outra aba, os vídeos tocam
+     numa janela por cima do próprio portfólio.
+  ===================================================== */
+  function extrairIdYouTube(link){
+    if(!link) return null;
+    try{
+      var url = new URL(link, window.location.href);
+      var host = url.hostname.replace(/^www\./, '');
+      if(host === 'youtu.be'){
+        return url.pathname.split('/').filter(Boolean)[0] || null;
+      }
+      if(host.indexOf('youtube.com') !== -1){
+        var partes = url.pathname.split('/').filter(Boolean);
+        var indiceShorts = partes.indexOf('shorts');
+        if(indiceShorts !== -1 && partes[indiceShorts + 1]) return partes[indiceShorts + 1];
+        var indiceEmbed = partes.indexOf('embed');
+        if(indiceEmbed !== -1 && partes[indiceEmbed + 1]) return partes[indiceEmbed + 1];
+        if(url.searchParams.get('v')) return url.searchParams.get('v');
+      }
+    } catch(erro){ return null; }
+    return null;
+  }
+
+  var lightboxVideo = document.getElementById('lightboxVideo');
+  var telaLightboxVideo = document.getElementById('telaLightboxVideo');
+  var fecharLightboxVideoBotao = document.getElementById('fecharLightboxVideo');
+
+  function abrirVideoNaPagina(link, titulo){
+    var idVideo = extrairIdYouTube(link);
+    if(idVideo){
+      telaLightboxVideo.innerHTML = '<iframe src="https://www.youtube.com/embed/' + idVideo + '?autoplay=1&rel=0" title="' + escaparHtml(titulo) + '" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+    } else {
+      telaLightboxVideo.innerHTML = '<p class="lightbox-video-aviso">Não consegui abrir esse vídeo aqui. <a href="' + link + '" target="_blank" rel="noopener noreferrer">Assista no YouTube</a>.</p>';
+    }
+    lightboxVideo.hidden = false;
+  }
+
+  function fecharLightboxVideo(){
+    lightboxVideo.hidden = true;
+    telaLightboxVideo.innerHTML = '';
+  }
+
+  fecharLightboxVideoBotao.addEventListener('click', fecharLightboxVideo);
+  lightboxVideo.addEventListener('click', function(evento){
+    if(evento.target === lightboxVideo) fecharLightboxVideo();
+  });
+  document.addEventListener('keydown', function(evento){
+    if(evento.key === 'Escape' && !lightboxVideo.hidden) fecharLightboxVideo();
+  });
+
+  // Faz um card de vídeo (destaque ou trabalho) abrir na janela em
+  // vez de navegar pro YouTube, mas só quando já existir um link
+  // real (o link "#" continua sem fazer nada, como antes).
+  function tornarCardDeVideo(card, link, titulo){
+    card.href = link || '#';
+    if(link && link !== '#'){
+      card.addEventListener('click', function(evento){
+        evento.preventDefault();
+        abrirVideoNaPagina(link, titulo);
+      });
+    }
   }
 
   // Registro simples de visita, só pra alimentar os números do
@@ -1160,9 +1285,7 @@
   var grideDestaques = document.getElementById('grideDestaques');
   destaques.forEach(function(d){
     var card = criarElemento('a', 'card-destaque reveal');
-    card.href = d.link;
-    card.target = "_blank";
-    card.rel = "noopener noreferrer";
+    tornarCardDeVideo(card, d.link, d.titulo);
     card.setAttribute('aria-label', d.titulo);
     card.innerHTML =
       '<div class="capa-video midia-placeholder" role="img" aria-label="Capa do vídeo: ' + d.titulo + '">' +
@@ -1219,11 +1342,7 @@
     grideTrabalhos.innerHTML = '';
     videos.forEach(function(v){
       var card = criarElemento('a', 'card-trabalho visivel');
-      card.href = v.link || '#';
-      if(v.link && v.link !== '#'){
-        card.target = '_blank';
-        card.rel = 'noopener noreferrer';
-      }
+      tornarCardDeVideo(card, v.link, v.titulo);
       card.setAttribute('data-nicho', v.nicho || '');
       card.setAttribute('aria-label', v.titulo);
       var legendaNicho = escaparHtml(v.nicho || '');

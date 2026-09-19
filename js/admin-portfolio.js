@@ -16,6 +16,30 @@
   var videosCache = [];
   var jaConfigurado = false;
 
+  // Os vídeos que já estavam fixos no código do portfólio antes de
+  // ele passar a ler do banco. O botão "Importar vídeos anteriores"
+  // manda essa lista pro banco de uma vez só, pra você não ter que
+  // digitar tudo de novo à mão.
+  var VIDEOS_ANTERIORES = [
+    { titulo: "Rotina de make no dia a dia", nicho: "beleza", formato: "Vídeo vertical 9:16", link: "#" },
+    { titulo: "Resenha de batom", nicho: "beleza", formato: "Foto still 4:5", link: "#" },
+    { titulo: "Rotina de skincare noturna", nicho: "skincare", formato: "Vídeo vertical 9:16", link: "#" },
+    { titulo: "Antes e depois com sérum", nicho: "skincare", formato: "Foto still 4:5", link: "#" },
+    { titulo: "Look do dia", nicho: "moda", formato: "Foto still 4:5", link: "#" },
+    { titulo: "Try on de acessórios", nicho: "moda", formato: "Vídeo vertical 9:16", link: "#" },
+    { titulo: "Treino em casa com peso corporal", nicho: "fitness", formato: "Vídeo vertical 9:16", link: "#" },
+    { titulo: "Look fitness para academia", nicho: "fitness", formato: "Foto still 4:5", link: "#" },
+    { titulo: "Valência", nicho: "viagem", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/wMn6O12js9I?feature=share" },
+    { titulo: "Córdoba", nicho: "viagem", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/GtXovgaC9F8?feature=share" },
+    { titulo: "Sevilha", nicho: "viagem", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/OPtVSOvBZNI" },
+    { titulo: "Itália", nicho: "viagem", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/wBNowcZuBQY?feature=share" },
+    { titulo: "Turquia", nicho: "viagem", formato: "Vídeo vertical 9:16", link: "#" },
+    { titulo: "Color WoW", nicho: "marcas", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/0s6vv8fqXT0?feature=share" },
+    { titulo: "Bohems Coffee - Turquia", nicho: "marcas", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/vgkxZ5Mznds?feature=share" },
+    { titulo: "My sht - Barcelona", nicho: "marcas", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/FQgOZoKCaa8?feature=share" },
+    { titulo: "Cloud Tattoo - Barcelona", nicho: "marcas", formato: "Vídeo vertical 9:16", link: "#" }
+  ];
+
   function itemStat(valor, rotulo) {
     return '<div class="stat-item"><span class="stat-valor">' + Admin.escapeHtml(valor) + '</span><span class="stat-rotulo">' + rotulo + "</span></div>";
   }
@@ -229,11 +253,44 @@
     renderizarTabelaVideos(videos);
   }
 
+  async function importarVideosAnteriores() {
+    var jaTemVideosReais = videosCache.some(function (v) { return v.nicho !== "exemplo"; });
+    if (jaTemVideosReais) {
+      var continuar = window.confirm("Já existem vídeos cadastrados. Importar de novo pode duplicar. Quer importar mesmo assim?");
+      if (!continuar) return;
+    } else if (!window.confirm("Isso vai adicionar os " + VIDEOS_ANTERIORES.length + " vídeos que estavam no seu portfólio antes (alguns ainda com link \"#\", pra você trocar depois). Continuar?")) {
+      return;
+    }
+
+    var maiorOrdem = -1;
+    videosCache.forEach(function (v) { if ((v.ordem || 0) > maiorOrdem) maiorOrdem = v.ordem || 0; });
+
+    var linhas = VIDEOS_ANTERIORES.map(function (v, indice) {
+      return {
+        titulo: v.titulo,
+        link: v.link,
+        nicho: v.nicho,
+        formato: v.formato,
+        visivel: true,
+        ordem: maiorOrdem + 1 + indice
+      };
+    });
+
+    var resultado = await window.banco.from("videos").insert(linhas);
+    if (resultado.error) {
+      Admin.mostrarAviso("avisosPortfolio", "Não consegui importar os vídeos agora.", "erro");
+      return;
+    }
+    Admin.mostrarAviso("avisosPortfolio", "Vídeos importados. Os que ainda têm link \"#\" precisam do link real, você troca clicando em editar.", "ok");
+    carregarTudo();
+  }
+
   function configurarEventosUmaVez() {
     if (jaConfigurado) return;
     jaConfigurado = true;
 
     document.getElementById("botaoNovoVideo").addEventListener("click", abrirModalNovo);
+    document.getElementById("botaoImportarVideos").addEventListener("click", importarVideosAnteriores);
 
     document.getElementById("formVideo").addEventListener("submit", async function (evento) {
       evento.preventDefault();

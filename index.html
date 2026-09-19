@@ -509,9 +509,13 @@
     gap:24px;
   }
   .card-trabalho{
+    display:block;
     border:1px solid var(--linha);
     background:var(--offwhite);
-    transition:opacity 0.4s ease, transform 0.4s ease;
+    transition:opacity 0.4s ease, transform 0.4s ease, border-color 0.3s ease;
+  }
+  .card-trabalho:hover, .card-trabalho:focus-visible{
+    border-color:var(--marrom);
   }
   .card-trabalho.escondido{ display:none; }
   .card-trabalho .midia-placeholder{ aspect-ratio:4/5; }
@@ -1050,17 +1054,26 @@
   ];
 
   // Trabalhos por nicho (galeria com filtro)
+  // Para trocar o VÍDEO de um card: mude o campo "link" para a URL real
+  // Para trocar a CAPA: troque a div com classe midia-placeholder por uma <img> ou <video poster="...">
   var trabalhos = [
-    { titulo: "Rotina de make no dia a dia", nicho: "beleza", formato: "Vídeo vertical 9:16" },
-    { titulo: "Resenha de batom", nicho: "beleza", formato: "Foto still 4:5" },
-    { titulo: "Rotina de skincare noturna", nicho: "skincare", formato: "Vídeo vertical 9:16" },
-    { titulo: "Antes e depois com sérum", nicho: "skincare", formato: "Foto still 4:5" },
-    { titulo: "Look do dia", nicho: "moda", formato: "Foto still 4:5" },
-    { titulo: "Try on de acessórios", nicho: "moda", formato: "Vídeo vertical 9:16" },
-    { titulo: "Treino em casa com peso corporal", nicho: "fitness", formato: "Vídeo vertical 9:16" },
-    { titulo: "Look fitness para academia", nicho: "fitness", formato: "Foto still 4:5" },
-    { titulo: "Vlog de viagem por Goiânia", nicho: "viagem", formato: "Vídeo vertical 9:16" },
-    { titulo: "Mala inteligente para viagem curta", nicho: "viagem", formato: "Foto still 4:5" }
+    { titulo: "Rotina de make no dia a dia", nicho: "beleza", formato: "Vídeo vertical 9:16", link: "#" }, // SUBSTITUA pelo link do vídeo
+    { titulo: "Resenha de batom", nicho: "beleza", formato: "Foto still 4:5", link: "#" }, // SUBSTITUA pelo link do vídeo
+    { titulo: "Rotina de skincare noturna", nicho: "skincare", formato: "Vídeo vertical 9:16", link: "#" }, // SUBSTITUA pelo link do vídeo
+    { titulo: "Antes e depois com sérum", nicho: "skincare", formato: "Foto still 4:5", link: "#" }, // SUBSTITUA pelo link do vídeo
+    { titulo: "Look do dia", nicho: "moda", formato: "Foto still 4:5", link: "#" }, // SUBSTITUA pelo link do vídeo
+    { titulo: "Try on de acessórios", nicho: "moda", formato: "Vídeo vertical 9:16", link: "#" }, // SUBSTITUA pelo link do vídeo
+    { titulo: "Treino em casa com peso corporal", nicho: "fitness", formato: "Vídeo vertical 9:16", link: "#" }, // SUBSTITUA pelo link do vídeo
+    { titulo: "Look fitness para academia", nicho: "fitness", formato: "Foto still 4:5", link: "#" }, // SUBSTITUA pelo link do vídeo
+    { titulo: "Valência", nicho: "viagem", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/wMn6O12js9I?feature=share" },
+    { titulo: "Córdoba", nicho: "viagem", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/GtXovgaC9F8?feature=share" },
+    { titulo: "Sevilha", nicho: "viagem", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/OPtVSOvBZNI" },
+    { titulo: "Itália", nicho: "viagem", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/wBNowcZuBQY?feature=share" },
+    { titulo: "Turquia", nicho: "viagem", formato: "Vídeo vertical 9:16", link: "#" }, // SUBSTITUA pelo link do vídeo
+    { titulo: "Color WoW", nicho: "marcas", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/0s6vv8fqXT0?feature=share" },
+    { titulo: "Bohems Coffee - Turquia", nicho: "marcas", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/vgkxZ5Mznds?feature=share" },
+    { titulo: "My sht - Barcelona", nicho: "marcas", formato: "Vídeo vertical 9:16", link: "https://youtube.com/shorts/FQgOZoKCaa8?feature=share" },
+    { titulo: "Cloud Tattoo - Barcelona", nicho: "marcas", formato: "Vídeo vertical 9:16", link: "#" } // SUBSTITUA pelo link do vídeo
   ];
 
   var nichos = [
@@ -1069,7 +1082,8 @@
     { valor: "skincare", rotulo: "Skincare" },
     { valor: "moda", rotulo: "Moda" },
     { valor: "fitness", rotulo: "Fitness" },
-    { valor: "viagem", rotulo: "Viagem" }
+    { valor: "viagem", rotulo: "Viagem: entre destinos" },
+    { valor: "marcas", rotulo: "Trabalhos com marcas" }
   ];
 
   // Seis serviços oferecidos
@@ -1168,11 +1182,18 @@
   // Galeria de trabalhos
   var grideTrabalhos = document.getElementById('grideTrabalhos');
   trabalhos.forEach(function(t){
-    var card = criarElemento('article', 'card-trabalho reveal');
+    var card = criarElemento('a', 'card-trabalho reveal');
+    card.href = t.link;
+    if(t.link && t.link !== '#'){
+      card.target = '_blank';
+      card.rel = 'noopener noreferrer';
+    }
     card.setAttribute('data-nicho', t.nicho);
+    card.setAttribute('aria-label', t.titulo);
     card.innerHTML =
       '<div class="midia-placeholder" role="img" aria-label="' + t.titulo + '">' +
         '<span class="legenda-formato">' + t.formato + '</span>' +
+        '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' +
       '</div>' +
       '<div class="card-trabalho-info">' +
         '<span class="tag-nicho">' + t.nicho + '</span>' +

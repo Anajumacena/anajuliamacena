@@ -184,6 +184,14 @@
     justify-content:center;
     overflow:hidden;
   }
+  .preview-video-hover{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    border:0;
+    pointer-events:none;
+  }
   .midia-placeholder .legenda-formato{
     position:absolute;
     bottom:14px;
@@ -1143,15 +1151,41 @@
 
   // Faz um card de vídeo (destaque ou trabalho) abrir na janela em
   // vez de navegar pro YouTube, mas só quando já existir um link
-  // real (o link "#" continua sem fazer nada, como antes).
+  // real (o link "#" continua sem fazer nada, como antes). Também
+  // faz o vídeo tocar em prévia, mudo, quando o mouse passa por cima.
   function tornarCardDeVideo(card, link, titulo){
     card.href = link || '#';
-    if(link && link !== '#'){
-      card.addEventListener('click', function(evento){
-        evento.preventDefault();
-        abrirVideoNaPagina(link, titulo);
-      });
-    }
+    if(!link || link === '#') return;
+
+    card.addEventListener('click', function(evento){
+      evento.preventDefault();
+      abrirVideoNaPagina(link, titulo);
+    });
+
+    if(prefereReduzirMovimento) return;
+    var idVideo = extrairIdYouTube(link);
+    if(!idVideo) return;
+
+    var temporizadorPreview = null;
+    card.addEventListener('mouseenter', function(){
+      temporizadorPreview = window.setTimeout(function(){
+        var containerMidia = card.querySelector('.midia-placeholder');
+        if(!containerMidia || containerMidia.querySelector('.preview-video-hover')) return;
+        var iframe = document.createElement('iframe');
+        iframe.className = 'preview-video-hover';
+        iframe.src = 'https://www.youtube.com/embed/' + idVideo + '?autoplay=1&mute=1&controls=0&loop=1&playlist=' + idVideo + '&modestbranding=1&rel=0&playsinline=1';
+        iframe.setAttribute('allow', 'autoplay; encrypted-media');
+        iframe.setAttribute('aria-hidden', 'true');
+        iframe.setAttribute('tabindex', '-1');
+        containerMidia.appendChild(iframe);
+      }, 200);
+    });
+    card.addEventListener('mouseleave', function(){
+      if(temporizadorPreview){ window.clearTimeout(temporizadorPreview); temporizadorPreview = null; }
+      var containerMidia = card.querySelector('.midia-placeholder');
+      var iframe = containerMidia && containerMidia.querySelector('.preview-video-hover');
+      if(iframe) iframe.remove();
+    });
   }
 
   // Registro simples de visita, só pra alimentar os números do

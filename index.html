@@ -341,6 +341,55 @@
     color:var(--texto-suave);
   }
 
+  /* ===== Faixa "Entre Olhares" (fotos rolando de lado) ===== */
+  .faixa-fotos{
+    margin-top:clamp(48px, 8vw, 80px);
+    border-top:1px solid var(--linha);
+    padding:26px 0 6px;
+  }
+  .faixa-fotos[hidden]{ display:none; }
+  .faixa-fotos .titulo-faixa{
+    text-align:center;
+    font-size:0.68rem;
+    text-transform:uppercase;
+    letter-spacing:0.16em;
+    color:var(--texto-suave);
+    margin-bottom:18px;
+  }
+  .pista-fotos-janela{
+    overflow:hidden;
+    width:100%;
+    -webkit-mask-image:linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    mask-image:linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+  .pista-fotos{
+    display:flex;
+    gap:16px;
+    width:max-content;
+    animation:rolar-entre-olhares 36s linear infinite;
+  }
+  .pista-fotos:hover{ animation-play-state:paused; }
+  .pista-fotos .foto-entre-olhares{
+    width:120px;
+    aspect-ratio:4/5;
+    flex-shrink:0;
+    background:linear-gradient(150deg, var(--nude) 0%, var(--areia) 55%, var(--marrom) 100%);
+    overflow:hidden;
+  }
+  .pista-fotos .foto-entre-olhares img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  @keyframes rolar-entre-olhares{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .pista-fotos{ animation:none; overflow-x:auto; }
+  }
+
   @media (max-width: 860px){
     .hero-topo{ grid-template-columns:1fr; gap:40px; }
     .hero-foto{ order:-1; aspect-ratio:4/3; }
@@ -883,6 +932,16 @@
       </div>
 
       <div class="hero-stats" id="statsHero"></div>
+
+      <!-- Faixa "Entre Olhares": fotos de viagem rolando de lado.
+           Vem do banco de dados (tabela videos, nicho "Entre Olhares").
+           Fica escondida sozinha se ainda não houver nenhuma foto. -->
+      <div class="faixa-fotos" id="faixaEntreOlhares" hidden>
+        <p class="titulo-faixa">Entre Olhares</p>
+        <div class="pista-fotos-janela">
+          <div class="pista-fotos" id="pistaEntreOlhares"></div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1301,6 +1360,29 @@
   var filtrosEl = document.getElementById('filtros');
   var grideTrabalhos = document.getElementById('grideTrabalhos');
 
+  // Monta a faixa "Entre Olhares" com as fotos rolando de lado.
+  // Duplica a lista de fotos pra rolagem parecer infinita, sem
+  // corte no meio.
+  function montarFaixaEntreOlhares(fotos){
+    var faixa = document.getElementById('faixaEntreOlhares');
+    var pista = document.getElementById('pistaEntreOlhares');
+    if(fotos.length === 0){
+      faixa.hidden = true;
+      pista.innerHTML = '';
+      return;
+    }
+    var htmlFotos = fotos.map(function(f){
+      var ehImagemDireta = f.link && f.link !== '#' && !extrairIdYouTube(f.link);
+      if(ehImagemDireta){
+        return '<div class="foto-entre-olhares"><img src="' + f.link + '" alt="' + escaparHtml(f.titulo) + '" loading="lazy"></div>';
+      }
+      return '<div class="foto-entre-olhares midia-placeholder"><span class="legenda-formato">' + escaparHtml(f.titulo) + '</span></div>';
+    }).join('');
+    // Repete a lista uma vez pra fazer a rolagem parecer sem fim
+    pista.innerHTML = htmlFotos + htmlFotos;
+    faixa.hidden = false;
+  }
+
   async function carregarTrabalhosDoBanco(){
     var videos = [];
     try{
@@ -1309,6 +1391,16 @@
         if(!resposta.error) videos = resposta.data || [];
       }
     } catch(erro){ /* segue com a lista vazia, tratado logo abaixo */ }
+
+    // "Entre Olhares" tem a faixa própria na capa, então essas fotos
+    // não entram na galeria com filtro aqui embaixo.
+    var fotosEntreOlhares = videos.filter(function(v){
+      return (v.nicho || '').trim().toLowerCase() === 'entre olhares';
+    });
+    montarFaixaEntreOlhares(fotosEntreOlhares);
+    videos = videos.filter(function(v){
+      return (v.nicho || '').trim().toLowerCase() !== 'entre olhares';
+    });
 
     if(videos.length === 0){
       filtrosEl.innerHTML = '';

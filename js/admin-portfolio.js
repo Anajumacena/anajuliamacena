@@ -54,7 +54,13 @@
     { titulo: "Sevilha, Espanha", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/08-sevilha-espanha.jpg" },
     { titulo: "Alhambra, Granada", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/09-alhambra-granada.jpg" },
     { titulo: "Rio Guadalquivir, Sevilha", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/10-rio-guadalquivir-sevilha.jpg" },
-    { titulo: "Ruas de Sitges", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/11-ruas-sitges.jpg" }
+    { titulo: "Ruas de Sitges", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/11-ruas-sitges.jpg" },
+    { titulo: "Coliseu, Roma", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/12-coliseu-roma.jpg" },
+    { titulo: "Capadócia ao amanhecer", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/13-capadocia-amanhecer.jpg" },
+    { titulo: "Formações da Capadócia", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/14-formacoes-capadocia.jpg" },
+    { titulo: "Capadócia, Turquia", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/15-capadocia-turquia.jpg" },
+    { titulo: "Vale da Capadócia", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/16-vale-capadocia.jpg" },
+    { titulo: "Parque em Istambul", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/17-parque-istambul.jpg" }
   ];
 
   function itemStat(valor, rotulo) {
@@ -303,22 +309,31 @@
   }
 
   async function importarFotosEntreOlhares() {
-    var jaTemFotos = videosCache.some(function (v) { return (v.nicho || "").trim().toLowerCase() === "entre olhares"; });
-    if (jaTemFotos) {
-      var continuar = window.confirm("Já existem fotos em \"Entre Olhares\". Importar de novo pode duplicar. Quer importar mesmo assim?");
-      if (!continuar) return;
-    } else if (!window.confirm("Isso vai adicionar as " + FOTOS_ENTRE_OLHARES.length + " fotos de viagem na faixa \"Entre Olhares\". Continuar?")) {
+    // Só importa as fotos que ainda não estão no banco (compara pelo
+    // link), então clicar de novo depois de eu adicionar fotos novas
+    // na lista não duplica as que você já tem.
+    var linksExistentes = videosCache.map(function (v) { return v.link; });
+    var faltando = FOTOS_ENTRE_OLHARES.filter(function (f) { return linksExistentes.indexOf(f.link) === -1; });
+
+    if (faltando.length === 0) {
+      Admin.mostrarAviso("avisosPortfolio", "Todas as fotos dessa lista já estão cadastradas.", "ok");
+      return;
+    }
+    if (!window.confirm("Isso vai adicionar " + faltando.length + " foto(s) nova(s) na faixa \"Entre Olhares\". Continuar?")) {
       return;
     }
 
-    var linhas = FOTOS_ENTRE_OLHARES.map(function (f, indice) {
+    var maiorOrdem = -1;
+    videosCache.forEach(function (v) { if ((v.ordem || 0) > maiorOrdem) maiorOrdem = v.ordem || 0; });
+
+    var linhas = faltando.map(function (f, indice) {
       return {
         titulo: f.titulo,
         link: f.link,
         nicho: "Entre Olhares",
         formato: "Foto",
         visivel: true,
-        ordem: 1000 + indice
+        ordem: maiorOrdem + 1 + indice
       };
     });
 

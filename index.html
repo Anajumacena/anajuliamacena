@@ -356,19 +356,42 @@
     color:var(--texto);
     margin-bottom:clamp(24px, 4vw, 40px);
   }
-  .pista-fotos-janela{
-    overflow:hidden;
-    width:100%;
-    -webkit-mask-image:linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
-    mask-image:linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  .carrossel-fotos{
+    display:flex;
+    align-items:center;
+    gap:12px;
   }
+  .pista-fotos-janela{
+    overflow-x:auto;
+    overflow-y:hidden;
+    scroll-behavior:smooth;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+    -webkit-mask-image:linear-gradient(to right, transparent, #000 3%, #000 97%, transparent);
+    mask-image:linear-gradient(to right, transparent, #000 3%, #000 97%, transparent);
+  }
+  .pista-fotos-janela::-webkit-scrollbar{ display:none; }
   .pista-fotos{
     display:flex;
     gap:16px;
     width:max-content;
-    animation:rolar-entre-olhares 36s linear infinite;
   }
-  .pista-fotos:hover{ animation-play-state:paused; }
+  .seta-fotos{
+    flex-shrink:0;
+    width:38px;
+    height:38px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid var(--linha-forte);
+    background:var(--offwhite);
+    color:var(--texto);
+    transition:border-color 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+  }
+  .seta-fotos svg{ width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.5; }
+  .seta-fotos:hover, .seta-fotos:focus-visible{ border-color:var(--marrom); color:var(--marrom); }
+  .seta-fotos:disabled{ opacity:0.3; }
+  .seta-fotos:disabled:hover{ border-color:var(--linha-forte); color:var(--texto); }
   .pista-fotos .foto-entre-olhares{
     width:clamp(190px, 22vw, 260px);
     flex-shrink:0;
@@ -398,13 +421,6 @@
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
-  }
-  @keyframes rolar-entre-olhares{
-    from{ transform:translateX(0); }
-    to{ transform:translateX(-50%); }
-  }
-  @media (prefers-reduced-motion: reduce){
-    .pista-fotos{ animation:none; overflow-x:auto; }
   }
 
   @media (max-width: 860px){
@@ -1017,8 +1033,16 @@
     <div class="container">
       <div class="faixa-fotos" id="faixaEntreOlhares" hidden>
         <p class="titulo-faixa">Entre Olhares</p>
-        <div class="pista-fotos-janela">
-          <div class="pista-fotos" id="pistaEntreOlhares"></div>
+        <div class="carrossel-fotos">
+          <button class="seta-fotos" id="setaFotosEsquerda" type="button" aria-label="Ver fotos anteriores">
+            <svg viewBox="0 0 24 24"><polyline points="15,4 7,12 15,20"/></svg>
+          </button>
+          <div class="pista-fotos-janela" id="janelaEntreOlhares">
+            <div class="pista-fotos" id="pistaEntreOlhares"></div>
+          </div>
+          <button class="seta-fotos" id="setaFotosDireita" type="button" aria-label="Ver mais fotos">
+            <svg viewBox="0 0 24 24"><polyline points="9,4 17,12 9,20"/></svg>
+          </button>
         </div>
       </div>
     </div>
@@ -1423,8 +1447,6 @@
   var grideTrabalhos = document.getElementById('grideTrabalhos');
 
   // Monta a faixa "Entre Olhares" com as fotos rolando de lado.
-  // Duplica a lista de fotos pra rolagem parecer infinita, sem
-  // corte no meio.
   function montarFaixaEntreOlhares(fotos){
     var faixa = document.getElementById('faixaEntreOlhares');
     var pista = document.getElementById('pistaEntreOlhares');
@@ -1433,7 +1455,7 @@
       pista.innerHTML = '';
       return;
     }
-    var htmlFotos = fotos.map(function(f){
+    pista.innerHTML = fotos.map(function(f){
       var ehImagemDireta = f.link && f.link !== '#' && !extrairIdYouTube(f.link);
       if(ehImagemDireta){
         return '<div class="foto-entre-olhares clicavel" data-link="' + escaparHtml(f.link) + '" data-titulo="' + escaparHtml(f.titulo) + '" tabindex="0" role="button" aria-label="Ver foto maior: ' + escaparHtml(f.titulo) + '">' +
@@ -1446,9 +1468,33 @@
         '<span class="legenda-local">' + escaparHtml(f.titulo) + '</span>' +
       '</div>';
     }).join('');
-    // Repete a lista uma vez pra fazer a rolagem parecer sem fim
-    pista.innerHTML = htmlFotos + htmlFotos;
     faixa.hidden = false;
+    window.setTimeout(atualizarSetasFotos, 0);
+  }
+
+  // Setas de navegação da faixa "Entre Olhares": cada clique rola
+  // quase uma tela inteira de fotos, pra frente ou pra trás. Sem
+  // rolagem automática.
+  var janelaEntreOlhares = document.getElementById('janelaEntreOlhares');
+  var setaFotosEsquerda = document.getElementById('setaFotosEsquerda');
+  var setaFotosDireita = document.getElementById('setaFotosDireita');
+
+  function atualizarSetasFotos(){
+    if(!janelaEntreOlhares) return;
+    var semRolagem = janelaEntreOlhares.scrollWidth <= janelaEntreOlhares.clientWidth + 2;
+    setaFotosEsquerda.disabled = semRolagem || janelaEntreOlhares.scrollLeft <= 2;
+    setaFotosDireita.disabled = semRolagem || janelaEntreOlhares.scrollLeft >= (janelaEntreOlhares.scrollWidth - janelaEntreOlhares.clientWidth - 2);
+  }
+
+  if(janelaEntreOlhares){
+    setaFotosEsquerda.addEventListener('click', function(){
+      janelaEntreOlhares.scrollBy({ left: -janelaEntreOlhares.clientWidth * 0.9, behavior: prefereReduzirMovimento ? 'auto' : 'smooth' });
+    });
+    setaFotosDireita.addEventListener('click', function(){
+      janelaEntreOlhares.scrollBy({ left: janelaEntreOlhares.clientWidth * 0.9, behavior: prefereReduzirMovimento ? 'auto' : 'smooth' });
+    });
+    janelaEntreOlhares.addEventListener('scroll', atualizarSetasFotos);
+    window.addEventListener('resize', atualizarSetasFotos);
   }
 
   // Clicar (ou apertar Enter) numa foto da faixa abre ela maior.

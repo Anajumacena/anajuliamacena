@@ -344,17 +344,17 @@
   /* ===== Faixa "Entre Olhares" (fotos rolando de lado) ===== */
   .faixa-fotos{
     margin-top:clamp(48px, 8vw, 80px);
-    border-top:1px solid var(--linha);
-    padding:26px 0 6px;
+    padding-top:clamp(32px, 6vw, 56px);
   }
   .faixa-fotos[hidden]{ display:none; }
   .faixa-fotos .titulo-faixa{
-    text-align:center;
-    font-size:0.68rem;
+    font-family:'Tenor Sans', serif;
+    font-weight:400;
+    letter-spacing:0.04em;
+    font-size:clamp(1.6rem, 3vw, 2.2rem);
     text-transform:uppercase;
-    letter-spacing:0.16em;
-    color:var(--texto-suave);
-    margin-bottom:18px;
+    color:var(--texto);
+    margin-bottom:clamp(24px, 4vw, 40px);
   }
   .pista-fotos-janela{
     overflow:hidden;
@@ -370,17 +370,21 @@
   }
   .pista-fotos:hover{ animation-play-state:paused; }
   .pista-fotos .foto-entre-olhares{
-    width:120px;
+    width:150px;
     aspect-ratio:4/5;
     flex-shrink:0;
     background:linear-gradient(150deg, var(--nude) 0%, var(--areia) 55%, var(--marrom) 100%);
     overflow:hidden;
+    transition:opacity 0.25s ease;
   }
+  .pista-fotos .foto-entre-olhares.clicavel{ cursor:pointer; }
+  .pista-fotos .foto-entre-olhares.clicavel:hover{ opacity:0.82; }
   .pista-fotos .foto-entre-olhares img{
     width:100%;
     height:100%;
     object-fit:cover;
     display:block;
+    pointer-events:none;
   }
   @keyframes rolar-entre-olhares{
     from{ transform:translateX(0); }
@@ -887,6 +891,18 @@
     font-size:0.9rem;
   }
   .lightbox-video-aviso a{ text-decoration:underline; }
+
+  /* ===== JANELA DE FOTO (Entre Olhares, ver maior) ===== */
+  .lightbox-foto-caixa{
+    max-width:640px;
+  }
+  .lightbox-foto-caixa img{
+    width:100%;
+    max-height:85vh;
+    object-fit:contain;
+    display:block;
+    background:#000;
+  }
 </style>
 </head>
 <body>
@@ -1088,6 +1104,14 @@
   </div>
 </div>
 
+<!-- JANELA DE FOTO: ver a foto da faixa Entre Olhares maior -->
+<div class="lightbox-video" id="lightboxFoto" hidden>
+  <div class="lightbox-video-caixa lightbox-foto-caixa" role="dialog" aria-modal="true" aria-label="Foto">
+    <button class="lightbox-video-fechar" id="fecharLightboxFoto" aria-label="Fechar foto">×</button>
+    <img id="imagemLightboxFoto" src="" alt="">
+  </div>
+</div>
+
 <!-- CARD DE CAPTURA DE MÍDIA KIT -->
 <div class="modal-overlay" id="modalCaptura" hidden>
   <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="tituloModal">
@@ -1172,8 +1196,31 @@
   lightboxVideo.addEventListener('click', function(evento){
     if(evento.target === lightboxVideo) fecharLightboxVideo();
   });
+
+  // Janela de foto: clicar numa foto da faixa "Entre Olhares" abre
+  // ela maior, por cima do site.
+  var lightboxFoto = document.getElementById('lightboxFoto');
+  var imagemLightboxFoto = document.getElementById('imagemLightboxFoto');
+  var fecharLightboxFotoBotao = document.getElementById('fecharLightboxFoto');
+
+  function abrirFotoNaPagina(link, titulo){
+    imagemLightboxFoto.src = link;
+    imagemLightboxFoto.alt = titulo;
+    lightboxFoto.hidden = false;
+  }
+  function fecharLightboxFoto(){
+    lightboxFoto.hidden = true;
+    imagemLightboxFoto.src = '';
+  }
+  fecharLightboxFotoBotao.addEventListener('click', fecharLightboxFoto);
+  lightboxFoto.addEventListener('click', function(evento){
+    if(evento.target === lightboxFoto) fecharLightboxFoto();
+  });
+
   document.addEventListener('keydown', function(evento){
-    if(evento.key === 'Escape' && !lightboxVideo.hidden) fecharLightboxVideo();
+    if(evento.key !== 'Escape') return;
+    if(!lightboxVideo.hidden) fecharLightboxVideo();
+    if(!lightboxFoto.hidden) fecharLightboxFoto();
   });
 
   // Faz um card de vídeo (destaque ou trabalho) abrir na janela em
@@ -1376,7 +1423,7 @@
     var htmlFotos = fotos.map(function(f){
       var ehImagemDireta = f.link && f.link !== '#' && !extrairIdYouTube(f.link);
       if(ehImagemDireta){
-        return '<div class="foto-entre-olhares"><img src="' + f.link + '" alt="' + escaparHtml(f.titulo) + '" loading="lazy"></div>';
+        return '<div class="foto-entre-olhares clicavel" data-link="' + escaparHtml(f.link) + '" data-titulo="' + escaparHtml(f.titulo) + '" tabindex="0" role="button" aria-label="Ver foto maior: ' + escaparHtml(f.titulo) + '"><img src="' + f.link + '" alt="' + escaparHtml(f.titulo) + '" loading="lazy"></div>';
       }
       return '<div class="foto-entre-olhares midia-placeholder"><span class="legenda-formato">' + escaparHtml(f.titulo) + '</span></div>';
     }).join('');
@@ -1384,6 +1431,22 @@
     pista.innerHTML = htmlFotos + htmlFotos;
     faixa.hidden = false;
   }
+
+  // Clicar (ou apertar Enter) numa foto da faixa abre ela maior.
+  // Um único listener cuida de todas as fotos, mesmo as que forem
+  // recriadas depois (a lista é montada de novo vinda do banco).
+  document.getElementById('pistaEntreOlhares').addEventListener('click', function(evento){
+    var item = evento.target.closest('.foto-entre-olhares.clicavel');
+    if(item) abrirFotoNaPagina(item.getAttribute('data-link'), item.getAttribute('data-titulo'));
+  });
+  document.getElementById('pistaEntreOlhares').addEventListener('keydown', function(evento){
+    if(evento.key !== 'Enter' && evento.key !== ' ') return;
+    var item = evento.target.closest('.foto-entre-olhares.clicavel');
+    if(item){
+      evento.preventDefault();
+      abrirFotoNaPagina(item.getAttribute('data-link'), item.getAttribute('data-titulo'));
+    }
+  });
 
   async function carregarTrabalhosDoBanco(){
     var videos = [];

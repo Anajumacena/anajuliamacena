@@ -367,8 +367,6 @@
     scroll-behavior:smooth;
     scrollbar-width:none;
     -ms-overflow-style:none;
-    -webkit-mask-image:linear-gradient(to right, transparent, #000 3%, #000 97%, transparent);
-    mask-image:linear-gradient(to right, transparent, #000 3%, #000 97%, transparent);
   }
   .pista-fotos-janela::-webkit-scrollbar{ display:none; }
   .pista-fotos{
@@ -378,20 +376,21 @@
   }
   .seta-fotos{
     flex-shrink:0;
-    width:38px;
-    height:38px;
+    width:24px;
+    height:24px;
     display:flex;
     align-items:center;
     justify-content:center;
-    border:1px solid var(--linha-forte);
-    background:var(--offwhite);
-    color:var(--texto);
-    transition:border-color 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+    border:none;
+    background:none;
+    padding:0;
+    color:var(--texto-suave);
+    transition:color 0.3s ease, opacity 0.3s ease;
   }
-  .seta-fotos svg{ width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.5; }
-  .seta-fotos:hover, .seta-fotos:focus-visible{ border-color:var(--marrom); color:var(--marrom); }
-  .seta-fotos:disabled{ opacity:0.3; }
-  .seta-fotos:disabled:hover{ border-color:var(--linha-forte); color:var(--texto); }
+  .seta-fotos svg{ width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1; }
+  .seta-fotos:hover, .seta-fotos:focus-visible{ color:var(--marrom); }
+  .seta-fotos:disabled{ opacity:0.25; }
+  .seta-fotos:disabled:hover{ color:var(--texto-suave); }
   .pista-fotos .foto-entre-olhares{
     width:clamp(190px, 22vw, 260px);
     flex-shrink:0;

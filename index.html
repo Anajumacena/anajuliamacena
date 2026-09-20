@@ -341,34 +341,6 @@
     color:var(--texto-suave);
   }
 
-  .faixa-marcas{
-    margin-top:clamp(48px, 8vw, 80px);
-    border-top:1px solid var(--linha);
-    padding:26px 0;
-    overflow:hidden;
-  }
-  .faixa-marcas .titulo-faixa{
-    text-align:center;
-    font-size:0.68rem;
-    text-transform:uppercase;
-    letter-spacing:0.16em;
-    color:var(--texto-suave);
-    margin-bottom:18px;
-  }
-  .faixa-marcas ul{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    gap:14px 40px;
-  }
-  .faixa-marcas li{
-    font-family:'Tenor Sans', serif;
-    font-size:0.95rem;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    color:var(--texto-suave);
-  }
-
   @media (max-width: 860px){
     .hero-topo{ grid-template-columns:1fr; gap:40px; }
     .hero-foto{ order:-1; aspect-ratio:4/3; }
@@ -911,11 +883,6 @@
       </div>
 
       <div class="hero-stats" id="statsHero"></div>
-
-      <div class="faixa-marcas">
-        <p class="titulo-faixa">Marcas que já confiaram no meu trabalho</p>
-        <ul id="listaMarcas"></ul>
-      </div>
     </div>
   </section>
 
@@ -1152,18 +1119,27 @@
   // vez de navegar pro YouTube, mas só quando já existir um link
   // real (o link "#" continua sem fazer nada, como antes). Também
   // faz o vídeo tocar em prévia, mudo, quando o mouse passa por cima.
+  // Retorna true quando o card é de um vídeo do YouTube (ganha o
+  // botão de play, a prévia com o mouse e a janela ao clicar).
+  // Quando o link não é do YouTube (por exemplo, uma foto), o card
+  // simplesmente abre esse link numa aba nova, sem tentar tocar nada.
   function tornarCardDeVideo(card, link, titulo){
     card.href = link || '#';
-    if(!link || link === '#') return;
+    if(!link || link === '#') return false;
+
+    var idVideo = extrairIdYouTube(link);
+    if(!idVideo){
+      card.target = '_blank';
+      card.rel = 'noopener noreferrer';
+      return false;
+    }
 
     card.addEventListener('click', function(evento){
       evento.preventDefault();
       abrirVideoNaPagina(link, titulo);
     });
 
-    if(prefereReduzirMovimento) return;
-    var idVideo = extrairIdYouTube(link);
-    if(!idVideo) return;
+    if(prefereReduzirMovimento) return true;
 
     var temporizadorPreview = null;
     card.addEventListener('mouseenter', function(){
@@ -1185,6 +1161,7 @@
       var iframe = containerMidia && containerMidia.querySelector('.preview-video-hover');
       if(iframe) iframe.remove();
     });
+    return true;
   }
 
   // Registro simples de visita, só pra alimentar os números do
@@ -1209,12 +1186,6 @@
   ===================================================== */
 
   // Marcas que já trabalharam com a creator (aparecem na faixa da capa)
-  var marcas = [
-    "Color WoW", "Marca 02", "Marca 03", "Marca 04",
-    "Marca 05", "Marca 06", "Marca 07", "Marca 08",
-    "Marca 09", "Marca 10", "Marca 11", "Marca 12"
-  ];
-
   // Três números curtos exibidos na capa (mesma base das métricas abaixo)
   // Conteúdos de destaque: os 3 vídeos em formato vertical
   // Para trocar o VÍDEO: mude o campo "link" para a URL real (reels, tiktok, drive etc)
@@ -1298,14 +1269,6 @@
     return el;
   }
 
-  // Marcas na faixa da capa
-  var listaMarcas = document.getElementById('listaMarcas');
-  marcas.forEach(function(nome){
-    var li = document.createElement('li');
-    li.textContent = nome;
-    listaMarcas.appendChild(li);
-  });
-
   // Três números da capa (usa as três primeiras métricas)
   var statsHero = document.getElementById('statsHero');
   metricas.slice(0, 3).forEach(function(m){
@@ -1318,12 +1281,12 @@
   var grideDestaques = document.getElementById('grideDestaques');
   destaques.forEach(function(d){
     var card = criarElemento('a', 'card-destaque reveal');
-    tornarCardDeVideo(card, d.link, d.titulo);
+    var ehVideoDestaque = tornarCardDeVideo(card, d.link, d.titulo);
     card.setAttribute('aria-label', d.titulo);
     card.innerHTML =
       '<div class="capa-video midia-placeholder" role="img" aria-label="Capa do vídeo: ' + d.titulo + '">' +
         '<span class="legenda-formato">Capa vertical 9:16</span>' +
-        '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' +
+        (ehVideoDestaque ? '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' : '') +
       '</div>' +
       '<div class="card-destaque-info">' +
         '<span class="numero-forte">' + d.numeroForte + '</span>' +
@@ -1375,7 +1338,7 @@
     grideTrabalhos.innerHTML = '';
     videos.forEach(function(v){
       var card = criarElemento('a', 'card-trabalho visivel');
-      tornarCardDeVideo(card, v.link, v.titulo);
+      var ehVideoTrabalho = tornarCardDeVideo(card, v.link, v.titulo);
       card.setAttribute('data-nicho', v.nicho || '');
       card.setAttribute('aria-label', v.titulo);
       var legendaNicho = escaparHtml(v.nicho || '');
@@ -1384,7 +1347,7 @@
       card.innerHTML =
         '<div class="midia-placeholder" role="img" aria-label="' + escaparHtml(v.titulo) + '">' +
           '<span class="legenda-formato">' + escaparHtml(v.formato || 'Vídeo vertical 9:16') + '</span>' +
-          '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' +
+          (ehVideoTrabalho ? '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' : '') +
         '</div>' +
         '<div class="card-trabalho-info">' +
           '<span class="tag-nicho">' + legendaNicho + '</span>' +

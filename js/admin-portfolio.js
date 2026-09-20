@@ -40,6 +40,23 @@
     { titulo: "Cloud Tattoo - Barcelona", nicho: "marcas", formato: "Vídeo vertical 9:16", link: "#" }
   ];
 
+  // Fotos de viagem da faixa "Entre Olhares", já hospedadas dentro do
+  // próprio site (pasta imagens/entre-olhares). O botão "Importar
+  // fotos Entre Olhares" manda essa lista pro banco de uma vez.
+  var FOTOS_ENTRE_OLHARES = [
+    { titulo: "Istambul, Turquia", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/01-istambul-turquia.jpg" },
+    { titulo: "Sitges, Espanha", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/02-sitges-espanha.jpg" },
+    { titulo: "Sitges ao entardecer", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/03-sitges-entardecer.jpg" },
+    { titulo: "Mirante em Sitges", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/04-mirante-sitges.jpg" },
+    { titulo: "Manarola, Itália", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/05-manarola-italia.jpg" },
+    { titulo: "Enseada na Turquia", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/06-enseada-turquia.jpg" },
+    { titulo: "Madri, Espanha", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/07-madri-espanha.jpg" },
+    { titulo: "Sevilha, Espanha", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/08-sevilha-espanha.jpg" },
+    { titulo: "Alhambra, Granada", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/09-alhambra-granada.jpg" },
+    { titulo: "Rio Guadalquivir, Sevilha", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/10-rio-guadalquivir-sevilha.jpg" },
+    { titulo: "Ruas de Sitges", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/11-ruas-sitges.jpg" }
+  ];
+
   function itemStat(valor, rotulo) {
     return '<div class="stat-item"><span class="stat-valor">' + Admin.escapeHtml(valor) + '</span><span class="stat-rotulo">' + rotulo + "</span></div>";
   }
@@ -285,12 +302,42 @@
     carregarTudo();
   }
 
+  async function importarFotosEntreOlhares() {
+    var jaTemFotos = videosCache.some(function (v) { return (v.nicho || "").trim().toLowerCase() === "entre olhares"; });
+    if (jaTemFotos) {
+      var continuar = window.confirm("Já existem fotos em \"Entre Olhares\". Importar de novo pode duplicar. Quer importar mesmo assim?");
+      if (!continuar) return;
+    } else if (!window.confirm("Isso vai adicionar as " + FOTOS_ENTRE_OLHARES.length + " fotos de viagem na faixa \"Entre Olhares\". Continuar?")) {
+      return;
+    }
+
+    var linhas = FOTOS_ENTRE_OLHARES.map(function (f, indice) {
+      return {
+        titulo: f.titulo,
+        link: f.link,
+        nicho: "Entre Olhares",
+        formato: "Foto",
+        visivel: true,
+        ordem: 1000 + indice
+      };
+    });
+
+    var resultado = await window.banco.from("videos").insert(linhas);
+    if (resultado.error) {
+      Admin.mostrarAviso("avisosPortfolio", "Não consegui importar as fotos agora.", "erro");
+      return;
+    }
+    Admin.mostrarAviso("avisosPortfolio", "Fotos importadas. Elas já aparecem rolando na faixa Entre Olhares do site.", "ok");
+    carregarTudo();
+  }
+
   function configurarEventosUmaVez() {
     if (jaConfigurado) return;
     jaConfigurado = true;
 
     document.getElementById("botaoNovoVideo").addEventListener("click", abrirModalNovo);
     document.getElementById("botaoImportarVideos").addEventListener("click", importarVideosAnteriores);
+    document.getElementById("botaoImportarEntreOlhares").addEventListener("click", importarFotosEntreOlhares);
 
     document.getElementById("formVideo").addEventListener("submit", async function (evento) {
       evento.preventDefault();

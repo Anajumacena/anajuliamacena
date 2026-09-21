@@ -916,8 +916,11 @@
     justify-content:center;
     padding:20px;
     z-index:900;
+    animation:apareceModalFundo 0.35s ease;
   }
   .modal-overlay[hidden]{ display:none; }
+  @keyframes apareceModalFundo{ from{ background:rgba(58,51,44,0); } to{ background:rgba(58,51,44,0.55); } }
+  @keyframes apareceModalCaixa{ from{ opacity:0; transform:translateY(14px) scale(0.98); } to{ opacity:1; transform:translateY(0) scale(1); } }
   .modal-caixa{
     position:relative;
     max-width:420px;
@@ -925,17 +928,25 @@
     background:var(--offwhite);
     border:1px solid var(--linha-forte);
     padding:44px 36px;
+    box-shadow:0 20px 60px rgba(58,51,44,0.35);
+    animation:apareceModalCaixa 0.4s ease;
   }
   .modal-fechar{
     position:absolute;
-    top:16px; right:16px;
-    background:none;
-    border:none;
+    top:12px; right:12px;
+    width:36px;
+    height:36px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--offwhite);
+    border:1px solid var(--linha-forte);
+    border-radius:50%;
     font-family:'Tenor Sans', serif;
     font-size:1.3rem;
     color:var(--texto-suave);
     line-height:1;
-    padding:6px;
+    padding:0;
   }
   .modal-fechar:hover, .modal-fechar:focus-visible{ color:var(--marrom); }
   .modal-caixa h3{
@@ -2106,7 +2117,7 @@
     if(elementoComFocoAntesDoModal) elementoComFocoAntesDoModal.focus();
   }
 
-  window.setTimeout(abrirModal, 7000);
+  window.setTimeout(abrirModal, 20000);
 
   fecharModal.addEventListener('click', fecharModalCaptura);
 

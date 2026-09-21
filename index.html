@@ -1816,16 +1816,17 @@
       return (v.nicho || '').trim().toLowerCase() !== 'entre olhares';
     });
 
-    // Branded Content leva tudo que tiver o campo "marca" preenchido.
+    // Branded Content mostra também tudo que tiver o campo "marca"
+    // preenchido, mas o vídeo continua aparecendo normalmente lá
+    // embaixo em "Trabalhos por nicho" também (não é ou/ou).
     var itensComMarca = videos.filter(function(v){ return (v.marca || '').trim() !== ''; });
     renderizarBrandedContent(itensComMarca);
-    videos = videos.filter(function(v){ return (v.marca || '').trim() === ''; });
 
-    // Entre Destinos leva só os vídeos de nicho "viagem" (sem marca).
+    // Entre Destinos mostra também os vídeos de nicho "viagem", e eles
+    // seguem aparecendo em "Trabalhos por nicho" do mesmo jeito.
     // As fotos ficam só na faixa Entre Olhares, lá na capa.
     var videosViagem = videos.filter(function(v){ return (v.nicho || '').trim().toLowerCase() === 'viagem'; });
     renderizarEntreDestinos(videosViagem);
-    videos = videos.filter(function(v){ return (v.nicho || '').trim().toLowerCase() !== 'viagem'; });
 
     if(videos.length === 0){
       filtrosEl.innerHTML = '';

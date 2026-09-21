@@ -184,6 +184,14 @@
     justify-content:center;
     overflow:hidden;
   }
+  .capa-video-real{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
   .preview-video-hover{
     position:absolute;
     inset:0;
@@ -1426,10 +1434,13 @@
   destaques.forEach(function(d){
     var card = criarElemento('a', 'card-destaque reveal');
     var ehVideoDestaque = tornarCardDeVideo(card, d.link, d.titulo);
+    var idCapaDestaque = extrairIdYouTube(d.link);
     card.setAttribute('aria-label', d.titulo);
     card.innerHTML =
       '<div class="capa-video midia-placeholder" role="img" aria-label="Capa do vídeo: ' + d.titulo + '">' +
-        '<span class="legenda-formato">Capa vertical 9:16</span>' +
+        (idCapaDestaque
+          ? '<img class="capa-video-real" src="https://img.youtube.com/vi/' + idCapaDestaque + '/hqdefault.jpg" alt="" loading="lazy">'
+          : '<span class="legenda-formato">Capa vertical 9:16</span>') +
         (ehVideoDestaque ? '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' : '') +
       '</div>' +
       '<div class="card-destaque-info">' +
@@ -1560,6 +1571,7 @@
     videos.forEach(function(v){
       var card = criarElemento('a', 'card-trabalho visivel');
       var ehVideoTrabalho = tornarCardDeVideo(card, v.link, v.titulo);
+      var idCapaTrabalho = extrairIdYouTube(v.link);
       card.setAttribute('data-nicho', v.nicho || '');
       card.setAttribute('aria-label', v.titulo);
       var legendaNicho = escaparHtml(v.nicho || '');
@@ -1567,7 +1579,9 @@
       if(v.destaque) legendaNicho += ' · ' + escaparHtml(v.destaque);
       card.innerHTML =
         '<div class="midia-placeholder" role="img" aria-label="' + escaparHtml(v.titulo) + '">' +
-          '<span class="legenda-formato">' + escaparHtml(v.formato || 'Vídeo vertical 9:16') + '</span>' +
+          (idCapaTrabalho
+            ? '<img class="capa-video-real" src="https://img.youtube.com/vi/' + idCapaTrabalho + '/hqdefault.jpg" alt="" loading="lazy">'
+            : '<span class="legenda-formato">' + escaparHtml(v.formato || 'Vídeo vertical 9:16') + '</span>') +
           (ehVideoTrabalho ? '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' : '') +
         '</div>' +
         '<div class="card-trabalho-info">' +

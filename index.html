@@ -677,11 +677,19 @@
     margin-bottom:10px;
   }
   .projeto-branded-descricao{ color:var(--texto-suave); font-size:0.95rem; }
-  /* O(s) vídeo(s) do projeto usa(m) a mesma grade e o mesmo tamanho
-     da seção Entre Destinos (classe .grade-destinos, reaproveitada). */
-  .projeto-branded-videos{ margin-bottom:20px; }
-  .projeto-branded-videos:empty{ display:none; margin-bottom:0; }
+  /* Vídeo e fotos lado a lado, pra ornar: o vídeo fica fixo do
+     tamanho da Entre Destinos, e as fotos preenchem o espaço ao
+     lado dele, quebrando linha quando não couber mais nenhuma. */
+  .projeto-branded-conjunto{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-start;
+    gap:18px;
+  }
+  .projeto-branded-videos{ flex:0 0 auto; width:min(345px, 100%); }
+  .projeto-branded-videos:empty{ display:none; }
   .projeto-branded-midias{
+    flex:1 1 320px;
     display:grid;
     grid-template-columns:repeat(auto-fill, minmax(190px, 1fr));
     gap:18px;
@@ -1805,8 +1813,10 @@
           '<h3 class="projeto-branded-marca">' + escaparHtml(p.marca) + '</h3>' +
           '<p class="projeto-branded-descricao">' + escaparHtml(descricaoFinal) + '</p>' +
         '</div>' +
-        '<div class="grade-destinos projeto-branded-videos"></div>' +
-        '<div class="projeto-branded-midias"></div>';
+        '<div class="projeto-branded-conjunto">' +
+          '<div class="grade-destinos projeto-branded-videos"></div>' +
+          '<div class="projeto-branded-midias"></div>' +
+        '</div>';
       var videosEl = bloco.querySelector('.projeto-branded-videos');
       var fotosEl = bloco.querySelector('.projeto-branded-midias');
       p.itens.forEach(function(item){

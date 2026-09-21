@@ -680,7 +680,13 @@
   .projeto-branded-midias{
     display:grid;
     grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
+    grid-auto-flow:dense;
     gap:14px;
+  }
+  /* O vídeo sempre fica em destaque: maior que as fotos ao redor. */
+  .projeto-branded-midias .card-midia-editorial.video-ao-vivo{
+    grid-column:span 2;
+    grid-row:span 2;
   }
 
   /* ----- Entre Destinos: vitrine editorial ----- */

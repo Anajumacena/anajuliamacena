@@ -92,6 +92,17 @@
     { titulo: "Bohems Coffee - xícara de café", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/bohems-coffee/05-xicara-de-cafe.jpg" }
   ];
 
+  // Fotos do projeto Cloud Tattoo pro Branded Content, já hospedadas
+  // dentro do próprio site (pasta imagens/branded/cloud-tattoo). O
+  // botão "Trocar Color WoW por Cloud Tattoo" manda essa lista pro
+  // banco de uma vez, todas com a marca "Cloud Tattoo" já preenchida.
+  var FOTOS_CLOUD_TATTOO = [
+    { titulo: "Cloud Tattoo - vitrine do estúdio", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/cloud-tattoo/01-vitrine-estudio.jpg" },
+    { titulo: "Cloud Tattoo - interior do estúdio", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/cloud-tattoo/02-interior-estudio.jpg" },
+    { titulo: "Cloud Tattoo - tatuando o braço", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/cloud-tattoo/03-tatuando-braco.jpg" },
+    { titulo: "Cloud Tattoo - detalhe da tatuagem", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/cloud-tattoo/04-detalhe-tatuagem.jpg" }
+  ];
+
   function itemStat(valor, rotulo) {
     return '<div class="stat-item"><span class="stat-valor">' + Admin.escapeHtml(valor) + '</span><span class="stat-rotulo">' + rotulo + "</span></div>";
   }
@@ -465,6 +476,57 @@
     carregarTudo();
   }
 
+  async function trocarColorWowPorCloudTattoo() {
+    // Troca a marca do vídeo que hoje está como "Color WoW" pra
+    // "Cloud Tattoo" (o projeto Color WoW deixa de existir) e, na
+    // mesma tacada, importa as fotos novas do estúdio de tatuagem.
+    var videoAntigo = videosCache.filter(function (v) { return (v.marca || "").trim() === "Color WoW"; });
+    var linksExistentes = videosCache.map(function (v) { return v.link; });
+    var fotosFaltando = FOTOS_CLOUD_TATTOO.filter(function (f) { return linksExistentes.indexOf(f.link) === -1; });
+
+    if (videoAntigo.length === 0 && fotosFaltando.length === 0) {
+      Admin.mostrarAviso("avisosPortfolio", "Não encontrei o vídeo do Color WoW nem fotos novas pra importar.", "ok");
+      return;
+    }
+    var mensagem = "Isso vai: ";
+    if (videoAntigo.length > 0) mensagem += "trocar a marca de " + videoAntigo.length + " vídeo(s) de \"Color WoW\" pra \"Cloud Tattoo\"";
+    if (videoAntigo.length > 0 && fotosFaltando.length > 0) mensagem += " e ";
+    if (fotosFaltando.length > 0) mensagem += "adicionar " + fotosFaltando.length + " foto(s) nova(s) no projeto Cloud Tattoo";
+    mensagem += ". O projeto \"Color WoW\" deixa de aparecer no site. Continuar?";
+    if (!window.confirm(mensagem)) return;
+
+    var erros = 0;
+    for (var i = 0; i < videoAntigo.length; i++) {
+      var resultadoTroca = await window.banco.from("videos").update({ marca: "Cloud Tattoo" }).eq("id", videoAntigo[i].id);
+      if (resultadoTroca.error) erros++;
+    }
+
+    if (fotosFaltando.length > 0) {
+      var maiorOrdem = -1;
+      videosCache.forEach(function (v) { if ((v.ordem || 0) > maiorOrdem) maiorOrdem = v.ordem || 0; });
+      var linhasFotos = fotosFaltando.map(function (f, indice) {
+        return {
+          titulo: f.titulo,
+          link: f.link,
+          nicho: "Branded Content",
+          marca: "Cloud Tattoo",
+          formato: "Foto",
+          visivel: true,
+          ordem: maiorOrdem + 1 + indice
+        };
+      });
+      var resultadoFotos = await window.banco.from("videos").insert(linhasFotos);
+      if (resultadoFotos.error) erros++;
+    }
+
+    if (erros > 0) {
+      Admin.mostrarAviso("avisosPortfolio", "Fiz parte, mas algo deu erro. Confira a lista e tente de novo se precisar.", "erro");
+    } else {
+      Admin.mostrarAviso("avisosPortfolio", "Pronto. Agora é o projeto Cloud Tattoo, com as fotos novas.", "ok");
+    }
+    carregarTudo();
+  }
+
   // Preenche o campo "marca" nos vídeos que você já tinha, pra eles
   // aparecerem agrupados na seção Branded Content. Só mexe em vídeos
   // que baterem exatamente com esses títulos e ainda não tiverem uma
@@ -561,6 +623,8 @@
     if (botaoImportarMySht) botaoImportarMySht.addEventListener("click", importarFotosMySht);
     var botaoImportarBohemsCoffee = document.getElementById("botaoImportarBohemsCoffee");
     if (botaoImportarBohemsCoffee) botaoImportarBohemsCoffee.addEventListener("click", importarFotosBohemsCoffee);
+    var botaoTrocarCloudTattoo = document.getElementById("botaoTrocarCloudTattoo");
+    if (botaoTrocarCloudTattoo) botaoTrocarCloudTattoo.addEventListener("click", trocarColorWowPorCloudTattoo);
     document.getElementById("botaoPreencherMarcas").addEventListener("click", preencherMarcasBranded);
     var botaoRemoverDuplicados = document.getElementById("botaoRemoverDuplicados");
     if (botaoRemoverDuplicados) botaoRemoverDuplicados.addEventListener("click", removerImportacaoDuplicada);

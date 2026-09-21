@@ -596,7 +596,7 @@
     font-size:0.95rem;
     border:1px dashed var(--linha-forte);
   }
-  .card-trabalho .midia-placeholder{ aspect-ratio:4/5; }
+  .card-trabalho .midia-placeholder{ aspect-ratio:9/16; }
   .card-trabalho-info{ padding:18px 20px; }
   .card-trabalho-info .tag-nicho{
     font-size:0.65rem;
@@ -1225,7 +1225,7 @@
   function abrirVideoNaPagina(link, titulo){
     var idVideo = extrairIdYouTube(link);
     if(idVideo){
-      telaLightboxVideo.innerHTML = '<iframe src="https://www.youtube.com/embed/' + idVideo + '?autoplay=1&rel=0" title="' + escaparHtml(titulo) + '" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+      telaLightboxVideo.innerHTML = '<iframe src="https://www.youtube.com/embed/' + idVideo + '?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3" title="' + escaparHtml(titulo) + '" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
     } else {
       telaLightboxVideo.innerHTML = '<p class="lightbox-video-aviso">Não consegui abrir esse vídeo aqui. <a href="' + link + '" target="_blank" rel="noopener noreferrer">Assista no YouTube</a>.</p>';
     }
@@ -1306,7 +1306,7 @@
           if(containerMidia && !containerMidia.querySelector('.preview-video-hover')){
             var iframe = document.createElement('iframe');
             iframe.className = 'preview-video-hover';
-            iframe.src = 'https://www.youtube.com/embed/' + idVideo + '?autoplay=1&mute=1&controls=0&loop=1&playlist=' + idVideo + '&modestbranding=1&rel=0&playsinline=1';
+            iframe.src = 'https://www.youtube.com/embed/' + idVideo + '?autoplay=1&mute=1&controls=0&loop=1&playlist=' + idVideo + '&modestbranding=1&rel=0&playsinline=1&iv_load_policy=3&disablekb=1';
             iframe.setAttribute('allow', 'autoplay; encrypted-media');
             iframe.setAttribute('aria-hidden', 'true');
             iframe.setAttribute('tabindex', '-1');

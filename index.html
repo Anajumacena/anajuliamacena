@@ -1805,6 +1805,21 @@
       }
     } catch(erro){ /* segue com a lista vazia, tratado logo abaixo */ }
 
+    // Nunca mostra a mesma dupla título+link duas vezes (protege
+    // contra reimportação acidental) e esconde qualquer linha sem
+    // link de vídeo de verdade (vazio ou "#") até ela ganhar o link
+    // real — assim nenhum card quebrado/vazio chega a aparecer pro
+    // público, mesmo se o banco ainda estiver com dados soltos.
+    var vistosChave = {};
+    videos = videos.filter(function(v){
+      var linkValido = v.link && v.link.trim() !== '' && v.link.trim() !== '#';
+      if(!linkValido) return false;
+      var chave = (v.titulo || '').trim().toLowerCase() + '|' + v.link.trim().toLowerCase();
+      if(vistosChave[chave]) return false;
+      vistosChave[chave] = true;
+      return true;
+    });
+
     // "Entre Olhares" tem a faixa própria na capa, então essas fotos
     // não entram na galeria com filtro aqui embaixo (mas reaparecem
     // dentro de "Entre Destinos" logo abaixo).

@@ -613,6 +613,91 @@
     letter-spacing:0.01em;
   }
 
+  /* ===== Cartão editorial (Branded Content e Entre Destinos) =====
+     Propositalmente diferente do card-trabalho: sem quadro branco
+     de informação embaixo, a legenda fica por cima da própria
+     imagem, com um degradê escuro. Visual mais de revista. */
+  .card-midia-editorial{
+    position:relative;
+    display:block;
+    aspect-ratio:9/16;
+    overflow:hidden;
+    background:linear-gradient(150deg, var(--nude) 0%, var(--areia) 55%, var(--marrom) 100%);
+  }
+  .card-midia-editorial.clicavel{ cursor:pointer; }
+  .card-midia-editorial .midia-placeholder{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    aspect-ratio:auto;
+  }
+  .card-midia-editorial .legenda-editorial{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    padding:22px 18px 16px;
+    background:linear-gradient(to top, rgba(20,17,14,0.78) 0%, rgba(20,17,14,0.35) 55%, transparent 100%);
+    z-index:2;
+    pointer-events:none;
+  }
+  .card-midia-editorial .legenda-editorial h3{
+    font-size:0.95rem;
+    text-transform:none;
+    letter-spacing:0.01em;
+    color:var(--offwhite);
+  }
+  .card-midia-editorial .legenda-editorial .sub-editorial{
+    font-size:0.7rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:rgba(253,252,250,0.8);
+    margin-top:4px;
+    display:block;
+  }
+
+  /* ----- Branded Content: blocos por projeto/marca ----- */
+  .projeto-branded{
+    margin-bottom:clamp(56px, 8vw, 96px);
+    padding-bottom:clamp(56px, 8vw, 96px);
+    border-bottom:1px solid var(--linha);
+  }
+  .projeto-branded:last-child{
+    margin-bottom:0;
+    padding-bottom:0;
+    border-bottom:none;
+  }
+  .projeto-branded-cabecalho{ max-width:640px; margin-bottom:clamp(24px, 4vw, 36px); }
+  .projeto-branded-marca{
+    font-size:clamp(1.3rem, 2.6vw, 1.8rem);
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  .projeto-branded-descricao{ color:var(--texto-suave); font-size:0.95rem; }
+  .projeto-branded-midias{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+    gap:20px;
+  }
+
+  /* ----- Entre Destinos: vitrine editorial ----- */
+  .intro-destinos{
+    max-width:640px;
+    font-size:1.05rem;
+    color:var(--texto-suave);
+    margin-bottom:clamp(36px, 6vw, 56px);
+  }
+  .grade-destinos{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+    gap:22px;
+  }
+  @media (min-width: 900px){
+    .grade-destinos .card-midia-editorial:nth-child(5n+1){
+      grid-column:span 2;
+      aspect-ratio:16/10;
+    }
+  }
+
   /* ===== SERVIÇOS ===== */
   .grade-servicos{
     display:grid;
@@ -954,6 +1039,8 @@
         <li><a href="#sobre">Sobre</a></li>
         <li><a href="#destaques">Destaques</a></li>
         <li><a href="#trabalhos">Trabalhos</a></li>
+        <li><a href="#branded">Branded Content</a></li>
+        <li><a href="#destinos">Entre Destinos</a></li>
         <li><a href="#servicos">Serviços</a></li>
         <li><a href="#numeros">Números</a></li>
         <li><a href="#contato">Contato</a></li>
@@ -1056,22 +1143,51 @@
     </div>
   </section>
 
-  <!-- 5. COMO EU TE AJUDO -->
-  <section class="secao fundo-offwhite" id="servicos">
+  <!-- 5. BRANDED CONTENT -->
+  <!-- Vitrine dos trabalhos com marca. Vem do banco (tabela videos,
+       agrupado pelo campo "marca"). Some sozinha se não houver nada
+       com marca preenchida ainda. -->
+  <section class="secao fundo-offwhite" id="branded" hidden>
     <div class="container">
       <div class="rotulo-secao">
         <span class="numero">04</span>
+        <h2>Branded Content</h2>
+      </div>
+      <div id="listaBrandedContent"></div>
+    </div>
+  </section>
+
+  <!-- 6. ENTRE DESTINOS -->
+  <!-- Projeto autoral de viagem: vídeos com nicho "viagem" e as fotos
+       da faixa Entre Olhares, juntos numa vitrine só. Some sozinha se
+       não houver nenhum conteúdo de viagem ainda. -->
+  <section class="secao" id="destinos" hidden>
+    <div class="container">
+      <div class="rotulo-secao">
+        <span class="numero">05</span>
+        <h2>Entre Destinos</h2>
+      </div>
+      <p class="intro-destinos reveal">Entre Destinos é o meu projeto autoral de storytelling de viagem. Aqui eu registro destinos, experiências, pessoas e momentos através de vídeos e fotografias, mostrando cada lugar a partir do meu olhar.</p>
+      <div class="grade-destinos" id="grideDestinos"></div>
+    </div>
+  </section>
+
+  <!-- 7. COMO EU TE AJUDO -->
+  <section class="secao fundo-offwhite" id="servicos">
+    <div class="container">
+      <div class="rotulo-secao">
+        <span class="numero">06</span>
         <h2>Como eu te ajudo</h2>
       </div>
       <div class="grade-servicos" id="grideServicos"></div>
     </div>
   </section>
 
-  <!-- 6. NÚMEROS E DEPOIMENTOS -->
+  <!-- 8. NÚMEROS E DEPOIMENTOS -->
   <section class="secao" id="numeros">
     <div class="container">
       <div class="rotulo-secao">
-        <span class="numero">05</span>
+        <span class="numero">07</span>
         <h2>Números e depoimentos</h2>
       </div>
 
@@ -1085,11 +1201,11 @@
     </div>
   </section>
 
-  <!-- 7. BORA CRIAR JUNTOS -->
+  <!-- 9. BORA CRIAR JUNTOS -->
   <section class="secao fundo-offwhite" id="contato">
     <div class="container">
       <div class="rotulo-secao">
-        <span class="numero">06</span>
+        <span class="numero">08</span>
         <h2>Bora criar juntos</h2>
       </div>
       <div class="grade-contato">
@@ -1599,6 +1715,94 @@
     }
   });
 
+  // Cartão editorial usado no Branded Content e no Entre Destinos:
+  // a legenda fica por cima da mídia, com degradê, sem o quadro
+  // branco de baixo que a galeria de Trabalhos usa. Fotos abrem na
+  // janela de foto, vídeos tocam sozinhos e abrem com som ao clicar,
+  // exatamente como no resto do site.
+  function criarCardEditorial(item, subtitulo){
+    var card = criarElemento('a', 'card-midia-editorial visivel');
+    var idVideoItem = extrairIdYouTube(item.link);
+    var ehVideo = false;
+    var vaiAutoTocar = false;
+    if(idVideoItem){
+      ehVideo = tornarCardDeVideo(card, item.link, item.titulo);
+      vaiAutoTocar = ehVideo && !prefereReduzirMovimento;
+    } else {
+      card.href = item.link || '#';
+      if(item.link && item.link !== '#'){
+        card.addEventListener('click', function(evento){
+          evento.preventDefault();
+          abrirFotoNaPagina(item.link, item.titulo);
+        });
+        card.classList.add('clicavel');
+      }
+    }
+    card.setAttribute('aria-label', item.titulo);
+    var imagemCapa = item.capa || (!ehVideo && item.link && item.link !== '#' ? item.link : null);
+    var capaHtml = (!vaiAutoTocar && imagemCapa) ? '<img class="capa-video-real" src="' + escaparHtml(imagemCapa) + '" alt="" loading="lazy">' : '';
+    card.innerHTML =
+      '<div class="midia-placeholder" role="img" aria-label="' + escaparHtml(item.titulo) + '">' +
+        capaHtml +
+        (ehVideo && !vaiAutoTocar ? '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' : '') +
+      '</div>' +
+      '<div class="legenda-editorial">' +
+        '<h3>' + escaparHtml(item.titulo) + '</h3>' +
+        (subtitulo ? '<span class="sub-editorial">' + escaparHtml(subtitulo) + '</span>' : '') +
+      '</div>';
+    return card;
+  }
+
+  function renderizarBrandedContent(itensComMarca){
+    var secao = document.getElementById('branded');
+    var lista = document.getElementById('listaBrandedContent');
+    if(itensComMarca.length === 0){
+      secao.hidden = true;
+      lista.innerHTML = '';
+      return;
+    }
+    var projetos = [];
+    var mapaProjetos = {};
+    itensComMarca.forEach(function(v){
+      var chave = v.marca.trim();
+      if(!mapaProjetos[chave]){
+        mapaProjetos[chave] = { marca: chave, descricao: '', itens: [] };
+        projetos.push(mapaProjetos[chave]);
+      }
+      mapaProjetos[chave].itens.push(v);
+      if(!mapaProjetos[chave].descricao && v.projeto_descricao) mapaProjetos[chave].descricao = v.projeto_descricao;
+    });
+    lista.innerHTML = '';
+    projetos.forEach(function(p){
+      var bloco = criarElemento('div', 'projeto-branded visivel');
+      var descricaoFinal = p.descricao || ('Projeto em parceria com a marca ' + p.marca + '.');
+      bloco.innerHTML =
+        '<div class="projeto-branded-cabecalho">' +
+          '<h3 class="projeto-branded-marca">' + escaparHtml(p.marca) + '</h3>' +
+          '<p class="projeto-branded-descricao">' + escaparHtml(descricaoFinal) + '</p>' +
+        '</div>' +
+        '<div class="projeto-branded-midias"></div>';
+      var midiasEl = bloco.querySelector('.projeto-branded-midias');
+      p.itens.forEach(function(item){ midiasEl.appendChild(criarCardEditorial(item, item.destaque || '')); });
+      lista.appendChild(bloco);
+    });
+    secao.hidden = false;
+  }
+
+  function renderizarEntreDestinos(videosViagem, fotosParaDestinos){
+    var secao = document.getElementById('destinos');
+    var grade = document.getElementById('grideDestinos');
+    var itens = videosViagem.concat(fotosParaDestinos);
+    if(itens.length === 0){
+      secao.hidden = true;
+      grade.innerHTML = '';
+      return;
+    }
+    grade.innerHTML = '';
+    itens.forEach(function(item){ grade.appendChild(criarCardEditorial(item, item.marca || '')); });
+    secao.hidden = false;
+  }
+
   async function carregarTrabalhosDoBanco(){
     var videos = [];
     try{
@@ -1609,7 +1813,8 @@
     } catch(erro){ /* segue com a lista vazia, tratado logo abaixo */ }
 
     // "Entre Olhares" tem a faixa própria na capa, então essas fotos
-    // não entram na galeria com filtro aqui embaixo.
+    // não entram na galeria com filtro aqui embaixo (mas reaparecem
+    // dentro de "Entre Destinos" logo abaixo).
     var fotosEntreOlhares = videos.filter(function(v){
       return (v.nicho || '').trim().toLowerCase() === 'entre olhares';
     });
@@ -1617,6 +1822,17 @@
     videos = videos.filter(function(v){
       return (v.nicho || '').trim().toLowerCase() !== 'entre olhares';
     });
+
+    // Branded Content leva tudo que tiver o campo "marca" preenchido.
+    var itensComMarca = videos.filter(function(v){ return (v.marca || '').trim() !== ''; });
+    renderizarBrandedContent(itensComMarca);
+    videos = videos.filter(function(v){ return (v.marca || '').trim() === ''; });
+
+    // Entre Destinos leva os vídeos de nicho "viagem" (sem marca) e
+    // reaproveita as fotos de Entre Olhares na mesma vitrine.
+    var videosViagem = videos.filter(function(v){ return (v.nicho || '').trim().toLowerCase() === 'viagem'; });
+    renderizarEntreDestinos(videosViagem, fotosEntreOlhares);
+    videos = videos.filter(function(v){ return (v.nicho || '').trim().toLowerCase() !== 'viagem'; });
 
     if(videos.length === 0){
       filtrosEl.innerHTML = '';

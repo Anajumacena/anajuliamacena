@@ -553,6 +553,7 @@
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="botao contorno-suave" id="botaoImportarVideos">Importar vídeos anteriores</button>
           <button class="botao contorno-suave" id="botaoImportarEntreOlhares">Importar fotos Entre Olhares</button>
+          <button class="botao contorno-suave" id="botaoPreencherMarcas">Preencher marcas (Branded Content)</button>
           <button class="botao principal" id="botaoNovoVideo">+ Adicionar vídeo</button>
         </div>
       </div>
@@ -759,6 +760,10 @@
       <div class="campo">
         <label for="videoCapa">Capa (link da foto)</label>
         <input type="url" id="videoCapa" placeholder="https://... (deixe vazio pro degradê)">
+      </div>
+      <div class="campo">
+        <label for="videoProjetoDescricao">Descrição do projeto (só pra Branded Content)</label>
+        <textarea id="videoProjetoDescricao" rows="2" placeholder="Uma frase curta contando o que foi esse projeto com a marca"></textarea>
       </div>
       <div class="campo">
         <label style="display:flex; align-items:center; gap:8px; text-transform:none; letter-spacing:0;">

@@ -312,5 +312,15 @@ alter table public.videos add column if not exists capa text;
 
 
 -- ============================================================
+-- 12) CAMPO "projeto_descricao" NA TABELA "videos"
+-- ============================================================
+-- Usado só na seção Branded Content: uma frase curta contando o
+-- que foi aquele projeto com a marca. Preencha em pelo menos um
+-- vídeo de cada marca (se preencher em mais de um, o site usa o
+-- primeiro que encontrar).
+alter table public.videos add column if not exists projeto_descricao text;
+
+
+-- ============================================================
 -- FIM DO SCRIPT
 -- ============================================================

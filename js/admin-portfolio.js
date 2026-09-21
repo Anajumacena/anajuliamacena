@@ -201,6 +201,7 @@
     document.getElementById("videoMarca").value = video.marca || "";
     document.getElementById("videoDestaque").value = video.destaque || "";
     document.getElementById("videoCapa").value = video.capa || "";
+    document.getElementById("videoProjetoDescricao").value = video.projeto_descricao || "";
     document.getElementById("videoVisivel").checked = !!video.visivel;
     Admin.abrirModal("modalVideo");
   }
@@ -347,6 +348,46 @@
     carregarTudo();
   }
 
+  // Preenche o campo "marca" nos vídeos que você já tinha, pra eles
+  // aparecerem agrupados na seção Branded Content. Só mexe em vídeos
+  // que baterem exatamente com esses títulos e ainda não tiverem uma
+  // marca preenchida (não sobrescreve o que você já editou à mão).
+  var MARCAS_PARA_PREENCHER = [
+    { titulo: "Color WoW", marca: "Color WoW" },
+    { titulo: "Bohems Coffee - Turquia", marca: "Bohems Coffee" },
+    { titulo: "My sht - Barcelona", marca: "My sht" },
+    { titulo: "Cloud Tattoo - Barcelona", marca: "Cloud Tattoo" }
+  ];
+
+  async function preencherMarcasBranded() {
+    var candidatos = MARCAS_PARA_PREENCHER
+      .map(function (m) {
+        var video = videosCache.filter(function (v) { return v.titulo === m.titulo && !v.marca; })[0];
+        return video ? { id: video.id, marca: m.marca } : null;
+      })
+      .filter(Boolean);
+
+    if (candidatos.length === 0) {
+      Admin.mostrarAviso("avisosPortfolio", "Não encontrei vídeos pra atualizar (ou eles já têm marca preenchida).", "ok");
+      return;
+    }
+    if (!window.confirm("Isso vai preencher a marca de " + candidatos.length + " vídeo(s) pra eles aparecerem em Branded Content. Continuar?")) {
+      return;
+    }
+
+    var erros = 0;
+    for (var i = 0; i < candidatos.length; i++) {
+      var resultado = await window.banco.from("videos").update({ marca: candidatos[i].marca }).eq("id", candidatos[i].id);
+      if (resultado.error) erros++;
+    }
+    if (erros > 0) {
+      Admin.mostrarAviso("avisosPortfolio", "Preenchi alguns, mas " + erros + " deram erro. Tente de novo.", "erro");
+    } else {
+      Admin.mostrarAviso("avisosPortfolio", "Marcas preenchidas. Já aparecem em Branded Content no site.", "ok");
+    }
+    carregarTudo();
+  }
+
   function configurarEventosUmaVez() {
     if (jaConfigurado) return;
     jaConfigurado = true;
@@ -354,6 +395,7 @@
     document.getElementById("botaoNovoVideo").addEventListener("click", abrirModalNovo);
     document.getElementById("botaoImportarVideos").addEventListener("click", importarVideosAnteriores);
     document.getElementById("botaoImportarEntreOlhares").addEventListener("click", importarFotosEntreOlhares);
+    document.getElementById("botaoPreencherMarcas").addEventListener("click", preencherMarcasBranded);
 
     document.getElementById("formVideo").addEventListener("submit", async function (evento) {
       evento.preventDefault();
@@ -366,6 +408,7 @@
         marca: document.getElementById("videoMarca").value.trim() || null,
         destaque: document.getElementById("videoDestaque").value.trim() || null,
         capa: document.getElementById("videoCapa").value.trim() || null,
+        projeto_descricao: document.getElementById("videoProjetoDescricao").value.trim() || null,
         visivel: document.getElementById("videoVisivel").checked
       };
       var resultado;

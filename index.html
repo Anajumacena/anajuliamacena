@@ -327,6 +327,7 @@
   .hero-foto{
     aspect-ratio:4/5;
     width:100%;
+    overflow:hidden;
   }
   .hero-stats{
     margin-top:clamp(48px, 8vw, 88px);
@@ -978,9 +979,8 @@
             <a class="botao contorno-suave" href="#trabalhos">Ver os trabalhos</a>
           </div>
         </div>
-        <!-- Foto da creator: troque o gradiente por uma <img src="sua-foto.jpg" alt="Ana Julia Macena"> mantendo a classe hero-foto -->
-        <div class="hero-foto midia-placeholder reveal" role="img" aria-label="Foto de Ana Julia Macena">
-          <span class="legenda-formato">Foto da creator 4:5</span>
+        <div class="hero-foto reveal">
+          <img src="imagens/perfil/capa.jpg" alt="Ana Julia Macena em um passeio, em frente a uma floricultura" style="width:100%; height:100%; object-fit:cover; display:block;">
         </div>
       </div>
 

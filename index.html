@@ -1325,7 +1325,13 @@
     filaCriacaoPlayers = [];
   };
   function criarPlayerYouTube(funcaoCriacao){
-    if(apiYouTubePronta && window.YT && window.YT.Player){
+    // Checa o YT.Player direto (não só a variável apiYouTubePronta):
+    // como a API agora carrega bem mais cedo, às vezes ela fica
+    // pronta antes desse script terminar de rodar, e o aviso
+    // "onYouTubeIframeAPIReady" pode disparar antes da gente estar
+    // escutando — aí a variável nunca vira true sozinha.
+    if(window.YT && window.YT.Player){
+      apiYouTubePronta = true;
       funcaoCriacao();
     } else {
       filaCriacaoPlayers.push(funcaoCriacao);

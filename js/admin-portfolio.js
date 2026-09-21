@@ -435,13 +435,10 @@
     var lista = candidatos.map(function (v) { return "- " + v.titulo; }).join("\n");
     if (!window.confirm("Vou apagar " + candidatos.length + " vídeo(s) que entraram duplicados ou sem link de verdade:\n" + lista + "\n\nOs seus vídeos originais não são tocados. Continuar?")) return;
 
-    var erros = 0;
-    for (var i = 0; i < candidatos.length; i++) {
-      var resultado = await window.banco.from("videos").delete().eq("id", candidatos[i].id);
-      if (resultado.error) erros++;
-    }
-    if (erros > 0) {
-      Admin.mostrarAviso("avisosPortfolio", "Removi alguns, mas " + erros + " deram erro. Tente de novo.", "erro");
+    var idsParaApagar = candidatos.map(function (v) { return v.id; });
+    var resultado = await window.banco.from("videos").delete().in("id", idsParaApagar);
+    if (resultado.error) {
+      Admin.mostrarAviso("avisosPortfolio", "Não consegui remover agora. Tente de novo em alguns segundos.", "erro");
     } else {
       Admin.mostrarAviso("avisosPortfolio", "Duplicados removidos. Os vídeos originais continuam no ar.", "ok");
     }

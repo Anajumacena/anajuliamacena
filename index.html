@@ -1180,11 +1180,39 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/banco.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
 <script>
 (function(){
   "use strict";
 
   var prefereReduzirMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* =====================================================
+     CONEXÃO OFICIAL COM O PLAYER DO YOUTUBE
+     Usamos a API de verdade (em vez de só um link de vídeo)
+     pra poder pedir qualidade alta e desligar a legenda com
+     mais força do que os parâmetros de link sozinhos conseguem.
+  ===================================================== */
+  var apiYouTubePronta = false;
+  var filaCriacaoPlayers = [];
+  window.onYouTubeIframeAPIReady = function(){
+    apiYouTubePronta = true;
+    filaCriacaoPlayers.forEach(function(funcao){ funcao(); });
+    filaCriacaoPlayers = [];
+  };
+  function criarPlayerYouTube(funcaoCriacao){
+    if(apiYouTubePronta && window.YT && window.YT.Player){
+      funcaoCriacao();
+    } else {
+      filaCriacaoPlayers.push(funcaoCriacao);
+    }
+  }
+  function forcarQualidadeAlta(evento){
+    try{
+      var niveis = evento.target.getAvailableQualityLevels();
+      evento.target.setPlaybackQuality(niveis && niveis.length ? niveis[0] : 'hd1080');
+    } catch(erro){ /* se a rede da pessoa não aguentar, o YouTube ajusta sozinho */ }
+  }
 
   function escaparHtml(valor){
     if(valor === null || valor === undefined) return '';
@@ -1221,19 +1249,38 @@
   var lightboxVideo = document.getElementById('lightboxVideo');
   var telaLightboxVideo = document.getElementById('telaLightboxVideo');
   var fecharLightboxVideoBotao = document.getElementById('fecharLightboxVideo');
+  var playerAtualLightbox = null;
 
   function abrirVideoNaPagina(link, titulo){
     var idVideo = extrairIdYouTube(link);
-    if(idVideo){
-      telaLightboxVideo.innerHTML = '<iframe src="https://www.youtube.com/embed/' + idVideo + '?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&cc_load_policy=0" title="' + escaparHtml(titulo) + '" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
-    } else {
-      telaLightboxVideo.innerHTML = '<p class="lightbox-video-aviso">Não consegui abrir esse vídeo aqui. <a href="' + link + '" target="_blank" rel="noopener noreferrer">Assista no YouTube</a>.</p>';
-    }
     lightboxVideo.hidden = false;
+    if(!idVideo){
+      telaLightboxVideo.innerHTML = '<p class="lightbox-video-aviso">Não consegui abrir esse vídeo aqui. <a href="' + link + '" target="_blank" rel="noopener noreferrer">Assista no YouTube</a>.</p>';
+      return;
+    }
+    var idHost = 'anfitriao-lightbox-video';
+    telaLightboxVideo.innerHTML = '<div id="' + idHost + '"></div>';
+    criarPlayerYouTube(function(){
+      playerAtualLightbox = new YT.Player(idHost, {
+        videoId: idVideo,
+        playerVars: {
+          autoplay: 1, rel: 0, modestbranding: 1, playsinline: 1,
+          iv_load_policy: 3, cc_load_policy: 0
+        },
+        events: {
+          onReady: function(evento){ forcarQualidadeAlta(evento); evento.target.playVideo(); },
+          onStateChange: function(evento){ if(evento.data === YT.PlayerState.PLAYING) forcarQualidadeAlta(evento); }
+        }
+      });
+    });
   }
 
   function fecharLightboxVideo(){
     lightboxVideo.hidden = true;
+    if(playerAtualLightbox){
+      try{ playerAtualLightbox.destroy(); } catch(erro){ /* já pode ter sido removido */ }
+      playerAtualLightbox = null;
+    }
     telaLightboxVideo.innerHTML = '';
   }
 
@@ -1304,13 +1351,35 @@
           if(!entrada.isIntersecting) return;
           var containerMidia = card.querySelector('.midia-placeholder');
           if(containerMidia && !containerMidia.querySelector('.preview-video-hover')){
-            var iframe = document.createElement('iframe');
-            iframe.className = 'preview-video-hover';
-            iframe.src = 'https://www.youtube.com/embed/' + idVideo + '?autoplay=1&mute=1&controls=0&loop=1&playlist=' + idVideo + '&modestbranding=1&rel=0&playsinline=1&iv_load_policy=3&disablekb=1&cc_load_policy=0&fs=0&showinfo=0';
-            iframe.setAttribute('allow', 'autoplay; encrypted-media');
-            iframe.setAttribute('aria-hidden', 'true');
-            iframe.setAttribute('tabindex', '-1');
-            containerMidia.appendChild(iframe);
+            var idHost = 'anfitriao-preview-' + idVideo + '-' + Math.random().toString(36).slice(2, 8);
+            var host = document.createElement('div');
+            host.id = idHost;
+            host.className = 'preview-video-hover';
+            host.setAttribute('aria-hidden', 'true');
+            containerMidia.appendChild(host);
+            criarPlayerYouTube(function(){
+              new YT.Player(idHost, {
+                videoId: idVideo,
+                playerVars: {
+                  autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: idVideo,
+                  modestbranding: 1, rel: 0, playsinline: 1, iv_load_policy: 3,
+                  disablekb: 1, cc_load_policy: 0, fs: 0
+                },
+                events: {
+                  onReady: function(evento){
+                    var iframeGerado = evento.target.getIframe();
+                    if(iframeGerado){
+                      iframeGerado.classList.add('preview-video-hover');
+                      iframeGerado.setAttribute('tabindex', '-1');
+                    }
+                    evento.target.mute();
+                    forcarQualidadeAlta(evento);
+                    evento.target.playVideo();
+                  },
+                  onStateChange: function(evento){ if(evento.data === YT.PlayerState.PLAYING) forcarQualidadeAlta(evento); }
+                }
+              });
+            });
           }
           observadorAutoplay.unobserve(card);
         });

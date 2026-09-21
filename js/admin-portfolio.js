@@ -80,6 +80,18 @@
     { titulo: "My sht - mesa de acessórios", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/my-sht/10-mesa-acessorios.jpg" }
   ];
 
+  // Fotos do projeto Bohems Coffee pro Branded Content, já hospedadas
+  // dentro do próprio site (pasta imagens/branded/bohems-coffee). O
+  // botão "Importar fotos Bohems Coffee" manda essa lista pro banco
+  // de uma vez, todas com a marca "Bohems Coffee" já preenchida.
+  var FOTOS_BOHEMS_COFFEE = [
+    { titulo: "Bohems Coffee - bebidas na mesa", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/bohems-coffee/01-bebidas-na-mesa.jpg" },
+    { titulo: "Bohems Coffee - cadeira e janela", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/bohems-coffee/02-cadeira-e-janela.jpg" },
+    { titulo: "Bohems Coffee - parede com objetos", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/bohems-coffee/03-parede-com-objetos.jpg" },
+    { titulo: "Bohems Coffee - mão segurando xícara", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/bohems-coffee/04-mao-segurando-xicara.jpg" },
+    { titulo: "Bohems Coffee - xícara de café", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/bohems-coffee/05-xicara-de-cafe.jpg" }
+  ];
+
   function itemStat(valor, rotulo) {
     return '<div class="stat-item"><span class="stat-valor">' + Admin.escapeHtml(valor) + '</span><span class="stat-rotulo">' + rotulo + "</span></div>";
   }
@@ -415,6 +427,44 @@
     carregarTudo();
   }
 
+  async function importarFotosBohemsCoffee() {
+    // Só importa as fotos que ainda não estão no banco (compara pelo
+    // link), então clicar de novo não duplica as que você já tem.
+    var linksExistentes = videosCache.map(function (v) { return v.link; });
+    var faltando = FOTOS_BOHEMS_COFFEE.filter(function (f) { return linksExistentes.indexOf(f.link) === -1; });
+
+    if (faltando.length === 0) {
+      Admin.mostrarAviso("avisosPortfolio", "Todas essas fotos do Bohems Coffee já estão cadastradas.", "ok");
+      return;
+    }
+    if (!window.confirm("Isso vai adicionar " + faltando.length + " foto(s) nova(s) no projeto Bohems Coffee, dentro de Branded Content. Continuar?")) {
+      return;
+    }
+
+    var maiorOrdem = -1;
+    videosCache.forEach(function (v) { if ((v.ordem || 0) > maiorOrdem) maiorOrdem = v.ordem || 0; });
+
+    var linhas = faltando.map(function (f, indice) {
+      return {
+        titulo: f.titulo,
+        link: f.link,
+        nicho: "Branded Content",
+        marca: "Bohems Coffee",
+        formato: "Foto",
+        visivel: true,
+        ordem: maiorOrdem + 1 + indice
+      };
+    });
+
+    var resultado = await window.banco.from("videos").insert(linhas);
+    if (resultado.error) {
+      Admin.mostrarAviso("avisosPortfolio", "Não consegui importar as fotos agora.", "erro");
+      return;
+    }
+    Admin.mostrarAviso("avisosPortfolio", "Fotos importadas. Elas já aparecem no projeto Bohems Coffee, em Branded Content.", "ok");
+    carregarTudo();
+  }
+
   // Preenche o campo "marca" nos vídeos que você já tinha, pra eles
   // aparecerem agrupados na seção Branded Content. Só mexe em vídeos
   // que baterem exatamente com esses títulos e ainda não tiverem uma
@@ -509,6 +559,8 @@
     document.getElementById("botaoImportarEntreOlhares").addEventListener("click", importarFotosEntreOlhares);
     var botaoImportarMySht = document.getElementById("botaoImportarMySht");
     if (botaoImportarMySht) botaoImportarMySht.addEventListener("click", importarFotosMySht);
+    var botaoImportarBohemsCoffee = document.getElementById("botaoImportarBohemsCoffee");
+    if (botaoImportarBohemsCoffee) botaoImportarBohemsCoffee.addEventListener("click", importarFotosBohemsCoffee);
     document.getElementById("botaoPreencherMarcas").addEventListener("click", preencherMarcasBranded);
     var botaoRemoverDuplicados = document.getElementById("botaoRemoverDuplicados");
     if (botaoRemoverDuplicados) botaoRemoverDuplicados.addEventListener("click", removerImportacaoDuplicada);

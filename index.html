@@ -1843,6 +1843,11 @@
     var videosViagem = videos.filter(function(v){ return (v.nicho || '').trim().toLowerCase() === 'viagem'; });
     renderizarEntreDestinos(videosViagem);
 
+    // "Trabalhos por nicho" é só pra vídeo. Fotos (como as do projeto
+    // My sht em Branded Content) aparecem só na seção editorial delas,
+    // nunca aqui — senão viram um card cinza sem imagem nenhuma.
+    videos = videos.filter(function(v){ return !!extrairIdYouTube(v.link); });
+
     if(videos.length === 0){
       filtrosEl.innerHTML = '';
       grideTrabalhos.innerHTML = '<p class="texto-vazio-trabalhos">Em breve, novos trabalhos por aqui.</p>';

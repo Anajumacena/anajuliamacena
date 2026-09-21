@@ -279,18 +279,30 @@
   }
 
   async function importarVideosAnteriores() {
-    var jaTemVideosReais = videosCache.some(function (v) { return v.nicho !== "exemplo"; });
-    if (jaTemVideosReais) {
-      var continuar = window.confirm("Já existem vídeos cadastrados. Importar de novo pode duplicar. Quer importar mesmo assim?");
-      if (!continuar) return;
-    } else if (!window.confirm("Isso vai adicionar os " + VIDEOS_ANTERIORES.length + " vídeos que estavam no seu portfólio antes (alguns ainda com link \"#\", pra você trocar depois). Continuar?")) {
+    // Só importa os que ainda não existem (compara por título + link),
+    // então clicar de novo por engano não duplica o que já está lá.
+    var jaExistentes = {};
+    videosCache.forEach(function (v) {
+      var chave = (v.titulo || "").trim().toLowerCase() + "|" + (v.link || "").trim().toLowerCase();
+      jaExistentes[chave] = true;
+    });
+    var faltando = VIDEOS_ANTERIORES.filter(function (v) {
+      var chave = (v.titulo || "").trim().toLowerCase() + "|" + (v.link || "").trim().toLowerCase();
+      return !jaExistentes[chave];
+    });
+
+    if (faltando.length === 0) {
+      Admin.mostrarAviso("avisosPortfolio", "Esses vídeos já estão todos cadastrados, não importei de novo.", "ok");
+      return;
+    }
+    if (!window.confirm("Isso vai adicionar " + faltando.length + " vídeo(s) que ainda não estão cadastrados (alguns ainda com link \"#\", pra você trocar depois). Continuar?")) {
       return;
     }
 
     var maiorOrdem = -1;
     videosCache.forEach(function (v) { if ((v.ordem || 0) > maiorOrdem) maiorOrdem = v.ordem || 0; });
 
-    var linhas = VIDEOS_ANTERIORES.map(function (v, indice) {
+    var linhas = faltando.map(function (v, indice) {
       return {
         titulo: v.titulo,
         link: v.link,
@@ -388,6 +400,54 @@
     carregarTudo();
   }
 
+  // IDs exatos dos vídeos que entraram duplicados (ou com link "#",
+  // sem vídeo de verdade) quando "Importar vídeos anteriores" foi
+  // clicado de novo em cima de vídeos que já existiam. Apaga só
+  // essas linhas específicas, sem tocar em mais nada.
+  var IDS_IMPORTACAO_DUPLICADA = [
+    "d696d5d5-28d9-4912-a40d-345e8c7b2f88",
+    "126cd3d0-2424-4299-b993-c8a3f0fd18ef",
+    "6186cf32-3216-4f4b-ab6a-3ce9001bf71a",
+    "4a8526e4-20ba-43a4-b19c-6c2972376dcc",
+    "704f004b-641b-4ca7-9ec8-0729d1f1f292",
+    "e8dc05ed-c003-4ccc-9fcb-f6bb4664f019",
+    "0ce50e29-6be2-4db2-abc3-beb913ed6e01",
+    "59c26c35-1fa0-46c7-9755-110df8fa7be4",
+    "0c41d166-012a-4cb6-be21-fc802c7c3119",
+    "e27487ac-1a24-4725-9f3e-fa2114a1d4da",
+    "8835d02e-50f7-4286-ae55-03659e78e209",
+    "24d4c799-1bf4-4dce-89da-7b0a5fe1c462",
+    "ee612191-c95e-4a26-84d3-1053d7bed718",
+    "90c8c5bf-7f96-451b-ae39-8809b8c9d0b7",
+    "5a46d431-7f0b-48e1-8205-35e312a33249",
+    "c40be3a2-1aaf-4402-a45a-d52a2c8eb622",
+    "675c5105-704d-4e6b-bb67-14588ac12be1"
+  ];
+
+  async function removerImportacaoDuplicada() {
+    var candidatos = videosCache.filter(function (v) {
+      return IDS_IMPORTACAO_DUPLICADA.indexOf(v.id) !== -1;
+    });
+    if (candidatos.length === 0) {
+      Admin.mostrarAviso("avisosPortfolio", "Não encontrei nenhum vídeo duplicado pra remover.", "ok");
+      return;
+    }
+    var lista = candidatos.map(function (v) { return "- " + v.titulo; }).join("\n");
+    if (!window.confirm("Vou apagar " + candidatos.length + " vídeo(s) que entraram duplicados ou sem link de verdade:\n" + lista + "\n\nOs seus vídeos originais não são tocados. Continuar?")) return;
+
+    var erros = 0;
+    for (var i = 0; i < candidatos.length; i++) {
+      var resultado = await window.banco.from("videos").delete().eq("id", candidatos[i].id);
+      if (resultado.error) erros++;
+    }
+    if (erros > 0) {
+      Admin.mostrarAviso("avisosPortfolio", "Removi alguns, mas " + erros + " deram erro. Tente de novo.", "erro");
+    } else {
+      Admin.mostrarAviso("avisosPortfolio", "Duplicados removidos. Os vídeos originais continuam no ar.", "ok");
+    }
+    carregarTudo();
+  }
+
   function configurarEventosUmaVez() {
     if (jaConfigurado) return;
     jaConfigurado = true;
@@ -396,6 +456,8 @@
     document.getElementById("botaoImportarVideos").addEventListener("click", importarVideosAnteriores);
     document.getElementById("botaoImportarEntreOlhares").addEventListener("click", importarFotosEntreOlhares);
     document.getElementById("botaoPreencherMarcas").addEventListener("click", preencherMarcasBranded);
+    var botaoRemoverDuplicados = document.getElementById("botaoRemoverDuplicados");
+    if (botaoRemoverDuplicados) botaoRemoverDuplicados.addEventListener("click", removerImportacaoDuplicada);
 
     document.getElementById("formVideo").addEventListener("submit", async function (evento) {
       evento.preventDefault();

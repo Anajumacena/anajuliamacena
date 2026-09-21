@@ -200,6 +200,7 @@
     border:0;
     pointer-events:none;
   }
+  a.video-ao-vivo{ cursor:pointer; }
   .midia-placeholder .legenda-formato{
     position:absolute;
     bottom:14px;
@@ -1290,29 +1291,32 @@
       evento.preventDefault();
       abrirVideoNaPagina(link, titulo);
     });
+    card.classList.add('video-ao-vivo');
 
     if(prefereReduzirMovimento) return true;
 
-    var temporizadorPreview = null;
-    card.addEventListener('mouseenter', function(){
-      temporizadorPreview = window.setTimeout(function(){
-        var containerMidia = card.querySelector('.midia-placeholder');
-        if(!containerMidia || containerMidia.querySelector('.preview-video-hover')) return;
-        var iframe = document.createElement('iframe');
-        iframe.className = 'preview-video-hover';
-        iframe.src = 'https://www.youtube.com/embed/' + idVideo + '?autoplay=1&mute=1&controls=0&loop=1&playlist=' + idVideo + '&modestbranding=1&rel=0&playsinline=1';
-        iframe.setAttribute('allow', 'autoplay; encrypted-media');
-        iframe.setAttribute('aria-hidden', 'true');
-        iframe.setAttribute('tabindex', '-1');
-        containerMidia.appendChild(iframe);
-      }, 200);
-    });
-    card.addEventListener('mouseleave', function(){
-      if(temporizadorPreview){ window.clearTimeout(temporizadorPreview); temporizadorPreview = null; }
-      var containerMidia = card.querySelector('.midia-placeholder');
-      var iframe = containerMidia && containerMidia.querySelector('.preview-video-hover');
-      if(iframe) iframe.remove();
-    });
+    // O vídeo já fica tocando sozinho, mudo, assim que o card entra
+    // na tela (sem precisar passar o mouse). Só carrega quando entra
+    // na tela pra não pesar a página com vídeo demais de uma vez.
+    if('IntersectionObserver' in window){
+      var observadorAutoplay = new IntersectionObserver(function(entradas){
+        entradas.forEach(function(entrada){
+          if(!entrada.isIntersecting) return;
+          var containerMidia = card.querySelector('.midia-placeholder');
+          if(containerMidia && !containerMidia.querySelector('.preview-video-hover')){
+            var iframe = document.createElement('iframe');
+            iframe.className = 'preview-video-hover';
+            iframe.src = 'https://www.youtube.com/embed/' + idVideo + '?autoplay=1&mute=1&controls=0&loop=1&playlist=' + idVideo + '&modestbranding=1&rel=0&playsinline=1';
+            iframe.setAttribute('allow', 'autoplay; encrypted-media');
+            iframe.setAttribute('aria-hidden', 'true');
+            iframe.setAttribute('tabindex', '-1');
+            containerMidia.appendChild(iframe);
+          }
+          observadorAutoplay.unobserve(card);
+        });
+      }, { threshold: 0.25 });
+      observadorAutoplay.observe(card);
+    }
     return true;
   }
 
@@ -1436,12 +1440,15 @@
     var card = criarElemento('a', 'card-destaque reveal');
     var ehVideoDestaque = tornarCardDeVideo(card, d.link, d.titulo);
     card.setAttribute('aria-label', d.titulo);
+    var vaiAutoTocarDestaque = ehVideoDestaque && !prefereReduzirMovimento;
     card.innerHTML =
       '<div class="capa-video midia-placeholder" role="img" aria-label="Capa do vídeo: ' + d.titulo + '">' +
-        (d.capa
-          ? '<img class="capa-video-real" src="' + d.capa + '" alt="" loading="lazy">'
-          : '<span class="legenda-formato">Capa vertical 9:16</span>') +
-        (ehVideoDestaque ? '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' : '') +
+        (vaiAutoTocarDestaque
+          ? ''
+          : (d.capa
+              ? '<img class="capa-video-real" src="' + d.capa + '" alt="" loading="lazy">'
+              : '<span class="legenda-formato">Capa vertical 9:16</span>')) +
+        (ehVideoDestaque && !vaiAutoTocarDestaque ? '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' : '') +
       '</div>' +
       '<div class="card-destaque-info">' +
         '<span class="numero-forte">' + d.numeroForte + '</span>' +
@@ -1576,12 +1583,15 @@
       var legendaNicho = escaparHtml(v.nicho || '');
       if(v.marca) legendaNicho += ' · ' + escaparHtml(v.marca);
       if(v.destaque) legendaNicho += ' · ' + escaparHtml(v.destaque);
+      var vaiAutoTocarTrabalho = ehVideoTrabalho && !prefereReduzirMovimento;
       card.innerHTML =
         '<div class="midia-placeholder" role="img" aria-label="' + escaparHtml(v.titulo) + '">' +
-          (v.capa
-            ? '<img class="capa-video-real" src="' + escaparHtml(v.capa) + '" alt="" loading="lazy">'
-            : '<span class="legenda-formato">' + escaparHtml(v.formato || 'Vídeo vertical 9:16') + '</span>') +
-          (ehVideoTrabalho ? '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' : '') +
+          (vaiAutoTocarTrabalho
+            ? ''
+            : (v.capa
+                ? '<img class="capa-video-real" src="' + escaparHtml(v.capa) + '" alt="" loading="lazy">'
+                : '<span class="legenda-formato">' + escaparHtml(v.formato || 'Vídeo vertical 9:16') + '</span>')) +
+          (ehVideoTrabalho && !vaiAutoTocarTrabalho ? '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' : '') +
         '</div>' +
         '<div class="card-trabalho-info">' +
           '<span class="tag-nicho">' + legendaNicho + '</span>' +

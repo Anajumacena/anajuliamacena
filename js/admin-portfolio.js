@@ -63,6 +63,23 @@
     { titulo: "Parque em Istambul", link: "https://anajumacena.github.io/anajuliamacena/imagens/entre-olhares/17-parque-istambul.jpg" }
   ];
 
+  // Fotos do projeto My sht (Barcelona) pro Branded Content, já
+  // hospedadas dentro do próprio site (pasta imagens/branded/my-sht).
+  // O botão "Importar fotos My sht" manda essa lista pro banco de
+  // uma vez, todas com a marca "My sht" já preenchida.
+  var FOTOS_MY_SHT = [
+    { titulo: "My sht - vitrine da loja", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/my-sht/01-vitrine-loja.jpg" },
+    { titulo: "My sht - sandálias Fendi", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/my-sht/02-sandalias-fendi.jpg" },
+    { titulo: "My sht - quadros na parede", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/my-sht/03-quadros-parede.jpg" },
+    { titulo: "My sht - óculos e brincos", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/my-sht/04-oculos-e-brincos.jpg" },
+    { titulo: "My sht - araras de roupa", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/my-sht/05-araras-de-roupa.jpg" },
+    { titulo: "My sht - parede de quadros da loja", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/my-sht/06-parede-quadros-loja.jpg" },
+    { titulo: "My sht - bolsas e sapatos", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/my-sht/07-bolsas-e-sapatos.jpg" },
+    { titulo: "My sht - bolsa na arara de roupas", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/my-sht/08-bolsa-arara-roupas.jpg" },
+    { titulo: "My sht - etiqueta Prada", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/my-sht/09-etiqueta-prada.jpg" },
+    { titulo: "My sht - mesa de acessórios", link: "https://anajumacena.github.io/anajuliamacena/imagens/branded/my-sht/10-mesa-acessorios.jpg" }
+  ];
+
   function itemStat(valor, rotulo) {
     return '<div class="stat-item"><span class="stat-valor">' + Admin.escapeHtml(valor) + '</span><span class="stat-rotulo">' + rotulo + "</span></div>";
   }
@@ -360,6 +377,44 @@
     carregarTudo();
   }
 
+  async function importarFotosMySht() {
+    // Só importa as fotos que ainda não estão no banco (compara pelo
+    // link), então clicar de novo não duplica as que você já tem.
+    var linksExistentes = videosCache.map(function (v) { return v.link; });
+    var faltando = FOTOS_MY_SHT.filter(function (f) { return linksExistentes.indexOf(f.link) === -1; });
+
+    if (faltando.length === 0) {
+      Admin.mostrarAviso("avisosPortfolio", "Todas essas fotos do My sht já estão cadastradas.", "ok");
+      return;
+    }
+    if (!window.confirm("Isso vai adicionar " + faltando.length + " foto(s) nova(s) no projeto My sht, dentro de Branded Content. Continuar?")) {
+      return;
+    }
+
+    var maiorOrdem = -1;
+    videosCache.forEach(function (v) { if ((v.ordem || 0) > maiorOrdem) maiorOrdem = v.ordem || 0; });
+
+    var linhas = faltando.map(function (f, indice) {
+      return {
+        titulo: f.titulo,
+        link: f.link,
+        nicho: "Branded Content",
+        marca: "My sht",
+        formato: "Foto",
+        visivel: true,
+        ordem: maiorOrdem + 1 + indice
+      };
+    });
+
+    var resultado = await window.banco.from("videos").insert(linhas);
+    if (resultado.error) {
+      Admin.mostrarAviso("avisosPortfolio", "Não consegui importar as fotos agora.", "erro");
+      return;
+    }
+    Admin.mostrarAviso("avisosPortfolio", "Fotos importadas. Elas já aparecem no projeto My sht, em Branded Content.", "ok");
+    carregarTudo();
+  }
+
   // Preenche o campo "marca" nos vídeos que você já tinha, pra eles
   // aparecerem agrupados na seção Branded Content. Só mexe em vídeos
   // que baterem exatamente com esses títulos e ainda não tiverem uma
@@ -452,6 +507,8 @@
     document.getElementById("botaoNovoVideo").addEventListener("click", abrirModalNovo);
     document.getElementById("botaoImportarVideos").addEventListener("click", importarVideosAnteriores);
     document.getElementById("botaoImportarEntreOlhares").addEventListener("click", importarFotosEntreOlhares);
+    var botaoImportarMySht = document.getElementById("botaoImportarMySht");
+    if (botaoImportarMySht) botaoImportarMySht.addEventListener("click", importarFotosMySht);
     document.getElementById("botaoPreencherMarcas").addEventListener("click", preencherMarcasBranded);
     var botaoRemoverDuplicados = document.getElementById("botaoRemoverDuplicados");
     if (botaoRemoverDuplicados) botaoRemoverDuplicados.addEventListener("click", removerImportacaoDuplicada);

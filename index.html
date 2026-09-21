@@ -1789,17 +1789,16 @@
     secao.hidden = false;
   }
 
-  function renderizarEntreDestinos(videosViagem, fotosParaDestinos){
+  function renderizarEntreDestinos(videosViagem){
     var secao = document.getElementById('destinos');
     var grade = document.getElementById('grideDestinos');
-    var itens = videosViagem.concat(fotosParaDestinos);
-    if(itens.length === 0){
+    if(videosViagem.length === 0){
       secao.hidden = true;
       grade.innerHTML = '';
       return;
     }
     grade.innerHTML = '';
-    itens.forEach(function(item){ grade.appendChild(criarCardEditorial(item, item.marca || '')); });
+    videosViagem.forEach(function(item){ grade.appendChild(criarCardEditorial(item, item.marca || '')); });
     secao.hidden = false;
   }
 
@@ -1828,10 +1827,10 @@
     renderizarBrandedContent(itensComMarca);
     videos = videos.filter(function(v){ return (v.marca || '').trim() === ''; });
 
-    // Entre Destinos leva os vídeos de nicho "viagem" (sem marca) e
-    // reaproveita as fotos de Entre Olhares na mesma vitrine.
+    // Entre Destinos leva só os vídeos de nicho "viagem" (sem marca).
+    // As fotos ficam só na faixa Entre Olhares, lá na capa.
     var videosViagem = videos.filter(function(v){ return (v.nicho || '').trim().toLowerCase() === 'viagem'; });
-    renderizarEntreDestinos(videosViagem, fotosEntreOlhares);
+    renderizarEntreDestinos(videosViagem);
     videos = videos.filter(function(v){ return (v.nicho || '').trim().toLowerCase() !== 'viagem'; });
 
     if(videos.length === 0){

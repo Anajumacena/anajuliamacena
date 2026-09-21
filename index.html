@@ -1351,21 +1351,24 @@
       contexto: "Vídeo autêntico mostrando o passo a passo real de uma rotina noturna.",
       numeroForte: "+00K",
       rotuloNumero: "views no reels",
-      link: "#" // SUBSTITUA pelo link real do vídeo
+      link: "#", // SUBSTITUA pelo link real do vídeo
+      capa: null // SUBSTITUA por um link de foto de capa (ou deixe null pro degradê)
     },
     {
       titulo: "Resenha sincera de produto",
       contexto: "Depoimento em primeira pessoa sobre a experiência de uso do produto.",
       numeroForte: "+00K",
       rotuloNumero: "visualizações no tiktok",
-      link: "#" // SUBSTITUA pelo link real do vídeo
+      link: "#", // SUBSTITUA pelo link real do vídeo
+      capa: null // SUBSTITUA por um link de foto de capa (ou deixe null pro degradê)
     },
     {
       titulo: "Unboxing e primeira impressão",
       contexto: "Reação genuína ao abrir o produto pela primeira vez, sem roteiro engessado.",
       numeroForte: "+00K",
       rotuloNumero: "views no reels",
-      link: "#" // SUBSTITUA pelo link real do vídeo
+      link: "#", // SUBSTITUA pelo link real do vídeo
+      capa: null // SUBSTITUA por um link de foto de capa (ou deixe null pro degradê)
     }
   ];
 
@@ -1434,12 +1437,11 @@
   destaques.forEach(function(d){
     var card = criarElemento('a', 'card-destaque reveal');
     var ehVideoDestaque = tornarCardDeVideo(card, d.link, d.titulo);
-    var idCapaDestaque = extrairIdYouTube(d.link);
     card.setAttribute('aria-label', d.titulo);
     card.innerHTML =
       '<div class="capa-video midia-placeholder" role="img" aria-label="Capa do vídeo: ' + d.titulo + '">' +
-        (idCapaDestaque
-          ? '<img class="capa-video-real" src="https://img.youtube.com/vi/' + idCapaDestaque + '/hqdefault.jpg" alt="" loading="lazy">'
+        (d.capa
+          ? '<img class="capa-video-real" src="' + d.capa + '" alt="" loading="lazy">'
           : '<span class="legenda-formato">Capa vertical 9:16</span>') +
         (ehVideoDestaque ? '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' : '') +
       '</div>' +
@@ -1571,7 +1573,6 @@
     videos.forEach(function(v){
       var card = criarElemento('a', 'card-trabalho visivel');
       var ehVideoTrabalho = tornarCardDeVideo(card, v.link, v.titulo);
-      var idCapaTrabalho = extrairIdYouTube(v.link);
       card.setAttribute('data-nicho', v.nicho || '');
       card.setAttribute('aria-label', v.titulo);
       var legendaNicho = escaparHtml(v.nicho || '');
@@ -1579,8 +1580,8 @@
       if(v.destaque) legendaNicho += ' · ' + escaparHtml(v.destaque);
       card.innerHTML =
         '<div class="midia-placeholder" role="img" aria-label="' + escaparHtml(v.titulo) + '">' +
-          (idCapaTrabalho
-            ? '<img class="capa-video-real" src="https://img.youtube.com/vi/' + idCapaTrabalho + '/hqdefault.jpg" alt="" loading="lazy">'
+          (v.capa
+            ? '<img class="capa-video-real" src="' + escaparHtml(v.capa) + '" alt="" loading="lazy">'
             : '<span class="legenda-formato">' + escaparHtml(v.formato || 'Vídeo vertical 9:16') + '</span>') +
           (ehVideoTrabalho ? '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' : '') +
         '</div>' +

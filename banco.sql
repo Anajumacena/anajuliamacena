@@ -303,5 +303,14 @@ values (
 
 
 -- ============================================================
+-- 11) CAMPO "capa" NA TABELA "videos"
+-- ============================================================
+-- Guarda o link de uma foto de capa escolhida por você pra cada
+-- vídeo. Quando esse campo está vazio, o site mostra um degradê
+-- no lugar (nunca quebra por falta de capa).
+alter table public.videos add column if not exists capa text;
+
+
+-- ============================================================
 -- FIM DO SCRIPT
 -- ============================================================

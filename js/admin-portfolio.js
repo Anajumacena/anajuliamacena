@@ -200,6 +200,7 @@
     document.getElementById("videoFormato").value = video.formato || "";
     document.getElementById("videoMarca").value = video.marca || "";
     document.getElementById("videoDestaque").value = video.destaque || "";
+    document.getElementById("videoCapa").value = video.capa || "";
     document.getElementById("videoVisivel").checked = !!video.visivel;
     Admin.abrirModal("modalVideo");
   }
@@ -364,6 +365,7 @@
         formato: document.getElementById("videoFormato").value.trim() || "Vídeo vertical 9:16",
         marca: document.getElementById("videoMarca").value.trim() || null,
         destaque: document.getElementById("videoDestaque").value.trim() || null,
+        capa: document.getElementById("videoCapa").value.trim() || null,
         visivel: document.getElementById("videoVisivel").checked
       };
       var resultado;

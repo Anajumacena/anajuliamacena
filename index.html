@@ -659,34 +659,31 @@
     display:block;
   }
 
-  /* ----- Branded Content: blocos por projeto/marca ----- */
+  /* ----- Branded Content: os 3 projetos lado a lado ----- */
+  #listaBrandedContent{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+    gap:clamp(28px, 4vw, 48px);
+    align-items:start;
+  }
   .projeto-branded{
-    margin-bottom:clamp(56px, 8vw, 96px);
-    padding-bottom:clamp(56px, 8vw, 96px);
-    border-bottom:1px solid var(--linha);
+    border-right:1px solid var(--linha);
+    padding-right:clamp(20px, 3vw, 32px);
   }
-  .projeto-branded:last-child{
-    margin-bottom:0;
-    padding-bottom:0;
-    border-bottom:none;
-  }
-  .projeto-branded-cabecalho{ max-width:640px; margin-bottom:clamp(24px, 4vw, 36px); }
+  .projeto-branded:last-child{ border-right:none; padding-right:0; }
+  .projeto-branded-cabecalho{ margin-bottom:16px; }
   .projeto-branded-marca{
-    font-size:clamp(1.3rem, 2.6vw, 1.8rem);
+    font-size:clamp(1.05rem, 1.6vw, 1.3rem);
     text-transform:uppercase;
-    margin-bottom:10px;
+    margin-bottom:8px;
   }
-  .projeto-branded-descricao{ color:var(--texto-suave); font-size:0.95rem; }
-  /* Vídeo e fotos lado a lado, pra ornar: o vídeo fica fixo do
-     tamanho da Entre Destinos, e as fotos preenchem o espaço ao
-     lado dele, quebrando linha quando não couber mais nenhuma. */
-  .projeto-branded-conjunto{
-    display:flex;
-    flex-wrap:wrap;
-    align-items:flex-start;
-    gap:18px;
-  }
-  .projeto-branded-videos{ flex:0 0 auto; width:min(345px, 100%); }
+  .projeto-branded-descricao{ color:var(--texto-suave); font-size:0.85rem; }
+  /* Vídeo do projeto: encolhe pra caber os 3 lado a lado, mas nunca
+     ultrapassa o tamanho da Entre Destinos. */
+  .projeto-branded-conjunto{ display:block; }
+  .projeto-branded-videos{ width:100%; }
+  .projeto-branded-videos.grade-destinos{ grid-template-columns:minmax(0, 1fr); }
+  .projeto-branded-videos .card-midia-editorial{ max-width:345px; }
   .projeto-branded-videos:empty{ display:none; }
   .projeto-branded-midias{
     flex:1 1 320px;

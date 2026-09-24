@@ -1898,13 +1898,13 @@
       var videosEl = bloco.querySelector('.projeto-branded-videos');
       var fotosEl = bloco.querySelector('.projeto-branded-midias');
       p.itens.forEach(function(item){
-        // O vídeo usa a mesma grade (e o mesmo tamanho) da seção
-        // Entre Destinos; as fotos ficam numa grade separada, menor.
-        var alvo = extrairIdYouTube(item.link) ? videosEl : fotosEl;
-        alvo.appendChild(criarCardEditorial(item, item.destaque || ''));
+        // Aqui só entra vídeo. As fotos de bastidor ficam só na
+        // faixa "Entre Marcas", pra não repetir a mesma foto duas
+        // vezes na página.
+        if(extrairIdYouTube(item.link)) videosEl.appendChild(criarCardEditorial(item, item.destaque || ''));
       });
       if(!videosEl.children.length) videosEl.remove();
-      if(!fotosEl.children.length) fotosEl.remove();
+      fotosEl.remove();
       lista.appendChild(bloco);
     });
     secao.hidden = false;

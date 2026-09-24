@@ -1860,7 +1860,6 @@
     pista.innerHTML = fotos.map(function(f){
       return '<div class="foto-entre-olhares clicavel" data-link="' + escaparHtml(f.link) + '" data-titulo="' + escaparHtml(f.titulo) + '" tabindex="0" role="button" aria-label="' + escaparHtml(t('verFotoMaior')) + escaparHtml(f.titulo) + '">' +
         '<div class="foto-entre-olhares-caixa"><img src="' + f.link + '" alt="' + escaparHtml(f.titulo) + '" loading="lazy"></div>' +
-        '<span class="legenda-local">' + escaparHtml(f.marca || f.titulo) + '</span>' +
       '</div>';
     }).join('');
     faixa.hidden = false;

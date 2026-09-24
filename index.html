@@ -1102,8 +1102,6 @@
           <img src="imagens/perfil/capa.jpg" alt="Ana Julia Macena em um passeio, em frente a uma floricultura" style="width:100%; height:100%; object-fit:cover; display:block;">
         </div>
       </div>
-
-      <div class="hero-stats" id="statsHero"></div>
     </div>
   </section>
 
@@ -1462,7 +1460,6 @@
     aplicarIdiomaEstatico();
     if(typeof renderizarDestaques === 'function') renderizarDestaques();
     if(typeof renderizarServicos === 'function') renderizarServicos();
-    if(typeof renderizarStatsHero === 'function') renderizarStatsHero();
     if(typeof carregarTrabalhosDoBanco === 'function') carregarTrabalhosDoBanco();
   }
 
@@ -1739,15 +1736,6 @@
     { numero: "04", titulo: { pt: "Mobile Content", en: "Mobile Content" }, descricao: { pt: "Fotos e vídeos produzidos com celular para Stories, Reels, campanhas, eventos e experiências.", en: "Photos and videos shot on mobile for Stories, Reels, campaigns, events, and experiences." } }
   ];
 
-  // Métricas com contador animado (SUBSTITUA os valores pelos seus números reais)
-  // "alvo" é o número final e "sufixo" é o texto que aparece colado depois (+, %, M etc)
-  var metricas = [
-    { alvo: 0, sufixo: "+", rotulo: { pt: "Vídeos entregues", en: "Videos delivered" } },
-    { alvo: 0, sufixo: "+", rotulo: { pt: "Marcas atendidas", en: "Brands served" } },
-    { alvo: 0, sufixo: "M+", rotulo: { pt: "Views somadas", en: "Combined views" } },
-    { alvo: 0, sufixo: "%", rotulo: { pt: "Entregas no prazo", en: "On-time delivery" } }
-  ];
-
   /* =====================================================
      RENDERIZAÇÃO
   ===================================================== */
@@ -1758,18 +1746,6 @@
     if(conteudoHTML !== undefined) el.innerHTML = conteudoHTML;
     return el;
   }
-
-  // Três números da capa (usa as três primeiras métricas)
-  var statsHero = document.getElementById('statsHero');
-  function renderizarStatsHero(){
-    statsHero.innerHTML = '';
-    metricas.slice(0, 3).forEach(function(m){
-      var div = criarElemento('div', 'hero-stat reveal visivel');
-      div.innerHTML = '<span class="valor">' + m.alvo + m.sufixo + '</span><span class="rotulo">' + escaparHtml(m.rotulo[idiomaAtual] || m.rotulo.pt) + '</span>';
-      statsHero.appendChild(div);
-    });
-  }
-  renderizarStatsHero();
 
   // Conteúdos de destaque
   var grideDestaques = document.getElementById('grideDestaques');

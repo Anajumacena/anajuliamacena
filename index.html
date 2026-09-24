@@ -1218,7 +1218,7 @@
     <div class="container">
       <div class="rotulo-secao">
         <span class="numero">05</span>
-        <h2>Entre Destinos</h2>
+        <h2 data-i18n="tituloEntreDestinos">Entre Destinos</h2>
       </div>
       <p class="intro-destinos reveal" data-i18n="introDestinos">Entre Destinos é o meu projeto autoral de storytelling de viagem. Aqui eu registro destinos, experiências, pessoas e momentos através de vídeos e fotografias, mostrando cada lugar a partir do meu olhar.</p>
       <div class="grade-destinos" id="grideDestinos"></div>
@@ -1350,7 +1350,7 @@
     navSobre: { pt: "Sobre", en: "About" },
     navDestaques: { pt: "Destaques", en: "Highlights" },
     navTrabalhos: { pt: "Trabalhos", en: "Work" },
-    navDestinos: { pt: "Entre Destinos", en: "Entre Destinos" },
+    navDestinos: { pt: "Entre Destinos", en: "Between Destinations" },
     navServicos: { pt: "Serviços", en: "Services" },
     navContato: { pt: "Contato", en: "Contact" },
     heroFrase: { pt: "Crio conteúdos autênticos para marcas com identidade, propósito e histórias para contar.", en: "I create authentic content for brands with identity, purpose, and stories to tell." },
@@ -1365,11 +1365,12 @@
     tituloDestaques: { pt: "Conteúdos de destaque", en: "Featured content" },
     tituloTrabalhos: { pt: "Trabalhos por nicho", en: "Work by niche" },
     ariaFiltrar: { pt: "Filtrar trabalhos por nicho", en: "Filter work by niche" },
-    tituloEntreOlhares: { pt: "Entre Olhares", en: "Entre Olhares" },
-    tituloEntreMarcas: { pt: "Entre Marcas", en: "Entre Marcas" },
+    tituloEntreOlhares: { pt: "Entre Olhares", en: "Between Glances" },
+    tituloEntreMarcas: { pt: "Entre Marcas", en: "Between Brands" },
+    tituloEntreDestinos: { pt: "Entre Destinos", en: "Between Destinations" },
     ariaFotosAnteriores: { pt: "Ver fotos anteriores", en: "See previous photos" },
     ariaMaisFotos: { pt: "Ver mais fotos", en: "See more photos" },
-    introDestinos: { pt: "Entre Destinos é o meu projeto autoral de storytelling de viagem. Aqui eu registro destinos, experiências, pessoas e momentos através de vídeos e fotografias, mostrando cada lugar a partir do meu olhar.", en: "Entre Destinos is my own travel storytelling project. Here I document destinations, experiences, people, and moments through video and photography, showing each place through my own eyes." },
+    introDestinos: { pt: "Entre Destinos é o meu projeto autoral de storytelling de viagem. Aqui eu registro destinos, experiências, pessoas e momentos através de vídeos e fotografias, mostrando cada lugar a partir do meu olhar.", en: "Between Destinations is my own travel storytelling project. Here I document destinations, experiences, people, and moments through video and photography, showing each place through my own eyes." },
     tituloServicos: { pt: "Como eu te ajudo", en: "How I can help you" },
     tituloContato: { pt: "Bora criar juntos", en: "Let's create together" },
     rotuloNome: { pt: "Nome", en: "Name" },
@@ -1396,6 +1397,27 @@
     fecharMenu: { pt: "Fechar menu", en: "Close menu" },
     botaoIdioma: { pt: "EN", en: "PT" }
   };
+
+  // Nomes de nicho são categoria/etiqueta fixa (não são um texto que
+  // você escreveu por vídeo), então também traduzem — diferente de
+  // título de vídeo, marca ou descrição de projeto, que são conteúdo
+  // seu e continuam em português.
+  var NICHO_TRADUCOES = {
+    "viagem": { pt: "viagem", en: "travel" },
+    "beleza": { pt: "beleza", en: "beauty" },
+    "moda": { pt: "moda", en: "fashion" },
+    "skincare": { pt: "skincare", en: "skincare" },
+    "fitness": { pt: "fitness", en: "fitness" },
+    "marcas": { pt: "marcas", en: "brands" },
+    "entre olhares": { pt: "Entre Olhares", en: "Between Glances" }
+  };
+
+  function traduzirNicho(nicho){
+    if(!nicho) return '';
+    var item = NICHO_TRADUCOES[nicho.trim().toLowerCase()];
+    if(!item) return nicho;
+    return item[idiomaAtual] || item.pt;
+  }
 
   var CHAVE_IDIOMA = 'ugcIdiomaSite';
   var idiomaAtual = 'pt';
@@ -2082,7 +2104,7 @@
     botaoTodos.setAttribute('aria-pressed', 'true');
     filtrosEl.appendChild(botaoTodos);
     nichosVistos.forEach(function(nicho){
-      var botao = criarElemento('button', 'filtro-botao', escaparHtml(nicho));
+      var botao = criarElemento('button', 'filtro-botao', escaparHtml(traduzirNicho(nicho)));
       botao.type = 'button';
       botao.setAttribute('data-filtro', nicho);
       botao.setAttribute('aria-pressed', 'false');
@@ -2095,7 +2117,7 @@
       var ehVideoTrabalho = tornarCardDeVideo(card, v.link, v.titulo);
       card.setAttribute('data-nicho', v.nicho || '');
       card.setAttribute('aria-label', v.titulo);
-      var legendaNicho = escaparHtml(v.nicho || '');
+      var legendaNicho = escaparHtml(traduzirNicho(v.nicho));
       if(v.marca) legendaNicho += ' · ' + escaparHtml(v.marca);
       if(v.destaque) legendaNicho += ' · ' + escaparHtml(v.destaque);
       var vaiAutoTocarTrabalho = ehVideoTrabalho && !prefereReduzirMovimento;

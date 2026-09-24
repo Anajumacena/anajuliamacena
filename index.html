@@ -1062,7 +1062,6 @@
         <li><a href="#branded">Branded Content</a></li>
         <li><a href="#destinos">Entre Destinos</a></li>
         <li><a href="#servicos">Serviços</a></li>
-        <li><a href="#numeros">Números</a></li>
         <li><a href="#contato">Contato</a></li>
       </ul>
     </nav>
@@ -1224,29 +1223,11 @@
     </div>
   </section>
 
-  <!-- 8. NÚMEROS E DEPOIMENTOS -->
-  <section class="secao" id="numeros">
-    <div class="container">
-      <div class="rotulo-secao">
-        <span class="numero">07</span>
-        <h2>Números e depoimentos</h2>
-      </div>
-
-      <div class="grade-metricas" id="grideMetricas"></div>
-
-      <p class="subtitulo-bloco reveal">Resultados de campanha</p>
-      <div class="grade-campanhas" id="grideCampanhas"></div>
-
-      <p class="subtitulo-bloco reveal">O que dizem sobre o meu trabalho</p>
-      <div class="grade-depoimentos" id="grideDepoimentos"></div>
-    </div>
-  </section>
-
-  <!-- 9. BORA CRIAR JUNTOS -->
+  <!-- 8. BORA CRIAR JUNTOS -->
   <section class="secao fundo-offwhite" id="contato">
     <div class="container">
       <div class="rotulo-secao">
-        <span class="numero">08</span>
+        <span class="numero">07</span>
         <h2>Bora criar juntos</h2>
       </div>
       <div class="grade-contato">
@@ -1629,21 +1610,6 @@
     { alvo: 0, sufixo: "+", rotulo: "Marcas atendidas" },
     { alvo: 0, sufixo: "M+", rotulo: "Views somadas" },
     { alvo: 0, sufixo: "%", rotulo: "Entregas no prazo" }
-  ];
-
-  // Resultados de campanha (SUBSTITUA pelos números reais de cada case)
-  var resultadosCampanha = [
-    { numero: "+00%", descricao: "Aumento de engajamento em campanha de skincare com depoimento real." },
-    { numero: "+00%", descricao: "Crescimento em cliques de anúncio usando corte de vídeo UGC." },
-    { numero: "+00K", descricao: "Visualizações orgânicas em conteúdo de unboxing para lançamento de produto." }
-  ];
-
-  // Depoimentos de clientes
-  var depoimentos = [
-    { texto: "Texto do depoimento do cliente sobre a experiência de trabalhar com a Ana Julia. Substitua por um feedback real.", nome: "Cliente 01", empresa: "Empresa 01" },
-    { texto: "Texto do depoimento do cliente sobre a experiência de trabalhar com a Ana Julia. Substitua por um feedback real.", nome: "Cliente 02", empresa: "Empresa 02" },
-    { texto: "Texto do depoimento do cliente sobre a experiência de trabalhar com a Ana Julia. Substitua por um feedback real.", nome: "Cliente 03", empresa: "Empresa 03" },
-    { texto: "Texto do depoimento do cliente sobre a experiência de trabalhar com a Ana Julia. Substitua por um feedback real.", nome: "Cliente 04", empresa: "Empresa 04" }
   ];
 
   /* =====================================================
@@ -2062,39 +2028,6 @@
       '<h3>' + s.titulo + '</h3>' +
       '<p>' + s.descricao + '</p>';
     grideServicos.appendChild(card);
-  });
-
-  // Métricas com contador
-  var grideMetricas = document.getElementById('grideMetricas');
-  metricas.forEach(function(m){
-    var div = criarElemento('div', 'metrica reveal');
-    div.innerHTML =
-      '<span class="metrica-numero" data-alvo="' + m.alvo + '" data-sufixo="' + m.sufixo + '">0' + (prefereReduzirMovimento ? m.sufixo : '') + '</span>' +
-      '<span class="metrica-rotulo">' + m.rotulo + '</span>';
-    grideMetricas.appendChild(div);
-  });
-  if(prefereReduzirMovimento){
-    grideMetricas.querySelectorAll('.metrica-numero').forEach(function(el){
-      el.textContent = el.getAttribute('data-alvo') + el.getAttribute('data-sufixo');
-    });
-  }
-
-  // Resultados de campanha
-  var grideCampanhas = document.getElementById('grideCampanhas');
-  resultadosCampanha.forEach(function(c){
-    var div = criarElemento('div', 'card-campanha reveal');
-    div.innerHTML = '<span class="numero-forte">' + c.numero + '</span><p>' + c.descricao + '</p>';
-    grideCampanhas.appendChild(div);
-  });
-
-  // Depoimentos
-  var grideDepoimentos = document.getElementById('grideDepoimentos');
-  depoimentos.forEach(function(d){
-    var div = criarElemento('div', 'card-depoimento reveal');
-    div.innerHTML =
-      '<blockquote>' + d.texto + '</blockquote>' +
-      '<footer><strong>' + d.nome + '</strong> · ' + d.empresa + '</footer>';
-    grideDepoimentos.appendChild(div);
   });
 
   /* =====================================================

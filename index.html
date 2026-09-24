@@ -257,6 +257,18 @@
     border-color:var(--marrom);
     color:var(--marrom);
   }
+  .botao-idioma{
+    font-family:'Tenor Sans', serif;
+    font-size:0.8rem;
+    letter-spacing:0.05em;
+    color:var(--texto);
+    background:none;
+    border:1px solid var(--linha-forte);
+    padding:6px 12px;
+    cursor:pointer;
+    transition:background 0.25s ease, color 0.25s ease;
+  }
+  .botao-idioma:hover, .botao-idioma:focus-visible{ background:var(--texto); color:var(--offwhite); }
   .nav-hamburguer{
     display:none;
     flex-direction:column;
@@ -1049,22 +1061,23 @@
 </style>
 </head>
 <body>
-<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<a class="skip-link" href="#conteudo" data-i18n="pularConteudo">Pular para o conteúdo</a>
 
 <header class="nav">
   <div class="nav-conteudo">
     <a href="#topo" class="nav-nome">Ana Julia Macena</a>
-    <nav aria-label="Navegação principal">
+    <nav data-i18n-aria="navPrincipal" aria-label="Navegação principal">
       <ul class="nav-links" id="menuNav">
-        <li><a href="#sobre">Sobre</a></li>
-        <li><a href="#destaques">Destaques</a></li>
-        <li><a href="#trabalhos">Trabalhos</a></li>
+        <li><a href="#sobre" data-i18n="navSobre">Sobre</a></li>
+        <li><a href="#destaques" data-i18n="navDestaques">Destaques</a></li>
+        <li><a href="#trabalhos" data-i18n="navTrabalhos">Trabalhos</a></li>
         <li><a href="#branded">Branded Content</a></li>
-        <li><a href="#destinos">Entre Destinos</a></li>
-        <li><a href="#servicos">Serviços</a></li>
-        <li><a href="#contato">Contato</a></li>
+        <li><a href="#destinos" data-i18n="navDestinos">Entre Destinos</a></li>
+        <li><a href="#servicos" data-i18n="navServicos">Serviços</a></li>
+        <li><a href="#contato" data-i18n="navContato">Contato</a></li>
       </ul>
     </nav>
+    <button class="botao-idioma" id="botaoIdioma" type="button">EN</button>
     <button class="nav-hamburguer" id="botaoHamburguer" aria-label="Abrir menu" aria-expanded="false" aria-controls="menuNav">
       <span></span><span></span><span></span>
     </button>
@@ -1079,10 +1092,10 @@
       <div class="hero-topo">
         <div class="reveal">
           <h1 class="hero-nome">Ana Julia<br>Macena</h1>
-          <p class="hero-frase">Crio conteúdos autênticos para marcas com identidade, propósito e histórias para contar.</p>
+          <p class="hero-frase" data-i18n="heroFrase">Crio conteúdos autênticos para marcas com identidade, propósito e histórias para contar.</p>
           <div class="hero-botoes">
-            <a class="botao cheio" href="#contato">Falar comigo</a>
-            <a class="botao contorno-suave" href="#trabalhos">Ver os trabalhos</a>
+            <a class="botao cheio" href="#contato" data-i18n="botaoFalarComigo">Falar comigo</a>
+            <a class="botao contorno-suave" href="#trabalhos" data-i18n="botaoVerTrabalhos">Ver os trabalhos</a>
           </div>
         </div>
         <div class="hero-foto reveal">
@@ -1099,19 +1112,19 @@
     <div class="container">
       <div class="rotulo-secao">
         <span class="numero">01</span>
-        <h2>Sobre mim</h2>
+        <h2 data-i18n="tituloSobre">Sobre mim</h2>
       </div>
       <div class="sobre-grade">
         <!-- Foto pessoal: troque o gradiente por <img src="sua-foto.jpg" alt="Ana Julia Macena sorrindo"> -->
         <div class="sobre-foto reveal">
-          <img src="imagens/perfil/sobre-mim.jpg" alt="Ana Julia Macena sorrindo em um campo, com balões de ar quente ao fundo, na Capadócia" style="width:100%; height:100%; object-fit:cover; display:block;">
+          <img src="imagens/perfil/sobre-mim.jpg" data-i18n-alt="altSobreFoto" alt="Ana Julia Macena sorrindo em um campo, com balões de ar quente ao fundo, na Capadócia" style="width:100%; height:100%; object-fit:cover; display:block;">
         </div>
         <div class="sobre-texto reveal">
-          <p>Prazer, meu nome é Ana Júlia. Sou publicitária, criadora de conteúdo e apaixonada pelo universo do audiovisual. Já desenvolvi projetos para marcas no Brasil, na Espanha e na Turquia. Meu trabalho parte de uma sensibilidade estética e de atenção aos detalhes, com um olhar documental para o que acontece de forma natural. Para mim, o audiovisual é uma forma de dar espaço ao que quase passa despercebido e revelar a essência por trás de cada história, marca e projeto.</p>
+          <p data-i18n="textoSobre">Prazer, meu nome é Ana Júlia. Sou publicitária, criadora de conteúdo e apaixonada pelo universo do audiovisual. Já desenvolvi projetos para marcas no Brasil, na Espanha e na Turquia. Meu trabalho parte de uma sensibilidade estética e de atenção aos detalhes, com um olhar documental para o que acontece de forma natural. Para mim, o audiovisual é uma forma de dar espaço ao que quase passa despercebido e revelar a essência por trás de cada história, marca e projeto.</p>
           <ul class="lista-promessas">
-            <li>Roteiro aprovado antes de gravar</li>
-            <li>Uma rodada de ajuste inclusa</li>
-            <li>Entrega em até 72 horas úteis</li>
+            <li data-i18n="promessa1">Roteiro aprovado antes de gravar</li>
+            <li data-i18n="promessa2">Uma rodada de ajuste inclusa</li>
+            <li data-i18n="promessa3">Entrega em até 72 horas úteis</li>
           </ul>
           <p class="assinatura">Ana Julia Macena</p>
         </div>
@@ -1124,7 +1137,7 @@
     <div class="container">
       <div class="rotulo-secao">
         <span class="numero">02</span>
-        <h2>Conteúdos de destaque</h2>
+        <h2 data-i18n="tituloDestaques">Conteúdos de destaque</h2>
       </div>
       <div class="grade-destaques" id="grideDestaques"></div>
     </div>
@@ -1135,9 +1148,9 @@
     <div class="container">
       <div class="rotulo-secao">
         <span class="numero">03</span>
-        <h2>Trabalhos por nicho</h2>
+        <h2 data-i18n="tituloTrabalhos">Trabalhos por nicho</h2>
       </div>
-      <div class="filtros" id="filtros" role="group" aria-label="Filtrar trabalhos por nicho"></div>
+      <div class="filtros" id="filtros" role="group" data-i18n-aria="ariaFiltrar" aria-label="Filtrar trabalhos por nicho"></div>
       <div class="grade-trabalhos" id="grideTrabalhos"></div>
     </div>
 
@@ -1146,15 +1159,15 @@
          Fica escondida sozinha se ainda não houver nenhuma foto. -->
     <div class="container">
       <div class="faixa-fotos" id="faixaEntreOlhares" hidden>
-        <p class="titulo-faixa">Entre Olhares</p>
+        <p class="titulo-faixa" data-i18n="tituloEntreOlhares">Entre Olhares</p>
         <div class="carrossel-fotos">
-          <button class="seta-fotos" id="setaFotosEsquerda" type="button" aria-label="Ver fotos anteriores">
+          <button class="seta-fotos" id="setaFotosEsquerda" type="button" data-i18n-aria="ariaFotosAnteriores" aria-label="Ver fotos anteriores">
             <svg viewBox="0 0 24 24"><polyline points="15,4 7,12 15,20"/></svg>
           </button>
           <div class="pista-fotos-janela" id="janelaEntreOlhares">
             <div class="pista-fotos" id="pistaEntreOlhares"></div>
           </div>
-          <button class="seta-fotos" id="setaFotosDireita" type="button" aria-label="Ver mais fotos">
+          <button class="seta-fotos" id="setaFotosDireita" type="button" data-i18n-aria="ariaMaisFotos" aria-label="Ver mais fotos">
             <svg viewBox="0 0 24 24"><polyline points="9,4 17,12 9,20"/></svg>
           </button>
         </div>
@@ -1181,15 +1194,15 @@
          ainda não houver nenhuma foto de marca. -->
     <div class="container">
       <div class="faixa-fotos" id="faixaEntreMarcas" hidden>
-        <p class="titulo-faixa">Entre Marcas</p>
+        <p class="titulo-faixa" data-i18n="tituloEntreMarcas">Entre Marcas</p>
         <div class="carrossel-fotos">
-          <button class="seta-fotos" id="setaMarcasEsquerda" type="button" aria-label="Ver fotos anteriores">
+          <button class="seta-fotos" id="setaMarcasEsquerda" type="button" data-i18n-aria="ariaFotosAnteriores" aria-label="Ver fotos anteriores">
             <svg viewBox="0 0 24 24"><polyline points="15,4 7,12 15,20"/></svg>
           </button>
           <div class="pista-fotos-janela" id="janelaEntreMarcas">
             <div class="pista-fotos" id="pistaEntreMarcas"></div>
           </div>
-          <button class="seta-fotos" id="setaMarcasDireita" type="button" aria-label="Ver mais fotos">
+          <button class="seta-fotos" id="setaMarcasDireita" type="button" data-i18n-aria="ariaMaisFotos" aria-label="Ver mais fotos">
             <svg viewBox="0 0 24 24"><polyline points="9,4 17,12 9,20"/></svg>
           </button>
         </div>
@@ -1207,7 +1220,7 @@
         <span class="numero">05</span>
         <h2>Entre Destinos</h2>
       </div>
-      <p class="intro-destinos reveal">Entre Destinos é o meu projeto autoral de storytelling de viagem. Aqui eu registro destinos, experiências, pessoas e momentos através de vídeos e fotografias, mostrando cada lugar a partir do meu olhar.</p>
+      <p class="intro-destinos reveal" data-i18n="introDestinos">Entre Destinos é o meu projeto autoral de storytelling de viagem. Aqui eu registro destinos, experiências, pessoas e momentos através de vídeos e fotografias, mostrando cada lugar a partir do meu olhar.</p>
       <div class="grade-destinos" id="grideDestinos"></div>
     </div>
   </section>
@@ -1217,7 +1230,7 @@
     <div class="container">
       <div class="rotulo-secao">
         <span class="numero">06</span>
-        <h2>Como eu te ajudo</h2>
+        <h2 data-i18n="tituloServicos">Como eu te ajudo</h2>
       </div>
       <div class="grade-servicos" id="grideServicos"></div>
     </div>
@@ -1228,32 +1241,32 @@
     <div class="container">
       <div class="rotulo-secao">
         <span class="numero">07</span>
-        <h2>Bora criar juntos</h2>
+        <h2 data-i18n="tituloContato">Bora criar juntos</h2>
       </div>
       <div class="grade-contato">
         <div class="reveal">
           <form id="formContato" novalidate>
             <div class="campo">
-              <label for="nomeContato">Nome</label>
+              <label for="nomeContato" data-i18n="rotuloNome">Nome</label>
               <input type="text" id="nomeContato" name="nome" required autocomplete="name">
             </div>
             <div class="campo">
-              <label for="emailContato">E-mail</label>
+              <label for="emailContato" data-i18n="rotuloEmail">E-mail</label>
               <input type="email" id="emailContato" name="email" required autocomplete="email">
             </div>
             <div class="campo">
-              <label for="mensagemContato">Mensagem</label>
+              <label for="mensagemContato" data-i18n="rotuloMensagem">Mensagem</label>
               <textarea id="mensagemContato" name="mensagem" required></textarea>
             </div>
-            <button type="submit" class="botao cheio">Enviar mensagem</button>
+            <button type="submit" class="botao cheio" data-i18n="botaoEnviarMensagem">Enviar mensagem</button>
           </form>
           <div class="confirmacao-envio" id="confirmacaoEnvio" role="status" aria-live="polite" hidden>
-            <strong>Mensagem enviada</strong>
-            Obrigada pelo contato. Eu respondo o mais rápido possível.
+            <strong data-i18n="msgEnviadaTitulo">Mensagem enviada</strong>
+            <span data-i18n="msgEnviadaTexto">Obrigada pelo contato. Eu respondo o mais rápido possível.</span>
           </div>
         </div>
         <div class="contato-direto reveal">
-          <h3>Fale direto comigo</h3>
+          <h3 data-i18n="faleDireto">Fale direto comigo</h3>
           <div class="contato-botoes">
             <a class="botao contorno-suave" href="https://wa.me/5562992686413" target="_blank" rel="noopener noreferrer">WhatsApp</a>
             <a class="botao contorno-suave" href="mailto:anajuliarmacena@gmail.com">E-mail</a>
@@ -1281,16 +1294,16 @@
 
 <!-- JANELA DE VÍDEO: assiste sem sair do site -->
 <div class="lightbox-video" id="lightboxVideo" hidden>
-  <div class="lightbox-video-caixa" role="dialog" aria-modal="true" aria-label="Vídeo">
-    <button class="lightbox-video-fechar" id="fecharLightboxVideo" aria-label="Fechar vídeo">×</button>
+  <div class="lightbox-video-caixa" role="dialog" aria-modal="true" data-i18n-aria="ariaVideo" aria-label="Vídeo">
+    <button class="lightbox-video-fechar" id="fecharLightboxVideo" data-i18n-aria="ariaFecharVideo" aria-label="Fechar vídeo">×</button>
     <div class="lightbox-video-tela" id="telaLightboxVideo"></div>
   </div>
 </div>
 
 <!-- JANELA DE FOTO: ver a foto da faixa Entre Olhares maior -->
 <div class="lightbox-video" id="lightboxFoto" hidden>
-  <div class="lightbox-video-caixa lightbox-foto-caixa" role="dialog" aria-modal="true" aria-label="Foto">
-    <button class="lightbox-video-fechar" id="fecharLightboxFoto" aria-label="Fechar foto">×</button>
+  <div class="lightbox-video-caixa lightbox-foto-caixa" role="dialog" aria-modal="true" data-i18n-aria="ariaFoto" aria-label="Foto">
+    <button class="lightbox-video-fechar" id="fecharLightboxFoto" data-i18n-aria="ariaFecharFoto" aria-label="Fechar foto">×</button>
     <img id="imagemLightboxFoto" src="" alt="">
   </div>
 </div>
@@ -1298,21 +1311,21 @@
 <!-- CARD DE CAPTURA DE MÍDIA KIT -->
 <div class="modal-overlay" id="modalCaptura" hidden>
   <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="tituloModal">
-    <button class="modal-fechar" id="fecharModal" aria-label="Fechar">×</button>
-    <h3 id="tituloModal">Quer meu mídia kit completo?</h3>
-    <p>Deixe seu nome e e-mail que eu te envio com todos os meus números e formatos de trabalho.</p>
+    <button class="modal-fechar" id="fecharModal" data-i18n-aria="ariaFechar" aria-label="Fechar">×</button>
+    <h3 id="tituloModal" data-i18n="modalTitulo">Quer meu mídia kit completo?</h3>
+    <p data-i18n="modalTexto">Deixe seu nome e e-mail que eu te envio com todos os meus números e formatos de trabalho.</p>
     <form id="formCaptura">
       <div class="campo">
-        <label for="nomeCaptura">Nome</label>
+        <label for="nomeCaptura" data-i18n="rotuloNome">Nome</label>
         <input type="text" id="nomeCaptura" name="nome" required autocomplete="name">
       </div>
       <div class="campo">
-        <label for="emailCaptura">E-mail</label>
+        <label for="emailCaptura" data-i18n="rotuloEmail">E-mail</label>
         <input type="email" id="emailCaptura" name="email" required autocomplete="email">
       </div>
-      <button type="submit" class="botao cheio">Quero receber</button>
+      <button type="submit" class="botao cheio" data-i18n="modalBotao">Quero receber</button>
     </form>
-    <p class="modal-confirmacao" id="confirmacaoCaptura">Recebido. Em breve eu envio o mídia kit para o seu e-mail.</p>
+    <p class="modal-confirmacao" id="confirmacaoCaptura" data-i18n="modalConfirmacao">Recebido. Em breve eu envio o mídia kit para o seu e-mail.</p>
   </div>
 </div>
 
@@ -1323,6 +1336,113 @@
   "use strict";
 
   var prefereReduzirMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* =====================================================
+     IDIOMA (PT/EN)
+     Só traduz o texto fixo do site (menu, títulos, botões,
+     formulário...). Título de vídeo, nome de marca e descrição de
+     projeto continuam em português, porque são conteúdo seu, vindo
+     do banco de dados — eu não posso inventar a tradução disso.
+  ===================================================== */
+  var TRADUCOES = {
+    pularConteudo: { pt: "Pular para o conteúdo", en: "Skip to content" },
+    navPrincipal: { pt: "Navegação principal", en: "Main navigation" },
+    navSobre: { pt: "Sobre", en: "About" },
+    navDestaques: { pt: "Destaques", en: "Highlights" },
+    navTrabalhos: { pt: "Trabalhos", en: "Work" },
+    navDestinos: { pt: "Entre Destinos", en: "Entre Destinos" },
+    navServicos: { pt: "Serviços", en: "Services" },
+    navContato: { pt: "Contato", en: "Contact" },
+    heroFrase: { pt: "Crio conteúdos autênticos para marcas com identidade, propósito e histórias para contar.", en: "I create authentic content for brands with identity, purpose, and stories to tell." },
+    botaoFalarComigo: { pt: "Falar comigo", en: "Get in touch" },
+    botaoVerTrabalhos: { pt: "Ver os trabalhos", en: "See my work" },
+    tituloSobre: { pt: "Sobre mim", en: "About me" },
+    altSobreFoto: { pt: "Ana Julia Macena sorrindo em um campo, com balões de ar quente ao fundo, na Capadócia", en: "Ana Julia Macena smiling in a field, with hot air balloons in the background, in Cappadocia" },
+    textoSobre: { pt: "Prazer, meu nome é Ana Júlia. Sou publicitária, criadora de conteúdo e apaixonada pelo universo do audiovisual. Já desenvolvi projetos para marcas no Brasil, na Espanha e na Turquia. Meu trabalho parte de uma sensibilidade estética e de atenção aos detalhes, com um olhar documental para o que acontece de forma natural. Para mim, o audiovisual é uma forma de dar espaço ao que quase passa despercebido e revelar a essência por trás de cada história, marca e projeto.", en: "Nice to meet you, my name is Ana Júlia. I'm an advertiser, content creator, and I'm passionate about the audiovisual world. I've developed projects for brands in Brazil, Spain, and Turkey. My work comes from an eye for aesthetics and attention to detail, with a documentary-style look at what happens naturally. To me, audiovisual work is a way to make space for what almost goes unnoticed and to reveal the essence behind every story, brand, and project." },
+    promessa1: { pt: "Roteiro aprovado antes de gravar", en: "Script approved before filming" },
+    promessa2: { pt: "Uma rodada de ajuste inclusa", en: "One round of revisions included" },
+    promessa3: { pt: "Entrega em até 72 horas úteis", en: "Delivery within 72 business hours" },
+    tituloDestaques: { pt: "Conteúdos de destaque", en: "Featured content" },
+    tituloTrabalhos: { pt: "Trabalhos por nicho", en: "Work by niche" },
+    ariaFiltrar: { pt: "Filtrar trabalhos por nicho", en: "Filter work by niche" },
+    tituloEntreOlhares: { pt: "Entre Olhares", en: "Entre Olhares" },
+    tituloEntreMarcas: { pt: "Entre Marcas", en: "Entre Marcas" },
+    ariaFotosAnteriores: { pt: "Ver fotos anteriores", en: "See previous photos" },
+    ariaMaisFotos: { pt: "Ver mais fotos", en: "See more photos" },
+    introDestinos: { pt: "Entre Destinos é o meu projeto autoral de storytelling de viagem. Aqui eu registro destinos, experiências, pessoas e momentos através de vídeos e fotografias, mostrando cada lugar a partir do meu olhar.", en: "Entre Destinos is my own travel storytelling project. Here I document destinations, experiences, people, and moments through video and photography, showing each place through my own eyes." },
+    tituloServicos: { pt: "Como eu te ajudo", en: "How I can help you" },
+    tituloContato: { pt: "Bora criar juntos", en: "Let's create together" },
+    rotuloNome: { pt: "Nome", en: "Name" },
+    rotuloEmail: { pt: "E-mail", en: "Email" },
+    rotuloMensagem: { pt: "Mensagem", en: "Message" },
+    botaoEnviarMensagem: { pt: "Enviar mensagem", en: "Send message" },
+    msgEnviadaTitulo: { pt: "Mensagem enviada", en: "Message sent" },
+    msgEnviadaTexto: { pt: "Obrigada pelo contato. Eu respondo o mais rápido possível.", en: "Thanks for reaching out. I'll reply as soon as possible." },
+    faleDireto: { pt: "Fale direto comigo", en: "Get in touch directly" },
+    ariaVideo: { pt: "Vídeo", en: "Video" },
+    ariaFecharVideo: { pt: "Fechar vídeo", en: "Close video" },
+    ariaFoto: { pt: "Foto", en: "Photo" },
+    ariaFecharFoto: { pt: "Fechar foto", en: "Close photo" },
+    ariaFechar: { pt: "Fechar", en: "Close" },
+    modalTitulo: { pt: "Quer meu mídia kit completo?", en: "Want my full media kit?" },
+    modalTexto: { pt: "Deixe seu nome e e-mail que eu te envio com todos os meus números e formatos de trabalho.", en: "Leave your name and email and I'll send you all my numbers and work formats." },
+    modalBotao: { pt: "Quero receber", en: "Yes, send it to me" },
+    modalConfirmacao: { pt: "Recebido. Em breve eu envio o mídia kit para o seu e-mail.", en: "Got it. I'll send the media kit to your email shortly." },
+    filtroTodos: { pt: "Todos", en: "All" },
+    trabalhosVazio: { pt: "Em breve, novos trabalhos por aqui.", en: "New work coming soon." },
+    verFotoMaior: { pt: "Ver foto maior: ", en: "View larger photo: " },
+    semFoto: { pt: "Sem foto", en: "No photo" },
+    abrirMenu: { pt: "Abrir menu", en: "Open menu" },
+    fecharMenu: { pt: "Fechar menu", en: "Close menu" },
+    botaoIdioma: { pt: "EN", en: "PT" }
+  };
+
+  var CHAVE_IDIOMA = 'ugcIdiomaSite';
+  var idiomaAtual = 'pt';
+  try{
+    var idiomaSalvo = window.localStorage.getItem(CHAVE_IDIOMA);
+    if(idiomaSalvo === 'en') idiomaAtual = 'en';
+  } catch(erro){ /* localStorage indisponível, segue em pt */ }
+
+  function t(chave){
+    var item = TRADUCOES[chave];
+    if(!item) return '';
+    return item[idiomaAtual] || item.pt;
+  }
+
+  // Só troca o texto fixo (HTML estático) — chamada tanto no
+  // carregamento da página quanto a cada troca de idioma.
+  function aplicarIdiomaEstatico(){
+    document.documentElement.lang = idiomaAtual === 'en' ? 'en' : 'pt-BR';
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      el.textContent = t(el.getAttribute('data-i18n'));
+    });
+    document.querySelectorAll('[data-i18n-aria]').forEach(function(el){
+      el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria')));
+    });
+    document.querySelectorAll('[data-i18n-alt]').forEach(function(el){
+      el.setAttribute('alt', t(el.getAttribute('data-i18n-alt')));
+    });
+    var botaoIdiomaEl = document.getElementById('botaoIdioma');
+    if(botaoIdiomaEl) botaoIdiomaEl.textContent = t('botaoIdioma');
+    var botaoHamburguerEl = document.getElementById('botaoHamburguer');
+    if(botaoHamburguerEl){
+      var aberto = botaoHamburguerEl.getAttribute('aria-expanded') === 'true';
+      botaoHamburguerEl.setAttribute('aria-label', aberto ? t('fecharMenu') : t('abrirMenu'));
+    }
+  }
+
+  // Troca de idioma de verdade (clique no botão EN/PT): além do texto
+  // fixo, refaz os trechos montados por JavaScript (destaques,
+  // serviços, números da capa e tudo que vem do banco) pra eles
+  // nascerem já no idioma certo.
+  function aplicarIdioma(){
+    aplicarIdiomaEstatico();
+    if(typeof renderizarDestaques === 'function') renderizarDestaques();
+    if(typeof renderizarServicos === 'function') renderizarServicos();
+    if(typeof renderizarStatsHero === 'function') renderizarStatsHero();
+    if(typeof carregarTrabalhosDoBanco === 'function') carregarTrabalhosDoBanco();
+  }
 
   /* =====================================================
      CONEXÃO OFICIAL COM O PLAYER DO YOUTUBE
@@ -1564,19 +1684,19 @@
   var destaques = [
     {
       titulo: "Itália",
-      contexto: "Bastidores de viagem pela Itália, contados em vídeo vertical.",
+      contexto: { pt: "Bastidores de viagem pela Itália, contados em vídeo vertical.", en: "Travel behind-the-scenes from Italy, told in vertical video." },
       link: "https://youtube.com/shorts/wBNowcZuBQY?feature=share",
       capa: null // SUBSTITUA por um link de foto de capa (ou deixe null pro degradê)
     },
     {
       titulo: "Bohems Coffee - Turquia",
-      contexto: "Conteúdo autêntico em parceria com a cafeteria Bohems Coffee, na Turquia.",
+      contexto: { pt: "Conteúdo autêntico em parceria com a cafeteria Bohems Coffee, na Turquia.", en: "Authentic content in partnership with Bohems Coffee, in Turkey." },
       link: "https://youtube.com/shorts/vgkxZ5Mznds?feature=share",
       capa: null // SUBSTITUA por um link de foto de capa (ou deixe null pro degradê)
     },
     {
       titulo: "My sht - Barcelona",
-      contexto: "Vídeo em parceria com a My sht, loja vintage em Barcelona.",
+      contexto: { pt: "Vídeo em parceria com a My sht, loja vintage em Barcelona.", en: "Video in partnership with My sht, a vintage store in Barcelona." },
       link: "https://youtube.com/shorts/FQgOZoKCaa8?feature=share",
       capa: null // SUBSTITUA por um link de foto de capa (ou deixe null pro degradê)
     }
@@ -1591,19 +1711,19 @@
 
   // Seis serviços oferecidos
   var servicos = [
-    { numero: "01", titulo: "Direção de Conteúdo para Marcas", descricao: "Estratégia, conceito e criação de conteúdos alinhados à identidade e aos objetivos da marca." },
-    { numero: "02", titulo: "Creator Content & UGC", descricao: "Vídeos autênticos e naturais, com linguagem de creator, pensados para conectar marcas e pessoas." },
-    { numero: "03", titulo: "Viagens & Experiências", descricao: "Narrativas visuais para destinos, hospedagens e experiências que inspiram novas viagens." },
-    { numero: "04", titulo: "Mobile Content", descricao: "Fotos e vídeos produzidos com celular para Stories, Reels, campanhas, eventos e experiências." }
+    { numero: "01", titulo: { pt: "Direção de Conteúdo para Marcas", en: "Content Direction for Brands" }, descricao: { pt: "Estratégia, conceito e criação de conteúdos alinhados à identidade e aos objetivos da marca.", en: "Strategy, concept, and content creation aligned with the brand's identity and goals." } },
+    { numero: "02", titulo: { pt: "Creator Content & UGC", en: "Creator Content & UGC" }, descricao: { pt: "Vídeos autênticos e naturais, com linguagem de creator, pensados para conectar marcas e pessoas.", en: "Authentic, natural videos with a creator's voice, made to connect brands and people." } },
+    { numero: "03", titulo: { pt: "Viagens & Experiências", en: "Travel & Experiences" }, descricao: { pt: "Narrativas visuais para destinos, hospedagens e experiências que inspiram novas viagens.", en: "Visual storytelling for destinations, stays, and experiences that inspire new trips." } },
+    { numero: "04", titulo: { pt: "Mobile Content", en: "Mobile Content" }, descricao: { pt: "Fotos e vídeos produzidos com celular para Stories, Reels, campanhas, eventos e experiências.", en: "Photos and videos shot on mobile for Stories, Reels, campaigns, events, and experiences." } }
   ];
 
   // Métricas com contador animado (SUBSTITUA os valores pelos seus números reais)
   // "alvo" é o número final e "sufixo" é o texto que aparece colado depois (+, %, M etc)
   var metricas = [
-    { alvo: 0, sufixo: "+", rotulo: "Vídeos entregues" },
-    { alvo: 0, sufixo: "+", rotulo: "Marcas atendidas" },
-    { alvo: 0, sufixo: "M+", rotulo: "Views somadas" },
-    { alvo: 0, sufixo: "%", rotulo: "Entregas no prazo" }
+    { alvo: 0, sufixo: "+", rotulo: { pt: "Vídeos entregues", en: "Videos delivered" } },
+    { alvo: 0, sufixo: "+", rotulo: { pt: "Marcas atendidas", en: "Brands served" } },
+    { alvo: 0, sufixo: "M+", rotulo: { pt: "Views somadas", en: "Combined views" } },
+    { alvo: 0, sufixo: "%", rotulo: { pt: "Entregas no prazo", en: "On-time delivery" } }
   ];
 
   /* =====================================================
@@ -1619,34 +1739,43 @@
 
   // Três números da capa (usa as três primeiras métricas)
   var statsHero = document.getElementById('statsHero');
-  metricas.slice(0, 3).forEach(function(m){
-    var div = criarElemento('div', 'hero-stat reveal');
-    div.innerHTML = '<span class="valor">' + m.alvo + m.sufixo + '</span><span class="rotulo">' + m.rotulo + '</span>';
-    statsHero.appendChild(div);
-  });
+  function renderizarStatsHero(){
+    statsHero.innerHTML = '';
+    metricas.slice(0, 3).forEach(function(m){
+      var div = criarElemento('div', 'hero-stat reveal visivel');
+      div.innerHTML = '<span class="valor">' + m.alvo + m.sufixo + '</span><span class="rotulo">' + escaparHtml(m.rotulo[idiomaAtual] || m.rotulo.pt) + '</span>';
+      statsHero.appendChild(div);
+    });
+  }
+  renderizarStatsHero();
 
   // Conteúdos de destaque
   var grideDestaques = document.getElementById('grideDestaques');
-  destaques.forEach(function(d){
-    var card = criarElemento('a', 'card-destaque reveal');
-    var ehVideoDestaque = tornarCardDeVideo(card, d.link, d.titulo);
-    card.setAttribute('aria-label', d.titulo);
-    var vaiAutoTocarDestaque = ehVideoDestaque && !prefereReduzirMovimento;
-    card.innerHTML =
-      '<div class="capa-video midia-placeholder" role="img" aria-label="Capa do vídeo: ' + d.titulo + '">' +
-        (vaiAutoTocarDestaque
-          ? ''
-          : (d.capa
-              ? '<img class="capa-video-real" src="' + d.capa + '" alt="" loading="lazy">'
-              : '<span class="legenda-formato">Capa vertical 9:16</span>')) +
-        (ehVideoDestaque && !vaiAutoTocarDestaque ? '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' : '') +
-      '</div>' +
-      '<div class="card-destaque-info">' +
-        '<h3>' + d.titulo + '</h3>' +
-        '<p class="contexto">' + d.contexto + '</p>' +
-      '</div>';
-    grideDestaques.appendChild(card);
-  });
+  function renderizarDestaques(){
+    grideDestaques.innerHTML = '';
+    destaques.forEach(function(d){
+      var card = criarElemento('a', 'card-destaque reveal visivel');
+      var ehVideoDestaque = tornarCardDeVideo(card, d.link, d.titulo);
+      card.setAttribute('aria-label', d.titulo);
+      var vaiAutoTocarDestaque = ehVideoDestaque && !prefereReduzirMovimento;
+      var contextoTexto = d.contexto[idiomaAtual] || d.contexto.pt;
+      card.innerHTML =
+        '<div class="capa-video midia-placeholder" role="img" aria-label="Capa do vídeo: ' + escaparHtml(d.titulo) + '">' +
+          (vaiAutoTocarDestaque
+            ? ''
+            : (d.capa
+                ? '<img class="capa-video-real" src="' + d.capa + '" alt="" loading="lazy">'
+                : '<span class="legenda-formato">Capa vertical 9:16</span>')) +
+          (ehVideoDestaque && !vaiAutoTocarDestaque ? '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' : '') +
+        '</div>' +
+        '<div class="card-destaque-info">' +
+          '<h3>' + escaparHtml(d.titulo) + '</h3>' +
+          '<p class="contexto">' + escaparHtml(contextoTexto) + '</p>' +
+        '</div>';
+      grideDestaques.appendChild(card);
+    });
+  }
+  renderizarDestaques();
 
   // Filtros de nicho e galeria de trabalhos: vêm do banco de dados
   var filtrosEl = document.getElementById('filtros');
@@ -1664,13 +1793,13 @@
     pista.innerHTML = fotos.map(function(f){
       var ehImagemDireta = f.link && f.link !== '#' && !extrairIdYouTube(f.link);
       if(ehImagemDireta){
-        return '<div class="foto-entre-olhares clicavel" data-link="' + escaparHtml(f.link) + '" data-titulo="' + escaparHtml(f.titulo) + '" tabindex="0" role="button" aria-label="Ver foto maior: ' + escaparHtml(f.titulo) + '">' +
+        return '<div class="foto-entre-olhares clicavel" data-link="' + escaparHtml(f.link) + '" data-titulo="' + escaparHtml(f.titulo) + '" tabindex="0" role="button" aria-label="' + escaparHtml(t('verFotoMaior')) + escaparHtml(f.titulo) + '">' +
           '<div class="foto-entre-olhares-caixa"><img src="' + f.link + '" alt="' + escaparHtml(f.titulo) + '" loading="lazy"></div>' +
           '<span class="legenda-local">' + escaparHtml(f.titulo) + '</span>' +
         '</div>';
       }
       return '<div class="foto-entre-olhares">' +
-        '<div class="foto-entre-olhares-caixa midia-placeholder"><span class="legenda-formato">Sem foto</span></div>' +
+        '<div class="foto-entre-olhares-caixa midia-placeholder"><span class="legenda-formato">' + escaparHtml(t('semFoto')) + '</span></div>' +
         '<span class="legenda-local">' + escaparHtml(f.titulo) + '</span>' +
       '</div>';
     }).join('');
@@ -1731,7 +1860,7 @@
       return;
     }
     pista.innerHTML = fotos.map(function(f){
-      return '<div class="foto-entre-olhares clicavel" data-link="' + escaparHtml(f.link) + '" data-titulo="' + escaparHtml(f.titulo) + '" tabindex="0" role="button" aria-label="Ver foto maior: ' + escaparHtml(f.titulo) + '">' +
+      return '<div class="foto-entre-olhares clicavel" data-link="' + escaparHtml(f.link) + '" data-titulo="' + escaparHtml(f.titulo) + '" tabindex="0" role="button" aria-label="' + escaparHtml(t('verFotoMaior')) + escaparHtml(f.titulo) + '">' +
         '<div class="foto-entre-olhares-caixa"><img src="' + f.link + '" alt="' + escaparHtml(f.titulo) + '" loading="lazy"></div>' +
         '<span class="legenda-local">' + escaparHtml(f.marca || f.titulo) + '</span>' +
       '</div>';
@@ -1937,7 +2066,7 @@
 
     if(videos.length === 0){
       filtrosEl.innerHTML = '';
-      grideTrabalhos.innerHTML = '<p class="texto-vazio-trabalhos">Em breve, novos trabalhos por aqui.</p>';
+      grideTrabalhos.innerHTML = '<p class="texto-vazio-trabalhos">' + escaparHtml(t('trabalhosVazio')) + '</p>';
       return;
     }
 
@@ -1947,7 +2076,7 @@
     });
 
     filtrosEl.innerHTML = '';
-    var botaoTodos = criarElemento('button', 'filtro-botao ativo', 'Todos');
+    var botaoTodos = criarElemento('button', 'filtro-botao ativo', t('filtroTodos'));
     botaoTodos.type = 'button';
     botaoTodos.setAttribute('data-filtro', 'todos');
     botaoTodos.setAttribute('aria-pressed', 'true');
@@ -2013,14 +2142,18 @@
 
   // Serviços
   var grideServicos = document.getElementById('grideServicos');
-  servicos.forEach(function(s){
-    var card = criarElemento('div', 'card-servico reveal');
-    card.innerHTML =
-      '<span class="numero-servico">' + s.numero + '</span>' +
-      '<h3>' + s.titulo + '</h3>' +
-      '<p>' + s.descricao + '</p>';
-    grideServicos.appendChild(card);
-  });
+  function renderizarServicos(){
+    grideServicos.innerHTML = '';
+    servicos.forEach(function(s){
+      var card = criarElemento('div', 'card-servico reveal visivel');
+      card.innerHTML =
+        '<span class="numero-servico">' + s.numero + '</span>' +
+        '<h3>' + escaparHtml(s.titulo[idiomaAtual] || s.titulo.pt) + '</h3>' +
+        '<p>' + escaparHtml(s.descricao[idiomaAtual] || s.descricao.pt) + '</p>';
+      grideServicos.appendChild(card);
+    });
+  }
+  renderizarServicos();
 
   /* =====================================================
      MENU MOBILE
@@ -2031,16 +2164,26 @@
   botaoHamburguer.addEventListener('click', function(){
     var aberto = menuNav.classList.toggle('aberto');
     botaoHamburguer.setAttribute('aria-expanded', aberto ? 'true' : 'false');
-    botaoHamburguer.setAttribute('aria-label', aberto ? 'Fechar menu' : 'Abrir menu');
+    botaoHamburguer.setAttribute('aria-label', aberto ? t('fecharMenu') : t('abrirMenu'));
   });
 
   menuNav.addEventListener('click', function(evento){
     if(evento.target.tagName === 'A'){
       menuNav.classList.remove('aberto');
       botaoHamburguer.setAttribute('aria-expanded', 'false');
-      botaoHamburguer.setAttribute('aria-label', 'Abrir menu');
+      botaoHamburguer.setAttribute('aria-label', t('abrirMenu'));
     }
   });
+
+  var botaoIdioma = document.getElementById('botaoIdioma');
+  if(botaoIdioma){
+    botaoIdioma.addEventListener('click', function(){
+      idiomaAtual = idiomaAtual === 'en' ? 'pt' : 'en';
+      try{ window.localStorage.setItem(CHAVE_IDIOMA, idiomaAtual); } catch(erro){ /* segue sem salvar */ }
+      aplicarIdioma();
+    });
+  }
+  aplicarIdiomaEstatico();
 
   /* =====================================================
      ANIMAÇÃO AO ROLAR (IntersectionObserver)

@@ -1183,6 +1183,27 @@
       </div>
       <div id="listaBrandedContent"></div>
     </div>
+
+    <!-- Faixa "Entre Marcas": fotos dos bastidores das marcas
+         (My sht, Bohems Coffee...) rolando de lado, do mesmo jeito
+         que a faixa "Entre Olhares". Fica escondida sozinha se
+         ainda não houver nenhuma foto de marca. -->
+    <div class="container">
+      <div class="faixa-fotos" id="faixaEntreMarcas" hidden>
+        <p class="titulo-faixa">Entre Marcas</p>
+        <div class="carrossel-fotos">
+          <button class="seta-fotos" id="setaMarcasEsquerda" type="button" aria-label="Ver fotos anteriores">
+            <svg viewBox="0 0 24 24"><polyline points="15,4 7,12 15,20"/></svg>
+          </button>
+          <div class="pista-fotos-janela" id="janelaEntreMarcas">
+            <div class="pista-fotos" id="pistaEntreMarcas"></div>
+          </div>
+          <button class="seta-fotos" id="setaMarcasDireita" type="button" aria-label="Ver mais fotos">
+            <svg viewBox="0 0 24 24"><polyline points="9,4 17,12 9,20"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- 6. ENTRE DESTINOS -->
@@ -1748,6 +1769,62 @@
     }
   });
 
+  // Monta a faixa "Entre Marcas": bastidores das marcas (fotos do
+  // My sht, Bohems Coffee etc.), rolando de lado do mesmo jeito que
+  // a faixa "Entre Olhares".
+  function montarFaixaEntreMarcas(fotos){
+    var faixa = document.getElementById('faixaEntreMarcas');
+    var pista = document.getElementById('pistaEntreMarcas');
+    if(fotos.length === 0){
+      faixa.hidden = true;
+      pista.innerHTML = '';
+      return;
+    }
+    pista.innerHTML = fotos.map(function(f){
+      return '<div class="foto-entre-olhares clicavel" data-link="' + escaparHtml(f.link) + '" data-titulo="' + escaparHtml(f.titulo) + '" tabindex="0" role="button" aria-label="Ver foto maior: ' + escaparHtml(f.titulo) + '">' +
+        '<div class="foto-entre-olhares-caixa"><img src="' + f.link + '" alt="' + escaparHtml(f.titulo) + '" loading="lazy"></div>' +
+        '<span class="legenda-local">' + escaparHtml(f.marca || f.titulo) + '</span>' +
+      '</div>';
+    }).join('');
+    faixa.hidden = false;
+    window.setTimeout(atualizarSetasMarcas, 0);
+  }
+
+  var janelaEntreMarcas = document.getElementById('janelaEntreMarcas');
+  var setaMarcasEsquerda = document.getElementById('setaMarcasEsquerda');
+  var setaMarcasDireita = document.getElementById('setaMarcasDireita');
+
+  function atualizarSetasMarcas(){
+    if(!janelaEntreMarcas) return;
+    var semRolagem = janelaEntreMarcas.scrollWidth <= janelaEntreMarcas.clientWidth + 2;
+    setaMarcasEsquerda.disabled = semRolagem || janelaEntreMarcas.scrollLeft <= 2;
+    setaMarcasDireita.disabled = semRolagem || janelaEntreMarcas.scrollLeft >= (janelaEntreMarcas.scrollWidth - janelaEntreMarcas.clientWidth - 2);
+  }
+
+  if(janelaEntreMarcas){
+    setaMarcasEsquerda.addEventListener('click', function(){
+      janelaEntreMarcas.scrollBy({ left: -janelaEntreMarcas.clientWidth * 0.9, behavior: prefereReduzirMovimento ? 'auto' : 'smooth' });
+    });
+    setaMarcasDireita.addEventListener('click', function(){
+      janelaEntreMarcas.scrollBy({ left: janelaEntreMarcas.clientWidth * 0.9, behavior: prefereReduzirMovimento ? 'auto' : 'smooth' });
+    });
+    janelaEntreMarcas.addEventListener('scroll', atualizarSetasMarcas);
+    window.addEventListener('resize', atualizarSetasMarcas);
+  }
+
+  document.getElementById('pistaEntreMarcas').addEventListener('click', function(evento){
+    var item = evento.target.closest('.foto-entre-olhares.clicavel');
+    if(item) abrirFotoNaPagina(item.getAttribute('data-link'), item.getAttribute('data-titulo'));
+  });
+  document.getElementById('pistaEntreMarcas').addEventListener('keydown', function(evento){
+    if(evento.key !== 'Enter' && evento.key !== ' ') return;
+    var item = evento.target.closest('.foto-entre-olhares.clicavel');
+    if(item){
+      evento.preventDefault();
+      abrirFotoNaPagina(item.getAttribute('data-link'), item.getAttribute('data-titulo'));
+    }
+  });
+
   // Cartão editorial usado no Branded Content e no Entre Destinos:
   // a legenda fica por cima da mídia, com degradê, sem o quadro
   // branco de baixo que a galeria de Trabalhos usa. Fotos abrem na
@@ -1886,6 +1963,16 @@
     // embaixo em "Trabalhos por nicho" também (não é ou/ou).
     var itensComMarca = videos.filter(function(v){ return (v.marca || '').trim() !== ''; });
     renderizarBrandedContent(itensComMarca);
+
+    // Faixa "Entre Marcas": as fotos (não os vídeos) do My sht e do
+    // Bohems Coffee também rolam aqui, do mesmo jeito que a faixa
+    // Entre Olhares — além de continuarem no card de cada marca lá
+    // em cima, em Branded Content.
+    var fotosEntreMarcas = itensComMarca.filter(function(v){
+      var marca = (v.marca || '').trim().toLowerCase();
+      return (marca === 'my sht' || marca === 'bohems coffee') && !extrairIdYouTube(v.link);
+    });
+    montarFaixaEntreMarcas(fotosEntreMarcas);
 
     // Entre Destinos mostra também os vídeos de nicho "viagem", e eles
     // seguem aparecendo em "Trabalhos por nicho" do mesmo jeito.

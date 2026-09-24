@@ -1970,7 +1970,7 @@
     // em cima, em Branded Content.
     var fotosEntreMarcas = itensComMarca.filter(function(v){
       var marca = (v.marca || '').trim().toLowerCase();
-      return (marca === 'my sht' || marca === 'bohems coffee') && !extrairIdYouTube(v.link);
+      return (marca === 'my sht' || marca === 'bohems coffee' || marca === 'cloud tattoo') && !extrairIdYouTube(v.link);
     });
     montarFaixaEntreMarcas(fotosEntreMarcas);
 

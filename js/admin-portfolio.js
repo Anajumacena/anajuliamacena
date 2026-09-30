@@ -527,34 +527,60 @@
     carregarTudo();
   }
 
-  // Troca o vídeo do projeto Cloud Tattoo pelo vídeo novo, agora já
-  // no YouTube (link enviado por você). Só mexe na linha que já é do
-  // Cloud Tattoo mas ainda está com o link antigo da marca Color WoW
-  // (sobra de antes da troca de marca).
+  // Garante que o projeto Cloud Tattoo tem o vídeo novo do YouTube
+  // (link enviado por você): troca a linha antiga se ela ainda
+  // existir, ou cria uma linha nova do zero se ela tiver sido
+  // apagada (por exemplo, numa limpeza de duplicados).
   var LINK_VIDEO_CLOUD_TATTOO_NOVO = "https://youtube.com/shorts/whYD4SFpSzM";
   async function atualizarVideoCloudTattoo() {
     var candidato = videosCache.filter(function (v) {
       return (v.marca || "").trim() === "Cloud Tattoo" && v.link !== LINK_VIDEO_CLOUD_TATTOO_NOVO && v.link !== "#" && v.link.indexOf(".jpg") === -1;
     });
-    if (candidato.length === 0) {
-      Admin.mostrarAviso("avisosPortfolio", "Não encontrei o vídeo antigo do Cloud Tattoo pra trocar.", "ok");
+
+    if (candidato.length > 0) {
+      if (!window.confirm("Isso vai trocar o vídeo do projeto Cloud Tattoo pelo vídeo novo do YouTube que você mandou. Continuar?")) return;
+      var erros = 0;
+      for (var i = 0; i < candidato.length; i++) {
+        var resultado = await window.banco.from("videos").update({
+          link: LINK_VIDEO_CLOUD_TATTOO_NOVO,
+          titulo: "Cloud Tattoo - Barcelona",
+          nicho: "Branded Content"
+        }).eq("id", candidato[i].id);
+        if (resultado.error) erros++;
+      }
+      if (erros > 0) {
+        Admin.mostrarAviso("avisosPortfolio", "Não consegui trocar agora. Tente de novo.", "erro");
+      } else {
+        Admin.mostrarAviso("avisosPortfolio", "Vídeo do Cloud Tattoo atualizado.", "ok");
+      }
+      carregarTudo();
       return;
     }
-    if (!window.confirm("Isso vai trocar o vídeo do projeto Cloud Tattoo pelo vídeo novo do YouTube que você mandou. Continuar?")) return;
 
-    var erros = 0;
-    for (var i = 0; i < candidato.length; i++) {
-      var resultado = await window.banco.from("videos").update({
-        link: LINK_VIDEO_CLOUD_TATTOO_NOVO,
-        titulo: "Cloud Tattoo - Barcelona",
-        nicho: "Branded Content"
-      }).eq("id", candidato[i].id);
-      if (resultado.error) erros++;
+    // Não achei nenhuma linha de vídeo do Cloud Tattoo (a antiga foi
+    // apagada) — cria uma nova do zero.
+    var jaExiste = videosCache.some(function (v) { return v.link === LINK_VIDEO_CLOUD_TATTOO_NOVO; });
+    if (jaExiste) {
+      Admin.mostrarAviso("avisosPortfolio", "Esse vídeo já está cadastrado.", "ok");
+      return;
     }
-    if (erros > 0) {
-      Admin.mostrarAviso("avisosPortfolio", "Não consegui trocar agora. Tente de novo.", "erro");
+    if (!window.confirm("Não achei o vídeo antigo do Cloud Tattoo (ele deve ter sido apagado). Vou criar o vídeo novo do zero. Continuar?")) return;
+
+    var maiorOrdem = -1;
+    videosCache.forEach(function (v) { if ((v.ordem || 0) > maiorOrdem) maiorOrdem = v.ordem || 0; });
+    var resultadoNovo = await window.banco.from("videos").insert({
+      titulo: "Cloud Tattoo - Barcelona",
+      link: LINK_VIDEO_CLOUD_TATTOO_NOVO,
+      nicho: "Branded Content",
+      marca: "Cloud Tattoo",
+      formato: "Vídeo vertical 9:16",
+      visivel: true,
+      ordem: maiorOrdem + 1
+    });
+    if (resultadoNovo.error) {
+      Admin.mostrarAviso("avisosPortfolio", "Não consegui criar o vídeo agora. Tente de novo.", "erro");
     } else {
-      Admin.mostrarAviso("avisosPortfolio", "Vídeo do Cloud Tattoo atualizado.", "ok");
+      Admin.mostrarAviso("avisosPortfolio", "Vídeo do Cloud Tattoo criado.", "ok");
     }
     carregarTudo();
   }

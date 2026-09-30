@@ -189,6 +189,23 @@
     justify-content:center;
     overflow:hidden;
   }
+  /* Selo com o nome da marca/categoria, no canto do vídeo. */
+  .selo-marca{
+    position:absolute;
+    top:14px;
+    left:14px;
+    z-index:3;
+    background:rgba(253,252,250,0.92);
+    color:var(--texto);
+    font-family:'Jost', sans-serif;
+    font-size:0.62rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    padding:6px 12px;
+    border-radius:999px;
+    pointer-events:none;
+  }
   .capa-video-real{
     position:absolute;
     inset:0;
@@ -1704,18 +1721,22 @@
   var destaques = [
     {
       titulo: "Itália",
+      marca: "", // sem marca: é conteúdo de viagem, então o selo mostra o nicho
+      nicho: "viagem",
       contexto: { pt: "Bastidores de viagem pela Itália, contados em vídeo vertical.", en: "Travel behind-the-scenes from Italy, told in vertical video." },
       link: "https://youtube.com/shorts/wBNowcZuBQY?feature=share",
       capa: null // SUBSTITUA por um link de foto de capa (ou deixe null pro degradê)
     },
     {
       titulo: "Bohems Coffee - Turquia",
+      marca: "Bohems Coffee",
       contexto: { pt: "Conteúdo autêntico em parceria com a cafeteria Bohems Coffee, na Turquia.", en: "Authentic content in partnership with Bohems Coffee, in Turkey." },
       link: "https://youtube.com/shorts/vgkxZ5Mznds?feature=share",
       capa: null // SUBSTITUA por um link de foto de capa (ou deixe null pro degradê)
     },
     {
       titulo: "My sht - Barcelona",
+      marca: "My sht",
       contexto: { pt: "Vídeo em parceria com a My sht, loja vintage em Barcelona.", en: "Video in partnership with My sht, a vintage store in Barcelona." },
       link: "https://youtube.com/shorts/FQgOZoKCaa8?feature=share",
       capa: null // SUBSTITUA por um link de foto de capa (ou deixe null pro degradê)
@@ -1758,8 +1779,10 @@
       card.setAttribute('aria-label', d.titulo);
       var vaiAutoTocarDestaque = ehVideoDestaque && !prefereReduzirMovimento;
       var contextoTexto = d.contexto[idiomaAtual] || d.contexto.pt;
+      var seloDestaque = d.marca || (d.nicho ? traduzirNicho(d.nicho) : '');
       card.innerHTML =
         '<div class="capa-video midia-placeholder" role="img" aria-label="Capa do vídeo: ' + escaparHtml(d.titulo) + '">' +
+          (seloDestaque ? '<span class="selo-marca">' + escaparHtml(seloDestaque) + '</span>' : '') +
           (vaiAutoTocarDestaque
             ? ''
             : (d.capa
@@ -1928,8 +1951,11 @@
     card.setAttribute('aria-label', item.titulo);
     var imagemCapa = item.capa || (!ehVideo && item.link && item.link !== '#' ? item.link : null);
     var capaHtml = (!vaiAutoTocar && imagemCapa) ? '<img class="capa-video-real" src="' + escaparHtml(imagemCapa) + '" alt="" loading="lazy">' : '';
+    var seloTexto = item.marca || (item.nicho ? traduzirNicho(item.nicho) : '');
+    var seloHtml = seloTexto ? '<span class="selo-marca">' + escaparHtml(seloTexto) + '</span>' : '';
     card.innerHTML =
       '<div class="midia-placeholder" role="img" aria-label="' + escaparHtml(item.titulo) + '">' +
+        seloHtml +
         capaHtml +
         (ehVideo && !vaiAutoTocar ? '<span class="botao-play" aria-hidden="true"><svg viewBox="0 0 24 24"><polygon points="5,3 21,12 5,21"/></svg></span>' : '') +
       '</div>' +
@@ -2097,8 +2123,10 @@
       if(v.marca) legendaNicho += ' · ' + escaparHtml(v.marca);
       if(v.destaque) legendaNicho += ' · ' + escaparHtml(v.destaque);
       var vaiAutoTocarTrabalho = ehVideoTrabalho && !prefereReduzirMovimento;
+      var seloTrabalho = v.marca || traduzirNicho(v.nicho);
       card.innerHTML =
         '<div class="midia-placeholder" role="img" aria-label="' + escaparHtml(v.titulo) + '">' +
+          (seloTrabalho ? '<span class="selo-marca">' + escaparHtml(seloTrabalho) + '</span>' : '') +
           (vaiAutoTocarTrabalho
             ? ''
             : (v.capa

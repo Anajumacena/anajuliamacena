@@ -691,6 +691,7 @@
 
     document.getElementById("formVideo").addEventListener("submit", async function (evento) {
       evento.preventDefault();
+      var botaoSalvarVideo = evento.target.querySelector('button[type="submit"]');
       var id = document.getElementById("videoId").value;
       var dados = {
         titulo: document.getElementById("videoTitulo").value.trim(),
@@ -703,21 +704,28 @@
         projeto_descricao: document.getElementById("videoProjetoDescricao").value.trim() || null,
         visivel: document.getElementById("videoVisivel").checked
       };
-      var resultado;
-      if (id) {
-        resultado = await window.banco.from("videos").update(dados).eq("id", id);
-      } else {
-        var maiorOrdem = -1;
-        videosCache.forEach(function (v) { if ((v.ordem || 0) > maiorOrdem) maiorOrdem = v.ordem || 0; });
-        dados.ordem = maiorOrdem + 1;
-        resultado = await window.banco.from("videos").insert(dados);
+      if (botaoSalvarVideo) botaoSalvarVideo.disabled = true;
+      try {
+        var resultado;
+        if (id) {
+          resultado = await window.banco.from("videos").update(dados).eq("id", id);
+        } else {
+          var maiorOrdem = -1;
+          videosCache.forEach(function (v) { if ((v.ordem || 0) > maiorOrdem) maiorOrdem = v.ordem || 0; });
+          dados.ordem = maiorOrdem + 1;
+          resultado = await window.banco.from("videos").insert(dados);
+        }
+        if (resultado.error) {
+          window.alert("Não consegui salvar o vídeo: " + (resultado.error.message || "erro desconhecido"));
+          return;
+        }
+        Admin.fecharModal("modalVideo");
+        carregarTudo();
+      } catch (erroInesperado) {
+        window.alert("Não consegui salvar o vídeo (erro de conexão): " + (erroInesperado && erroInesperado.message ? erroInesperado.message : erroInesperado));
+      } finally {
+        if (botaoSalvarVideo) botaoSalvarVideo.disabled = false;
       }
-      if (resultado.error) {
-        Admin.mostrarAviso("avisosPortfolio", "Não consegui salvar o vídeo agora.", "erro");
-        return;
-      }
-      Admin.fecharModal("modalVideo");
-      carregarTudo();
     });
 
     document.getElementById("corpoTabelaVideos").addEventListener("click", function (evento) {

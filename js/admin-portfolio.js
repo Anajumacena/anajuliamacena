@@ -527,11 +527,11 @@
     carregarTudo();
   }
 
-  // Troca o vídeo do projeto Cloud Tattoo pelo vídeo novo, hospedado
-  // direto no site (não é um link do YouTube). Só mexe na linha que
-  // já é do Cloud Tattoo mas ainda está com o link antigo da marca
-  // Color WoW (sobra de antes da troca de marca).
-  var LINK_VIDEO_CLOUD_TATTOO_NOVO = "https://anajumacena.github.io/anajuliamacena/videos/branded/cloud-tattoo.mp4";
+  // Troca o vídeo do projeto Cloud Tattoo pelo vídeo novo, agora já
+  // no YouTube (link enviado por você). Só mexe na linha que já é do
+  // Cloud Tattoo mas ainda está com o link antigo da marca Color WoW
+  // (sobra de antes da troca de marca).
+  var LINK_VIDEO_CLOUD_TATTOO_NOVO = "https://youtube.com/shorts/whYD4SFpSzM";
   async function atualizarVideoCloudTattoo() {
     var candidato = videosCache.filter(function (v) {
       return (v.marca || "").trim() === "Cloud Tattoo" && v.link !== LINK_VIDEO_CLOUD_TATTOO_NOVO && v.link !== "#" && v.link.indexOf(".jpg") === -1;
@@ -540,7 +540,7 @@
       Admin.mostrarAviso("avisosPortfolio", "Não encontrei o vídeo antigo do Cloud Tattoo pra trocar.", "ok");
       return;
     }
-    if (!window.confirm("Isso vai trocar o vídeo do projeto Cloud Tattoo pelo vídeo novo que você mandou (hospedado direto no site, sem ser do YouTube). Continuar?")) return;
+    if (!window.confirm("Isso vai trocar o vídeo do projeto Cloud Tattoo pelo vídeo novo do YouTube que você mandou. Continuar?")) return;
 
     var erros = 0;
     for (var i = 0; i < candidato.length; i++) {

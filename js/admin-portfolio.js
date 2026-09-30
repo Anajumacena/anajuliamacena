@@ -527,6 +527,38 @@
     carregarTudo();
   }
 
+  // Troca o vídeo do projeto Cloud Tattoo pelo vídeo novo, hospedado
+  // direto no site (não é um link do YouTube). Só mexe na linha que
+  // já é do Cloud Tattoo mas ainda está com o link antigo da marca
+  // Color WoW (sobra de antes da troca de marca).
+  var LINK_VIDEO_CLOUD_TATTOO_NOVO = "https://anajumacena.github.io/anajuliamacena/videos/branded/cloud-tattoo.mp4";
+  async function atualizarVideoCloudTattoo() {
+    var candidato = videosCache.filter(function (v) {
+      return (v.marca || "").trim() === "Cloud Tattoo" && v.link !== LINK_VIDEO_CLOUD_TATTOO_NOVO && v.link !== "#" && v.link.indexOf(".jpg") === -1;
+    });
+    if (candidato.length === 0) {
+      Admin.mostrarAviso("avisosPortfolio", "Não encontrei o vídeo antigo do Cloud Tattoo pra trocar.", "ok");
+      return;
+    }
+    if (!window.confirm("Isso vai trocar o vídeo do projeto Cloud Tattoo pelo vídeo novo que você mandou (hospedado direto no site, sem ser do YouTube). Continuar?")) return;
+
+    var erros = 0;
+    for (var i = 0; i < candidato.length; i++) {
+      var resultado = await window.banco.from("videos").update({
+        link: LINK_VIDEO_CLOUD_TATTOO_NOVO,
+        titulo: "Cloud Tattoo - Barcelona",
+        nicho: "Branded Content"
+      }).eq("id", candidato[i].id);
+      if (resultado.error) erros++;
+    }
+    if (erros > 0) {
+      Admin.mostrarAviso("avisosPortfolio", "Não consegui trocar agora. Tente de novo.", "erro");
+    } else {
+      Admin.mostrarAviso("avisosPortfolio", "Vídeo do Cloud Tattoo atualizado.", "ok");
+    }
+    carregarTudo();
+  }
+
   // Preenche o campo "marca" nos vídeos que você já tinha, pra eles
   // aparecerem agrupados na seção Branded Content. Só mexe em vídeos
   // que baterem exatamente com esses títulos e ainda não tiverem uma
@@ -625,6 +657,8 @@
     if (botaoImportarBohemsCoffee) botaoImportarBohemsCoffee.addEventListener("click", importarFotosBohemsCoffee);
     var botaoTrocarCloudTattoo = document.getElementById("botaoTrocarCloudTattoo");
     if (botaoTrocarCloudTattoo) botaoTrocarCloudTattoo.addEventListener("click", trocarColorWowPorCloudTattoo);
+    var botaoAtualizarVideoCloudTattoo = document.getElementById("botaoAtualizarVideoCloudTattoo");
+    if (botaoAtualizarVideoCloudTattoo) botaoAtualizarVideoCloudTattoo.addEventListener("click", atualizarVideoCloudTattoo);
     document.getElementById("botaoPreencherMarcas").addEventListener("click", preencherMarcasBranded);
     var botaoRemoverDuplicados = document.getElementById("botaoRemoverDuplicados");
     if (botaoRemoverDuplicados) botaoRemoverDuplicados.addEventListener("click", removerImportacaoDuplicada);

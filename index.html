@@ -221,6 +221,7 @@
     height:100%;
     border:0;
     pointer-events:none;
+    object-fit:cover;
   }
   a.video-ao-vivo{ cursor:pointer; }
   .midia-placeholder .legenda-formato{
@@ -1051,11 +1052,12 @@
     aspect-ratio:9/16;
     background:#000;
   }
-  .lightbox-video-tela iframe{
+  .lightbox-video-tela iframe, .lightbox-video-tela video{
     width:100%;
     height:100%;
     border:0;
     display:block;
+    object-fit:contain;
   }
   .lightbox-video-aviso{
     color:var(--offwhite);
@@ -1546,6 +1548,13 @@
     return null;
   }
 
+  // Vídeo hospedado direto no site (arquivo .mp4/.webm/.mov), pra
+  // quando o conteúdo ainda não está no YouTube.
+  function ehVideoArquivo(link){
+    if(!link) return false;
+    return /\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(link.trim());
+  }
+
   var lightboxVideo = document.getElementById('lightboxVideo');
   var telaLightboxVideo = document.getElementById('telaLightboxVideo');
   var fecharLightboxVideoBotao = document.getElementById('fecharLightboxVideo');
@@ -1555,6 +1564,10 @@
     var idVideo = extrairIdYouTube(link);
     lightboxVideo.hidden = false;
     if(!idVideo){
+      if(ehVideoArquivo(link)){
+        telaLightboxVideo.innerHTML = '<video src="' + escaparHtml(link) + '" controls autoplay playsinline></video>';
+        return;
+      }
       telaLightboxVideo.innerHTML = '<p class="lightbox-video-aviso">Não consegui abrir esse vídeo aqui. <a href="' + link + '" target="_blank" rel="noopener noreferrer">Assista no YouTube</a>.</p>';
       return;
     }
@@ -1628,7 +1641,8 @@
     if(!link || link === '#') return false;
 
     var idVideo = extrairIdYouTube(link);
-    if(!idVideo){
+    var arquivoVideo = !idVideo && ehVideoArquivo(link);
+    if(!idVideo && !arquivoVideo){
       card.target = '_blank';
       card.rel = 'noopener noreferrer';
       return false;
@@ -1651,35 +1665,49 @@
           if(!entrada.isIntersecting) return;
           var containerMidia = card.querySelector('.midia-placeholder');
           if(containerMidia && !containerMidia.querySelector('.preview-video-hover')){
-            var idHost = 'anfitriao-preview-' + idVideo + '-' + Math.random().toString(36).slice(2, 8);
-            var host = document.createElement('div');
-            host.id = idHost;
-            host.className = 'preview-video-hover';
-            host.setAttribute('aria-hidden', 'true');
-            containerMidia.appendChild(host);
-            criarPlayerYouTube(function(){
-              new YT.Player(idHost, {
-                videoId: idVideo,
-                playerVars: {
-                  autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: idVideo,
-                  modestbranding: 1, rel: 0, playsinline: 1, iv_load_policy: 3,
-                  disablekb: 1, cc_load_policy: 0, fs: 0
-                },
-                events: {
-                  onReady: function(evento){
-                    var iframeGerado = evento.target.getIframe();
-                    if(iframeGerado){
-                      iframeGerado.classList.add('preview-video-hover');
-                      iframeGerado.setAttribute('tabindex', '-1');
-                    }
-                    evento.target.mute();
-                    forcarQualidadeAlta(evento);
-                    evento.target.playVideo();
+            if(arquivoVideo){
+              var videoEl = document.createElement('video');
+              videoEl.className = 'preview-video-hover';
+              videoEl.src = link;
+              videoEl.muted = true;
+              videoEl.loop = true;
+              videoEl.autoplay = true;
+              videoEl.playsInline = true;
+              videoEl.setAttribute('aria-hidden', 'true');
+              videoEl.setAttribute('tabindex', '-1');
+              containerMidia.appendChild(videoEl);
+              videoEl.play().catch(function(){});
+            } else {
+              var idHost = 'anfitriao-preview-' + idVideo + '-' + Math.random().toString(36).slice(2, 8);
+              var host = document.createElement('div');
+              host.id = idHost;
+              host.className = 'preview-video-hover';
+              host.setAttribute('aria-hidden', 'true');
+              containerMidia.appendChild(host);
+              criarPlayerYouTube(function(){
+                new YT.Player(idHost, {
+                  videoId: idVideo,
+                  playerVars: {
+                    autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: idVideo,
+                    modestbranding: 1, rel: 0, playsinline: 1, iv_load_policy: 3,
+                    disablekb: 1, cc_load_policy: 0, fs: 0
                   },
-                  onStateChange: function(evento){ if(evento.data === YT.PlayerState.PLAYING) forcarQualidadeAlta(evento); }
-                }
+                  events: {
+                    onReady: function(evento){
+                      var iframeGerado = evento.target.getIframe();
+                      if(iframeGerado){
+                        iframeGerado.classList.add('preview-video-hover');
+                        iframeGerado.setAttribute('tabindex', '-1');
+                      }
+                      evento.target.mute();
+                      forcarQualidadeAlta(evento);
+                      evento.target.playVideo();
+                    },
+                    onStateChange: function(evento){ if(evento.data === YT.PlayerState.PLAYING) forcarQualidadeAlta(evento); }
+                  }
+                });
               });
-            });
+            }
           }
           observadorAutoplay.unobserve(card);
         });
@@ -1935,7 +1963,7 @@
     var idVideoItem = extrairIdYouTube(item.link);
     var ehVideo = false;
     var vaiAutoTocar = false;
-    if(idVideoItem){
+    if(idVideoItem || ehVideoArquivo(item.link)){
       ehVideo = tornarCardDeVideo(card, item.link, item.titulo);
       vaiAutoTocar = ehVideo && !prefereReduzirMovimento;
     } else {
@@ -2004,7 +2032,7 @@
         // Aqui só entra vídeo. As fotos de bastidor ficam só na
         // faixa "Entre Marcas", pra não repetir a mesma foto duas
         // vezes na página.
-        if(extrairIdYouTube(item.link)) videosEl.appendChild(criarCardEditorial(item, item.destaque || ''));
+        if(extrairIdYouTube(item.link) || ehVideoArquivo(item.link)) videosEl.appendChild(criarCardEditorial(item, item.destaque || ''));
       });
       if(!videosEl.children.length) videosEl.remove();
       fotosEl.remove();
@@ -2073,7 +2101,7 @@
     // em cima, em Branded Content.
     var fotosEntreMarcas = itensComMarca.filter(function(v){
       var marca = (v.marca || '').trim().toLowerCase();
-      return (marca === 'my sht' || marca === 'bohems coffee' || marca === 'cloud tattoo') && !extrairIdYouTube(v.link);
+      return (marca === 'my sht' || marca === 'bohems coffee' || marca === 'cloud tattoo') && !extrairIdYouTube(v.link) && !ehVideoArquivo(v.link);
     });
     montarFaixaEntreMarcas(fotosEntreMarcas);
 
@@ -2086,7 +2114,7 @@
     // "Trabalhos por nicho" é só pra vídeo. Fotos (como as do projeto
     // My sht em Branded Content) aparecem só na seção editorial delas,
     // nunca aqui — senão viram um card cinza sem imagem nenhuma.
-    videos = videos.filter(function(v){ return !!extrairIdYouTube(v.link); });
+    videos = videos.filter(function(v){ return !!extrairIdYouTube(v.link) || ehVideoArquivo(v.link); });
 
     if(videos.length === 0){
       filtrosEl.innerHTML = '';

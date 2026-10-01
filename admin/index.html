@@ -593,6 +593,8 @@
           <button class="filtro-pilula-botao" data-situacao="parada">Parada</button>
         </div>
         <div class="espacador"></div>
+        <input type="file" id="arquivoImportarMarcas" accept=".csv,text/csv" hidden>
+        <button class="botao contorno-suave" id="botaoImportarMarcas">Importar planilha (CSV)</button>
         <button class="botao contorno-suave" id="botaoExportarMarcas">Baixar CSV</button>
         <button class="botao principal" id="botaoNovaMarca">+ Adicionar marca</button>
       </div>
@@ -839,6 +841,36 @@
   </div>
 </div>
 
+<!-- ===================== MODAL: IMPORTAR MARCAS (CSV) ===================== -->
+<div class="fundo-modal" id="modalImportarMarcas" hidden>
+  <div class="caixa-modal" style="max-width:720px;">
+    <div class="cabecalho-modal">
+      <h2>Importar planilha de marcas</h2>
+      <button class="fechar-modal" data-fechar="modalImportarMarcas">×</button>
+    </div>
+    <p id="resumoImportarMarcas" style="color:var(--texto-suave); font-size:0.9rem; margin-bottom:16px;"></p>
+    <div class="tabela-scroll" style="max-height:360px;">
+      <table>
+        <thead>
+          <tr>
+            <th>Marca</th>
+            <th>Instagram</th>
+            <th>E-mail</th>
+            <th>Telefone</th>
+            <th>Situação</th>
+            <th>Último contato</th>
+          </tr>
+        </thead>
+        <tbody id="corpoPreviaImportarMarcas"></tbody>
+      </table>
+    </div>
+    <div class="rodape-modal">
+      <button type="button" class="botao" data-fechar="modalImportarMarcas">Cancelar</button>
+      <button type="button" class="botao principal" id="botaoConfirmarImportarMarcas">Confirmar importação</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===================== MODAL: CALENDÁRIO ===================== -->
 <div class="fundo-modal" id="modalCalendario" hidden>
   <div class="caixa-modal">
@@ -987,13 +1019,13 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../js/banco.js?v=20260930"></script>
-<script src="../js/biblioteca.js?v=20260930"></script>
-<script src="../js/admin-nucleo.js?v=20260930"></script>
-<script src="../js/admin-portfolio.js?v=20260930"></script>
-<script src="../js/admin-marcas.js?v=20260930"></script>
-<script src="../js/admin-calendario.js?v=20260930"></script>
-<script src="../js/admin-campanhas.js?v=20260930"></script>
-<script src="../js/admin-checklist.js?v=20260930"></script>
+<script src="../js/banco.js?v=20261001"></script>
+<script src="../js/biblioteca.js?v=20261001"></script>
+<script src="../js/admin-nucleo.js?v=20261001"></script>
+<script src="../js/admin-portfolio.js?v=20261001"></script>
+<script src="../js/admin-marcas.js?v=20261001"></script>
+<script src="../js/admin-calendario.js?v=20261001"></script>
+<script src="../js/admin-campanhas.js?v=20261001"></script>
+<script src="../js/admin-checklist.js?v=20261001"></script>
 </body>
 </html>

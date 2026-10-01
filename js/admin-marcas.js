@@ -197,6 +197,27 @@
     Admin.abrirModal("modalImportarMarcas");
   }
 
+  // Insere uma marca (ou um lote) e, se o banco disser que a coluna
+  // "nicho" não existe ainda, tenta de novo sem esse campo — assim
+  // você não fica travada esperando rodar aquele SQL pra conseguir
+  // importar. O nicho dessas marcas fica vazio até você rodar o SQL
+  // e cadastrar de novo (ou editar cada uma depois).
+  async function inserirComFallbackDeNicho(linhaOuLote) {
+    var resultado = await window.banco.from("marcas").insert(linhaOuLote);
+    if (!resultado.error) return { ok: true, semNicho: false };
+    var ehErroDeColuna = Admin.ehErroDeEstrutura(resultado.error) && /nicho/i.test(resultado.error.message || "");
+    if (!ehErroDeColuna) return { ok: false, erro: resultado.error.message };
+    function semCampoNicho(m) {
+      var copia = {};
+      Object.keys(m).forEach(function (chave) { if (chave !== "nicho") copia[chave] = m[chave]; });
+      return copia;
+    }
+    var semNicho = Array.isArray(linhaOuLote) ? linhaOuLote.map(semCampoNicho) : semCampoNicho(linhaOuLote);
+    var resultado2 = await window.banco.from("marcas").insert(semNicho);
+    if (!resultado2.error) return { ok: true, semNicho: true };
+    return { ok: false, erro: resultado2.error.message };
+  }
+
   async function confirmarImportacaoMarcas() {
     if (marcasParaImportar.length === 0) return;
     var botao = document.getElementById("botaoConfirmarImportarMarcas");
@@ -204,22 +225,25 @@
     try {
       var LOTE = 50;
       var importadas = 0;
+      var nichoDescartado = false;
       var falhas = [];
       for (var i = 0; i < marcasParaImportar.length; i += LOTE) {
         var pedaco = marcasParaImportar.slice(i, i + LOTE);
-        var resultado = await window.banco.from("marcas").insert(pedaco);
-        if (!resultado.error) {
+        var resultadoLote = await inserirComFallbackDeNicho(pedaco);
+        if (resultadoLote.ok) {
           importadas += pedaco.length;
+          if (resultadoLote.semNicho) nichoDescartado = true;
           continue;
         }
         // Esse lote deu erro: tenta marca por marca, pra não perder
         // as boas do lote por causa de uma só com problema.
         for (var j = 0; j < pedaco.length; j++) {
-          var resultadoUnico = await window.banco.from("marcas").insert(pedaco[j]);
-          if (resultadoUnico.error) {
-            falhas.push({ nome: pedaco[j].nome, erro: resultadoUnico.error.message });
-          } else {
+          var resultadoUnico = await inserirComFallbackDeNicho(pedaco[j]);
+          if (resultadoUnico.ok) {
             importadas++;
+            if (resultadoUnico.semNicho) nichoDescartado = true;
+          } else {
+            falhas.push({ nome: pedaco[j].nome, erro: resultadoUnico.erro });
           }
         }
       }
@@ -230,6 +254,12 @@
         window.alert(
           "Importei " + importadas + " marca(s). " + falhas.length + " não entraram por erro:\n\n" + resumoErro +
           (falhas.length > 5 ? "\n... e mais " + (falhas.length - 5) + " com o mesmo tipo de erro." : "")
+        );
+      } else if (nichoDescartado) {
+        window.alert(
+          importadas + " marca(s) importada(s) com sucesso! Só que o campo \"nicho\" ainda não existe no seu banco, " +
+          "então essas marcas entraram sem nicho preenchido. Quando rodar o SQL (alter table public.marcas add column if not exists nicho text;) " +
+          "no Supabase, é só editar cada marca e preencher o nicho, ou importar de novo com a coluna de nicho."
         );
       } else {
         Admin.mostrarAviso("avisosMarcas", importadas + " marca(s) importada(s) com sucesso.", "ok");
@@ -434,9 +464,20 @@
         obs: document.getElementById("marcaObs").value.trim() || null
       };
       try {
-        var resultado = id
-          ? await window.banco.from("marcas").update(dados).eq("id", id)
-          : await window.banco.from("marcas").insert(dados);
+        var resultado;
+        if (id) {
+          resultado = await window.banco.from("marcas").update(dados).eq("id", id);
+          if (resultado.error && Admin.ehErroDeEstrutura(resultado.error) && /nicho/i.test(resultado.error.message || "")) {
+            var semNicho = {};
+            Object.keys(dados).forEach(function (chave) { if (chave !== "nicho") semNicho[chave] = dados[chave]; });
+            resultado = await window.banco.from("marcas").update(semNicho).eq("id", id);
+            if (!resultado.error) window.alert('Salvei, mas o campo "nicho" ainda não existe no seu banco, então ele não foi salvo. Rode o SQL da coluna "nicho" no Supabase e tente de novo.');
+          }
+        } else {
+          resultado = await inserirComFallbackDeNicho(dados);
+          if (resultado.ok && resultado.semNicho) window.alert('Salvei, mas o campo "nicho" ainda não existe no seu banco, então ele não foi salvo. Rode o SQL da coluna "nicho" no Supabase e tente de novo.');
+          if (!resultado.ok) resultado = { error: { message: resultado.erro } };
+        }
         if (resultado.error) {
           window.alert("Não consegui salvar a marca: " + (resultado.error.message || "erro desconhecido"));
           return;

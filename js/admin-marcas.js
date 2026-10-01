@@ -194,19 +194,36 @@
     botao.disabled = true;
     try {
       var LOTE = 50;
-      var erros = 0;
+      var importadas = 0;
+      var falhas = [];
       for (var i = 0; i < marcasParaImportar.length; i += LOTE) {
         var pedaco = marcasParaImportar.slice(i, i + LOTE);
         var resultado = await window.banco.from("marcas").insert(pedaco);
-        if (resultado.error) erros++;
+        if (!resultado.error) {
+          importadas += pedaco.length;
+          continue;
+        }
+        // Esse lote deu erro: tenta marca por marca, pra não perder
+        // as boas do lote por causa de uma só com problema.
+        for (var j = 0; j < pedaco.length; j++) {
+          var resultadoUnico = await window.banco.from("marcas").insert(pedaco[j]);
+          if (resultadoUnico.error) {
+            falhas.push({ nome: pedaco[j].nome, erro: resultadoUnico.error.message });
+          } else {
+            importadas++;
+          }
+        }
       }
-      var totalImportadas = marcasParaImportar.length;
       marcasParaImportar = [];
       Admin.fecharModal("modalImportarMarcas");
-      if (erros > 0) {
-        window.alert("Importei parte das marcas, mas algum lote deu erro. Confira a lista e, se faltar alguma, tente importar de novo.");
+      if (falhas.length > 0) {
+        var resumoErro = falhas.slice(0, 5).map(function (f) { return "- " + f.nome + ": " + f.erro; }).join("\n");
+        window.alert(
+          "Importei " + importadas + " marca(s). " + falhas.length + " não entraram por erro:\n\n" + resumoErro +
+          (falhas.length > 5 ? "\n... e mais " + (falhas.length - 5) + " com o mesmo tipo de erro." : "")
+        );
       } else {
-        Admin.mostrarAviso("avisosMarcas", totalImportadas + " marca(s) importada(s) com sucesso.", "ok");
+        Admin.mostrarAviso("avisosMarcas", importadas + " marca(s) importada(s) com sucesso.", "ok");
       }
       carregarTudo();
     } catch (erro) {

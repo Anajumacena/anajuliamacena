@@ -125,37 +125,46 @@
   }
 
   function processarArquivoCSV(arquivo) {
+    var nomeArquivo = (arquivo.name || "").toLowerCase();
+    if (nomeArquivo.endsWith(".xlsx") || nomeArquivo.endsWith(".xls")) {
+      window.alert('Esse arquivo é uma planilha do Excel (' + arquivo.name + '), não um .csv. No Excel ou Google Planilhas, use "Arquivo → Baixar/Exportar → CSV" e importe o arquivo .csv gerado.');
+      return;
+    }
     var leitor = new FileReader();
     leitor.onload = function (e) {
-      var linhas = analisarCSV(String(e.target.result));
-      if (linhas.length < 2) {
-        window.alert("Não encontrei nenhuma linha de dados nessa planilha.");
-        return;
-      }
-      var mapa = mapearColunas(linhas[0]);
-      if (mapa.nome === undefined) {
-        window.alert('Não encontrei uma coluna de nome da marca. Confira se a primeira linha da planilha tem os títulos das colunas (ex: "Nome", "Instagram", "E-mail"...).');
-        return;
-      }
-      function pegar(linha, campo) { return mapa[campo] !== undefined ? (linha[mapa[campo]] || "").trim() : ""; }
-      marcasParaImportar = linhas.slice(1).map(function (linha) {
-        return {
-          nome: pegar(linha, "nome"),
-          nicho: pegar(linha, "nicho") || null,
-          instagram: pegar(linha, "instagram") || null,
-          email: pegar(linha, "email") || null,
-          telefone: pegar(linha, "telefone") || null,
-          situacao: normalizarSituacaoImportada(pegar(linha, "situacao")),
-          obs: pegar(linha, "obs") || null,
-          ultimo_contato: normalizarDataImportada(pegar(linha, "ultimo_contato"))
-        };
-      }).filter(function (m) { return m.nome; });
+      try {
+        var linhas = analisarCSV(String(e.target.result));
+        if (linhas.length < 2) {
+          window.alert("Não encontrei nenhuma linha de dados nessa planilha.");
+          return;
+        }
+        var mapa = mapearColunas(linhas[0]);
+        if (mapa.nome === undefined) {
+          window.alert('Não encontrei uma coluna de nome da marca. Confira se a primeira linha da planilha tem os títulos das colunas (ex: "Nome", "Instagram", "E-mail"...). Colunas encontradas: ' + linhas[0].join(", "));
+          return;
+        }
+        function pegar(linha, campo) { return mapa[campo] !== undefined ? (linha[mapa[campo]] || "").trim() : ""; }
+        marcasParaImportar = linhas.slice(1).map(function (linha) {
+          return {
+            nome: pegar(linha, "nome"),
+            nicho: pegar(linha, "nicho") || null,
+            instagram: pegar(linha, "instagram") || null,
+            email: pegar(linha, "email") || null,
+            telefone: pegar(linha, "telefone") || null,
+            situacao: normalizarSituacaoImportada(pegar(linha, "situacao")),
+            obs: pegar(linha, "obs") || null,
+            ultimo_contato: normalizarDataImportada(pegar(linha, "ultimo_contato"))
+          };
+        }).filter(function (m) { return m.nome; });
 
-      if (marcasParaImportar.length === 0) {
-        window.alert("Não encontrei nenhuma marca com o nome preenchido nessa planilha.");
-        return;
+        if (marcasParaImportar.length === 0) {
+          window.alert("Não encontrei nenhuma marca com o nome preenchido nessa planilha.");
+          return;
+        }
+        mostrarPreviaImportacao();
+      } catch (erroLeitura) {
+        window.alert("Não consegui entender esse arquivo: " + (erroLeitura && erroLeitura.message ? erroLeitura.message : erroLeitura));
       }
-      mostrarPreviaImportacao();
     };
     leitor.onerror = function () {
       window.alert("Não consegui ler esse arquivo. Confira se é um .csv válido.");

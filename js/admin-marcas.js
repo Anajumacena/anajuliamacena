@@ -272,6 +272,45 @@
     }
   }
 
+  // Preenche o nicho "viagens" nas pousadas de Itacaré e Caraíva que
+  // você importou da planilha. Só mexe nessas marcas específicas,
+  // identificadas pelo nome, pra não arriscar mudar nicho de outra
+  // marca por engano.
+  var NOMES_POUSADAS_VIAGEM = [
+    "Mentawai Ecopousada", "Pousada Sunset Itacaré", "Pousada Passarela da Vila",
+    "Pousada Shangri-lá", "Pousada Açuncena", "Itaoca Pousada", "Pousada Maresia",
+    "Pousada Raisis", "Pousada Porto dos Casais", "Pousada La Cabana", "Villa Rio Caraíva",
+    "OCA Caraíva", "Pousada Kiarô", "Pousada Lua Cheia", "Pousada Flor do Mar",
+    "Pousada NÔ", "Nossa Casa Caraíva", "Casa Muká", "Pousada Aconchego", "Pousada Nova Caraíva"
+  ];
+  async function definirNichoPousadasViagem() {
+    var candidatas = marcasCache.filter(function (m) {
+      return NOMES_POUSADAS_VIAGEM.indexOf(m.nome) !== -1 && (m.nicho || "").trim() === "";
+    });
+    if (candidatas.length === 0) {
+      Admin.mostrarAviso("avisosMarcas", "Não encontrei nenhuma das pousadas sem nicho pra atualizar.", "ok");
+      return;
+    }
+    if (!window.confirm('Isso vai colocar o nicho "viagens" em ' + candidatas.length + ' pousada(s) de Itacaré/Caraíva. Continuar?')) return;
+    var erros = 0;
+    var semColuna = false;
+    for (var i = 0; i < candidatas.length; i++) {
+      var resultado = await window.banco.from("marcas").update({ nicho: "viagens" }).eq("id", candidatas[i].id);
+      if (resultado.error) {
+        if (Admin.ehErroDeEstrutura(resultado.error) && /nicho/i.test(resultado.error.message || "")) semColuna = true;
+        erros++;
+      }
+    }
+    if (semColuna) {
+      window.alert('A coluna "nicho" ainda não existe no seu banco. Roda esse SQL no Supabase primeiro:\n\nalter table public.marcas add column if not exists nicho text;\n\nDepois clica nesse botão de novo.');
+    } else if (erros > 0) {
+      window.alert("Preenchi algumas, mas " + erros + " deram erro. Tenta de novo.");
+    } else {
+      Admin.mostrarAviso("avisosMarcas", "Nicho \"viagens\" preenchido em " + candidatas.length + " pousada(s).", "ok");
+    }
+    carregarTudo();
+  }
+
   function somenteDigitos(texto) { return (texto || "").replace(/\D/g, ""); }
 
   function linkInstagram(handle) {
@@ -418,6 +457,8 @@
       evento.target.value = "";
     });
     document.getElementById("botaoConfirmarImportarMarcas").addEventListener("click", confirmarImportacaoMarcas);
+    var botaoNichoPousadas = document.getElementById("botaoNichoPousadasViagem");
+    if (botaoNichoPousadas) botaoNichoPousadas.addEventListener("click", definirNichoPousadasViagem);
 
     document.getElementById("buscaMarcas").addEventListener("input", function (evento) {
       buscaAtual = evento.target.value;

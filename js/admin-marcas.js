@@ -19,6 +19,7 @@
 
   var marcasCache = [];
   var situacaoAtual = "todas";
+  var nichoAtual = "todos";
   var buscaAtual = "";
   var jaConfigurado = false;
   var marcasParaImportar = [];
@@ -77,6 +78,7 @@
 
   var MAPA_CABECALHOS = {
     nome: ["nome", "marca", "empresa", "cliente", "nome da marca", "name", "brand"],
+    nicho: ["nicho", "categoria", "segmento", "area", "área", "niche"],
     instagram: ["instagram", "insta", "@", "usuario", "usuário"],
     email: ["email", "e-mail", "mail"],
     telefone: ["telefone", "fone", "whatsapp", "celular", "tel", "phone"],
@@ -139,6 +141,7 @@
       marcasParaImportar = linhas.slice(1).map(function (linha) {
         return {
           nome: pegar(linha, "nome"),
+          nicho: pegar(linha, "nicho") || null,
           instagram: pegar(linha, "instagram") || null,
           email: pegar(linha, "email") || null,
           telefone: pegar(linha, "telefone") || null,
@@ -169,6 +172,7 @@
       var tr = document.createElement("tr");
       tr.innerHTML =
         "<td>" + Admin.escapeHtml(m.nome) + "</td>" +
+        "<td>" + Admin.escapeHtml(m.nicho || "-") + "</td>" +
         "<td>" + Admin.escapeHtml(m.instagram || "-") + "</td>" +
         "<td>" + Admin.escapeHtml(m.email || "-") + "</td>" +
         "<td>" + Admin.escapeHtml(m.telefone || "-") + "</td>" +
@@ -178,7 +182,7 @@
     });
     if (marcasParaImportar.length > 15) {
       var trMais = document.createElement("tr");
-      trMais.innerHTML = '<td colspan="6" style="text-align:center; color:var(--texto-suave);">+ ' + (marcasParaImportar.length - 15) + " marca(s) a mais…</td>";
+      trMais.innerHTML = '<td colspan="7" style="text-align:center; color:var(--texto-suave);">+ ' + (marcasParaImportar.length - 15) + " marca(s) a mais…</td>";
       corpo.appendChild(trMais);
     }
     Admin.abrirModal("modalImportarMarcas");
@@ -232,6 +236,8 @@
     var filtradas = marcasCache.filter(function (m) {
       var passaSituacao = situacaoAtual === "todas" || m.situacao === situacaoAtual;
       if (!passaSituacao) return false;
+      var passaNicho = nichoAtual === "todos" || (m.nicho || "").trim().toLowerCase() === nichoAtual;
+      if (!passaNicho) return false;
       if (!termo) return true;
       var alvo = ((m.nome || "") + " " + (m.instagram || "") + " " + (m.email || "")).toLowerCase();
       return alvo.indexOf(termo) !== -1;
@@ -239,14 +245,35 @@
     renderizarTabela(filtradas);
   }
 
+  // Monta os botões de filtro de nicho sozinhos, a partir dos
+  // nichos que já existirem nas marcas cadastradas (igual o filtro
+  // de nicho dos vídeos no site público).
+  function montarFiltrosNicho() {
+    var container = document.getElementById("filtrosNichoMarcas");
+    var nichosVistos = [];
+    marcasCache.forEach(function (m) {
+      var nicho = (m.nicho || "").trim();
+      if (nicho && nichosVistos.indexOf(nicho) === -1) nichosVistos.push(nicho);
+    });
+    container.innerHTML = '<button class="filtro-pilula-botao' + (nichoAtual === "todos" ? " ativo" : "") + '" data-nicho="todos">Todos</button>';
+    nichosVistos.forEach(function (nicho) {
+      var chave = nicho.toLowerCase();
+      var botao = document.createElement("button");
+      botao.className = "filtro-pilula-botao" + (nichoAtual === chave ? " ativo" : "");
+      botao.setAttribute("data-nicho", chave);
+      botao.textContent = nicho;
+      container.appendChild(botao);
+    });
+  }
+
   function renderizarTabela(marcas) {
     var corpo = document.getElementById("corpoTabelaMarcas");
     if (marcasCache.length === 0) {
-      corpo.innerHTML = '<tr><td colspan="7"><p class="texto-vazio">Nenhuma marca cadastrada ainda. Clique em "Adicionar marca" pra começar.</p></td></tr>';
+      corpo.innerHTML = '<tr><td colspan="8"><p class="texto-vazio">Nenhuma marca cadastrada ainda. Clique em "Adicionar marca" pra começar.</p></td></tr>';
       return;
     }
     if (marcas.length === 0) {
-      corpo.innerHTML = '<tr><td colspan="7"><p class="texto-vazio">Nenhuma marca encontrada com esse filtro ou busca.</p></td></tr>';
+      corpo.innerHTML = '<tr><td colspan="8"><p class="texto-vazio">Nenhuma marca encontrada com esse filtro ou busca.</p></td></tr>';
       return;
     }
     corpo.innerHTML = "";
@@ -262,6 +289,7 @@
       }
       tr.innerHTML =
         "<td>" + Admin.escapeHtml(m.nome) + "</td>" +
+        "<td>" + Admin.escapeHtml(m.nicho || "-") + "</td>" +
         "<td>" + (m.instagram ? '<a data-parar-propagacao="1" href="' + linkInstagram(m.instagram) + '" target="_blank" rel="noopener noreferrer">' + Admin.escapeHtml(m.instagram) + "</a>" : "-") + "</td>" +
         "<td>" + Admin.escapeHtml(m.email || "-") + "</td>" +
         "<td>" + Admin.escapeHtml(m.telefone || "-") + "</td>" +
@@ -284,6 +312,7 @@
     document.getElementById("tituloModalMarca").textContent = "Editar marca";
     document.getElementById("marcaId").value = marca.id;
     document.getElementById("marcaNome").value = marca.nome || "";
+    document.getElementById("marcaNicho").value = marca.nicho || "";
     document.getElementById("marcaInstagram").value = marca.instagram || "";
     document.getElementById("marcaTelefone").value = marca.telefone || "";
     document.getElementById("marcaEmail").value = marca.email || "";
@@ -296,9 +325,9 @@
   }
 
   function exportarCSV() {
-    var colunas = ["Marca", "Instagram", "E-mail", "Telefone", "Situação", "Observação", "Último contato"];
+    var colunas = ["Marca", "Nicho", "Instagram", "E-mail", "Telefone", "Situação", "Observação", "Último contato"];
     var linhas = marcasCache.map(function (m) {
-      return [m.nome, m.instagram, m.email, m.telefone, ROTULOS_SITUACAO[m.situacao] || m.situacao, m.obs, m.ultimo_contato ? Admin.formatarDataBR(m.ultimo_contato) : ""];
+      return [m.nome, m.nicho, m.instagram, m.email, m.telefone, ROTULOS_SITUACAO[m.situacao] || m.situacao, m.obs, m.ultimo_contato ? Admin.formatarDataBR(m.ultimo_contato) : ""];
     });
     Admin.baixarCSV("marcas.csv", colunas, linhas);
   }
@@ -313,6 +342,7 @@
     } else {
       marcasCache = resposta.data || [];
     }
+    montarFiltrosNicho();
     aplicarFiltros();
   }
 
@@ -347,6 +377,15 @@
       aplicarFiltros();
     });
 
+    document.getElementById("filtrosNichoMarcas").addEventListener("click", function (evento) {
+      var botao = evento.target.closest(".filtro-pilula-botao");
+      if (!botao) return;
+      nichoAtual = botao.getAttribute("data-nicho");
+      document.querySelectorAll("#filtrosNichoMarcas .filtro-pilula-botao").forEach(function (b) { b.classList.remove("ativo"); });
+      botao.classList.add("ativo");
+      aplicarFiltros();
+    });
+
     document.getElementById("corpoTabelaMarcas").addEventListener("click", function (evento) {
       if (evento.target.closest('[data-parar-propagacao="1"]')) return;
       var tr = evento.target.closest("tr[data-id]");
@@ -360,6 +399,7 @@
       var id = document.getElementById("marcaId").value;
       var dados = {
         nome: document.getElementById("marcaNome").value.trim(),
+        nicho: document.getElementById("marcaNicho").value.trim() || null,
         instagram: document.getElementById("marcaInstagram").value.trim() || null,
         telefone: document.getElementById("marcaTelefone").value.trim() || null,
         email: document.getElementById("marcaEmail").value.trim() || null,
@@ -367,15 +407,19 @@
         ultimo_contato: document.getElementById("marcaUltimoContato").value || null,
         obs: document.getElementById("marcaObs").value.trim() || null
       };
-      var resultado = id
-        ? await window.banco.from("marcas").update(dados).eq("id", id)
-        : await window.banco.from("marcas").insert(dados);
-      if (resultado.error) {
-        Admin.mostrarAviso("avisosMarcas", "Não consegui salvar a marca agora.", "erro");
-        return;
+      try {
+        var resultado = id
+          ? await window.banco.from("marcas").update(dados).eq("id", id)
+          : await window.banco.from("marcas").insert(dados);
+        if (resultado.error) {
+          window.alert("Não consegui salvar a marca: " + (resultado.error.message || "erro desconhecido"));
+          return;
+        }
+        Admin.fecharModal("modalMarca");
+        carregarTudo();
+      } catch (erroInesperado) {
+        window.alert("Não consegui salvar a marca (erro de conexão): " + (erroInesperado && erroInesperado.message ? erroInesperado.message : erroInesperado));
       }
-      Admin.fecharModal("modalMarca");
-      carregarTudo();
     });
 
     document.getElementById("botaoExcluirMarca").addEventListener("click", async function () {

@@ -598,11 +598,18 @@
         <button class="botao contorno-suave" id="botaoExportarMarcas">Baixar CSV</button>
         <button class="botao principal" id="botaoNovaMarca">+ Adicionar marca</button>
       </div>
+      <div class="barra-ferramentas">
+        <span style="font-size:0.8rem; color:var(--texto-suave); text-transform:uppercase; letter-spacing:0.04em;">Nicho</span>
+        <div class="filtros-pilula" id="filtrosNichoMarcas">
+          <button class="filtro-pilula-botao ativo" data-nicho="todos">Todos</button>
+        </div>
+      </div>
       <div class="tabela-scroll">
         <table>
           <thead>
             <tr>
               <th>Marca</th>
+              <th>Nicho</th>
               <th>Instagram</th>
               <th>E-mail</th>
               <th>Telefone</th>
@@ -815,6 +822,10 @@
       </div>
       <div class="linha-campos">
         <div class="campo">
+          <label for="marcaNicho">Nicho</label>
+          <input type="text" id="marcaNicho" placeholder="viagem, moda, tech...">
+        </div>
+        <div class="campo">
           <label for="marcaSituacao">Situação</label>
           <select id="marcaSituacao">
             <option value="lead">Lead</option>
@@ -823,10 +834,10 @@
             <option value="parada">Parada</option>
           </select>
         </div>
-        <div class="campo">
-          <label for="marcaUltimoContato">Último contato</label>
-          <input type="date" id="marcaUltimoContato">
-        </div>
+      </div>
+      <div class="campo">
+        <label for="marcaUltimoContato">Último contato</label>
+        <input type="date" id="marcaUltimoContato">
       </div>
       <div class="campo">
         <label for="marcaObs">Observação</label>
@@ -854,6 +865,7 @@
         <thead>
           <tr>
             <th>Marca</th>
+            <th>Nicho</th>
             <th>Instagram</th>
             <th>E-mail</th>
             <th>Telefone</th>
@@ -1019,13 +1031,13 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../js/banco.js?v=20261001"></script>
-<script src="../js/biblioteca.js?v=20261001"></script>
-<script src="../js/admin-nucleo.js?v=20261001"></script>
-<script src="../js/admin-portfolio.js?v=20261001"></script>
-<script src="../js/admin-marcas.js?v=20261001"></script>
-<script src="../js/admin-calendario.js?v=20261001"></script>
-<script src="../js/admin-campanhas.js?v=20261001"></script>
-<script src="../js/admin-checklist.js?v=20261001"></script>
+<script src="../js/banco.js?v=20261001b"></script>
+<script src="../js/biblioteca.js?v=20261001b"></script>
+<script src="../js/admin-nucleo.js?v=20261001b"></script>
+<script src="../js/admin-portfolio.js?v=20261001b"></script>
+<script src="../js/admin-marcas.js?v=20261001b"></script>
+<script src="../js/admin-calendario.js?v=20261001b"></script>
+<script src="../js/admin-campanhas.js?v=20261001b"></script>
+<script src="../js/admin-checklist.js?v=20261001b"></script>
 </body>
 </html>

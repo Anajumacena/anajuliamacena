@@ -322,5 +322,14 @@ alter table public.videos add column if not exists projeto_descricao text;
 
 
 -- ============================================================
+-- 13) CAMPO "nicho" NA TABELA "marcas"
+-- ============================================================
+-- Guarda o nicho de cada marca/contato (ex: viagem, moda, tech),
+-- pra dar pra separar e filtrar o CRM por área. Fica em branco até
+-- você preencher, e aceita qualquer palavra que você quiser usar.
+alter table public.marcas add column if not exists nicho text;
+
+
+-- ============================================================
 -- FIM DO SCRIPT
 -- ============================================================

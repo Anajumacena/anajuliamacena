@@ -1152,8 +1152,48 @@
       width:100%;
       max-width:none;
     }
-    .projeto-branded-marca{ font-size:0.95rem; }
-    .projeto-branded-descricao{ font-size:0.72rem; }
+    .projeto-branded-marca{
+      font-size:0.95rem;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .projeto-branded-descricao{
+      font-size:0.72rem;
+      line-height:1.4;
+      min-height:2.8em;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+
+    /* Todos os cartões de uma fileira com a mesma altura: título
+       sempre ocupa o mesmo espaço, não importa quantas linhas tenha. */
+    .grade-destaques,
+    .grade-trabalhos{ align-items:stretch; }
+    .grade-destaques > .card-destaque,
+    .grade-trabalhos > .card-trabalho{
+      display:flex;
+      flex-direction:column;
+    }
+    .card-destaque-info,
+    .card-trabalho-info{ flex:1; }
+    .card-destaque-info h3,
+    .card-trabalho-info h3{
+      line-height:1.3;
+      min-height:2.6em;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+    .card-destaque-info .contexto{ line-height:1.4; min-height:4.2em; }
+    .card-trabalho-info .tag-nicho{
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
 
     /* Cartões menores, pra caber ~2 por tela */
     .card-destaque .capa-video{ max-width:none; margin:0; }

@@ -1078,6 +1078,104 @@
     display:block;
     background:#000;
   }
+
+  /* ===== CELULAR: vídeos em carrossel lateral e Sobre lado a lado =====
+     Fica por último de propósito, pra ganhar das regras acima. */
+  @media (max-width: 700px){
+    /* Sobre mim: foto à esquerda, texto à direita; a lista de
+       promessas e a assinatura descem pra largura inteira. */
+    .sobre-grade{
+      grid-template-columns:0.9fr 1.1fr;
+      column-gap:16px;
+      row-gap:20px;
+      align-items:start;
+    }
+    .sobre-foto{
+      aspect-ratio:3/4;
+      border-radius:16px;
+      position:sticky;
+      top:84px;
+    }
+    .sobre-texto{ display:contents; }
+    .sobre-texto p{ font-size:0.8rem; line-height:1.6; align-self:start; }
+    .sobre-texto .lista-promessas{ grid-column:1 / -1; margin-top:0; gap:10px; }
+    .sobre-texto .lista-promessas li{ font-size:0.82rem; padding-bottom:10px; }
+    .sobre-texto .assinatura{ grid-column:1 / -1; margin-top:0; font-size:1.1rem; }
+
+    /* Vídeos: uma fileira que rola de lado, em vez de empilhar */
+    .grade-destaques,
+    .grade-trabalhos,
+    .grade-destinos,
+    #listaBrandedContent{
+      display:flex;
+      flex-wrap:nowrap;
+      align-items:flex-start;
+      gap:12px;
+      overflow-x:auto;
+      overflow-y:hidden;
+      margin:0 -24px;
+      padding:0 24px 10px;
+      scroll-snap-type:x mandatory;
+      scroll-padding-left:24px;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+    }
+    .grade-destaques::-webkit-scrollbar,
+    .grade-trabalhos::-webkit-scrollbar,
+    .grade-destinos::-webkit-scrollbar,
+    #listaBrandedContent::-webkit-scrollbar{ display:none; }
+
+    .grade-destaques > .card-destaque,
+    .grade-trabalhos > .card-trabalho,
+    .grade-destinos > .card-midia-editorial{
+      flex:0 0 clamp(132px, 41vw, 190px);
+      min-width:0;
+      scroll-snap-align:start;
+    }
+    .grade-trabalhos > .texto-vazio-trabalhos{ flex:0 0 100%; }
+
+    /* Branded Content: cada projeto vira uma coluna da fileira */
+    #listaBrandedContent > .projeto-branded{
+      flex:0 0 clamp(150px, 52vw, 230px);
+      min-width:0;
+      scroll-snap-align:start;
+    }
+    .projeto-branded-videos.grade-destinos{
+      display:block;
+      overflow:visible;
+      margin:0;
+      padding:0;
+      scroll-snap-type:none;
+    }
+    .projeto-branded-videos.grade-destinos > .card-midia-editorial{
+      flex:none;
+      width:100%;
+      max-width:none;
+    }
+    .projeto-branded-marca{ font-size:0.95rem; }
+    .projeto-branded-descricao{ font-size:0.72rem; }
+
+    /* Cartões menores, pra caber ~2 por tela */
+    .card-destaque .capa-video{ max-width:none; margin:0; }
+    .card-destaque-info{ padding:10px 12px; }
+    .card-destaque-info h3{ font-size:0.85rem; margin-bottom:4px; }
+    .card-destaque-info .contexto{
+      font-size:0.7rem;
+      display:-webkit-box;
+      -webkit-line-clamp:3;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+    .card-trabalho-info{ padding:10px 12px; }
+    .card-trabalho-info .tag-nicho{ font-size:0.55rem; margin-bottom:4px; }
+    .card-trabalho-info h3{ font-size:0.82rem; }
+    .card-midia-editorial .legenda-editorial{ padding:16px 10px 10px; }
+    .card-midia-editorial .legenda-editorial h3{ font-size:0.8rem; }
+    .selo-marca{ top:8px; left:8px; font-size:0.52rem; padding:4px 8px; }
+    .botao-play{ width:40px; height:40px; }
+    .filtros{ gap:8px; margin-bottom:24px; }
+    .filtro-botao{ padding:8px 14px; font-size:0.62rem; }
+  }
 </style>
 </head>
 <body>
@@ -2192,6 +2290,7 @@
         card.classList.add('escondido');
       }
     });
+    grideTrabalhos.scrollLeft = 0;
   });
 
   // Serviços

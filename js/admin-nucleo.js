@@ -17,6 +17,7 @@ window.Admin = {};
   var MAPA_SECOES = {
     portfolio:  { id: "secaoPortfolio",  titulo: "Portfólio" },
     marcas:     { id: "secaoMarcas",     titulo: "Marcas" },
+    prospeccao: { id: "secaoProspeccao", titulo: "Prospecção" },
     calendario: { id: "secaoCalendario", titulo: "Calendário" },
     campanhas:  { id: "secaoCampanhas",  titulo: "Campanhas" },
     checklist:  { id: "secaoChecklist",  titulo: "Checklist do portfólio" }

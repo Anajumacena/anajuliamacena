@@ -23,6 +23,8 @@
   var buscaAtual = "";
   var jaConfigurado = false;
   var marcasParaImportar = [];
+  var marcasVisiveis = [];
+  var colunaSelecaoExiste = true;
 
   // ---------------------------------------------------------
   // Importar planilha (CSV) de marcas
@@ -337,7 +339,70 @@
       var alvo = ((m.nome || "") + " " + (m.instagram || "") + " " + (m.email || "")).toLowerCase();
       return alvo.indexOf(termo) !== -1;
     });
+    marcasVisiveis = filtradas;
     renderizarTabela(filtradas);
+    atualizarResumoSelecao();
+  }
+
+  // ---------------------------------------------------------
+  // Seleção de marcas (alimenta a aba Prospecção)
+  // ---------------------------------------------------------
+
+  function temEmail(m) { return !!(m.email && String(m.email).trim()); }
+
+  function atualizarResumoSelecao() {
+    var n = marcasCache.filter(function (m) { return m.selecionada === true; }).length;
+    document.getElementById("resumoSelecaoMarcas").textContent =
+      n + (n === 1 ? " marca selecionada" : " marcas selecionadas");
+  }
+
+  function avisarColunaDeSelecaoFaltando() {
+    window.alert(
+      'Não consegui salvar a seleção porque falta a coluna "selecionada" no seu banco. ' +
+      "Abra o arquivo disparo.sql do seu projeto, cole no Supabase (SQL Editor, New query, Run) e tente de novo."
+    );
+  }
+
+  // Salva no banco a seleção de uma ou várias marcas. Se der erro,
+  // desfaz na tela também, pra não mostrar uma seleção que não foi salva.
+  async function salvarSelecao(ids, valor) {
+    if (ids.length === 0) return true;
+    var resposta;
+    try {
+      resposta = await window.banco.from("marcas").update({ selecionada: valor }).in("id", ids);
+    } catch (erro) {
+      window.alert("Não consegui salvar a seleção agora: " + (erro && erro.message ? erro.message : erro));
+      return false;
+    }
+    if (resposta.error) {
+      if (Admin.ehErroDeEstrutura(resposta.error)) avisarColunaDeSelecaoFaltando();
+      else window.alert("Não consegui salvar a seleção: " + resposta.error.message);
+      return false;
+    }
+    marcasCache.forEach(function (m) {
+      if (ids.indexOf(m.id) !== -1) m.selecionada = valor;
+    });
+    return true;
+  }
+
+  async function selecionarVisiveis() {
+    var ids = marcasVisiveis.filter(function (m) { return temEmail(m) && m.selecionada !== true; })
+      .map(function (m) { return m.id; });
+    if (ids.length === 0) {
+      var comEmail = marcasVisiveis.filter(temEmail).length;
+      Admin.mostrarAviso("avisosMarcas", comEmail === 0
+        ? "Nenhuma das marcas que aparecem agora tem e-mail cadastrado."
+        : "Todas as marcas com e-mail que aparecem já estão selecionadas.", "aviso");
+      return;
+    }
+    if (await salvarSelecao(ids, true)) aplicarFiltros();
+  }
+
+  async function limparSelecao() {
+    var ids = marcasCache.filter(function (m) { return m.selecionada === true; })
+      .map(function (m) { return m.id; });
+    if (ids.length === 0) return;
+    if (await salvarSelecao(ids, false)) aplicarFiltros();
   }
 
   // Monta os botões de filtro de nicho sozinhos, a partir dos
@@ -364,11 +429,11 @@
   function renderizarTabela(marcas) {
     var corpo = document.getElementById("corpoTabelaMarcas");
     if (marcasCache.length === 0) {
-      corpo.innerHTML = '<tr><td colspan="8"><p class="texto-vazio">Nenhuma marca cadastrada ainda. Clique em "Adicionar marca" pra começar.</p></td></tr>';
+      corpo.innerHTML = '<tr><td colspan="9"><p class="texto-vazio">Nenhuma marca cadastrada ainda. Clique em "Adicionar marca" pra começar.</p></td></tr>';
       return;
     }
     if (marcas.length === 0) {
-      corpo.innerHTML = '<tr><td colspan="8"><p class="texto-vazio">Nenhuma marca encontrada com esse filtro ou busca.</p></td></tr>';
+      corpo.innerHTML = '<tr><td colspan="9"><p class="texto-vazio">Nenhuma marca encontrada com esse filtro ou busca.</p></td></tr>';
       return;
     }
     corpo.innerHTML = "";
@@ -382,7 +447,11 @@
       if (m.telefone) {
         contatoHtml += '<a class="botao-icone" data-parar-propagacao="1" href="' + linkWhatsApp(m.telefone) + '" target="_blank" rel="noopener noreferrer" title="Abrir WhatsApp">' + ICONE_WHATSAPP + "</a>";
       }
+      var caixinha = '<td class="celula-selecao" data-parar-propagacao="1"><input type="checkbox" data-selecionar="' + Admin.escapeHtml(m.id) + '"' +
+        (m.selecionada === true ? " checked" : "") +
+        (temEmail(m) ? "" : ' disabled title="Essa marca não tem e-mail cadastrado"') + "></td>";
       tr.innerHTML =
+        caixinha +
         "<td>" + Admin.escapeHtml(m.nome) + "</td>" +
         "<td>" + Admin.escapeHtml(m.nicho || "-") + "</td>" +
         "<td>" + (m.instagram ? '<a data-parar-propagacao="1" href="' + linkInstagram(m.instagram) + '" target="_blank" rel="noopener noreferrer">' + Admin.escapeHtml(m.instagram) + "</a>" : "-") + "</td>" +
@@ -437,6 +506,10 @@
     } else {
       marcasCache = resposta.data || [];
     }
+    colunaSelecaoExiste = marcasCache.length === 0 || Object.prototype.hasOwnProperty.call(marcasCache[0], "selecionada");
+    if (!colunaSelecaoExiste) {
+      Admin.mostrarAviso("avisosMarcas", 'Para poder selecionar marcas pra Prospecção, falta a coluna "selecionada" no banco. Cole o arquivo disparo.sql no Supabase (SQL Editor). O resto continua funcionando.', "aviso");
+    }
     montarFiltrosNicho();
     aplicarFiltros();
   }
@@ -481,6 +554,17 @@
       document.querySelectorAll("#filtrosNichoMarcas .filtro-pilula-botao").forEach(function (b) { b.classList.remove("ativo"); });
       botao.classList.add("ativo");
       aplicarFiltros();
+    });
+
+    document.getElementById("botaoSelecionarVisiveis").addEventListener("click", selecionarVisiveis);
+    document.getElementById("botaoLimparSelecao").addEventListener("click", limparSelecao);
+
+    document.getElementById("corpoTabelaMarcas").addEventListener("change", async function (evento) {
+      var caixinha = evento.target.closest("input[data-selecionar]");
+      if (!caixinha) return;
+      var ok = await salvarSelecao([caixinha.getAttribute("data-selecionar")], caixinha.checked);
+      if (!ok) caixinha.checked = !caixinha.checked;
+      atualizarResumoSelecao();
     });
 
     document.getElementById("corpoTabelaMarcas").addEventListener("click", function (evento) {

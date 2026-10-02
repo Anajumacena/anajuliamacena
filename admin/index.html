@@ -341,6 +341,17 @@
   }
   .filtro-pilula-botao.ativo{ background:var(--texto); color:var(--offwhite); border-color:var(--texto); }
   .espacador{ flex:1; }
+  .barra-selecao-marcas{
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+    padding:10px 14px;
+    margin-bottom:14px;
+    background:var(--marrom-suave);
+    border:1px solid var(--linha);
+  }
+  .resumo-selecao{ font-size:0.85rem; font-weight:500; color:var(--marrom); margin-right:6px; }
+  .dica-selecao{ font-size:0.72rem; color:var(--texto-suave); }
+  .celula-selecao input[type="checkbox"]{ width:16px; height:16px; accent-color:var(--marrom); cursor:pointer; }
+  .celula-selecao input[type="checkbox"]:disabled{ cursor:not-allowed; opacity:0.4; }
 
   /* ===== Calendário ===== */
   .barra-calendario{ display:flex; align-items:center; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
@@ -474,6 +485,127 @@
 
   .grade-duas-colunas{ display:grid; grid-template-columns:1.3fr 1fr; gap:20px; align-items:start; }
   @media (max-width: 980px){ .grade-duas-colunas{ grid-template-columns:1fr; } }
+
+  /* ===== Aba Prospecção ===== */
+  :root{ --azul:#4a6d8c; --azul-fundo:#e8eef4; --marrom-escuro:#7a6048; }
+
+  .pr-hero{
+    background:linear-gradient(135deg, var(--marrom) 0%, var(--marrom-escuro) 100%);
+    color:#fff;
+    border-radius:8px;
+    padding:26px 28px 22px;
+    margin-bottom:18px;
+  }
+  .pr-hero-topo{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+  .pr-hero-icone{
+    width:56px; height:56px; flex-shrink:0;
+    border-radius:10px;
+    background:rgba(255,255,255,0.18);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .pr-hero-icone svg{ width:28px; height:28px; stroke:#fff; fill:none; stroke-width:1.5; }
+  .pr-hero-texto{ flex:1; min-width:200px; }
+  .pr-hero-texto h2{ font-size:1.5rem; color:#fff; }
+  .pr-hero-texto p{ margin:4px 0 0; font-size:0.88rem; color:rgba(255,255,255,0.88); }
+  .pr-hero-total{ text-align:right; }
+  .pr-hero-total span{ display:block; font-family:'Tenor Sans', serif; font-size:2.6rem; line-height:1; color:#fff; }
+  .pr-hero-total small{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.1em; color:rgba(255,255,255,0.85); }
+  .pr-chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
+  .pr-chips span{
+    background:rgba(255,255,255,0.16);
+    border:1px solid rgba(255,255,255,0.22);
+    border-radius:999px;
+    padding:5px 12px;
+    font-size:0.74rem;
+    color:#fff;
+  }
+
+  .pr-kpis{ display:grid; grid-template-columns:repeat(auto-fit, minmax(170px,1fr)); gap:12px; margin-bottom:22px; }
+  .pr-kpi{
+    background:var(--offwhite);
+    border:1px solid var(--linha);
+    border-left:4px solid var(--cor-kpi, var(--marrom));
+    border-radius:6px;
+    padding:14px 16px;
+  }
+  .pr-kpi b{ display:block; font-family:'Tenor Sans', serif; font-weight:400; font-size:1.7rem; color:var(--cor-kpi, var(--marrom)); line-height:1.15; }
+  .pr-kpi span{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--texto-suave); }
+  .pr-kpi.verde{ --cor-kpi:var(--ok); }
+  .pr-kpi.ambar{ --cor-kpi:var(--aviso); }
+  .pr-kpi.azul{ --cor-kpi:var(--azul); }
+  .pr-kpi.vermelho{ --cor-kpi:var(--erro); }
+
+  .pr-layout{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px; align-items:start; margin-bottom:26px; }
+  .pr-form{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+  .pr-cartao{ background:var(--offwhite); border:1px solid var(--linha); border-radius:6px; padding:20px; }
+  .pr-cartao h3{ font-size:0.85rem; text-transform:uppercase; margin-bottom:12px; }
+  .pr-nota{ font-size:0.8rem; color:var(--texto-suave); margin:0 0 12px; }
+  .pr-contagem{ font-size:0.9rem; margin:10px 0 0; }
+  .pr-contagem strong{ color:var(--marrom); font-weight:500; }
+  .pr-detalhe{ font-size:0.76rem; color:var(--texto-suave); margin:4px 0 0; }
+  .pr-marcar{ display:flex; align-items:center; gap:8px; margin-top:12px; font-size:0.82rem; text-transform:none; letter-spacing:0; color:var(--texto); cursor:pointer; }
+  .pr-marcar input{ width:16px; height:16px; accent-color:var(--marrom); }
+  .pr-pilulas{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .pr-codigo{ font-family:Consolas, Menlo, monospace; font-size:0.78rem; line-height:1.5; min-height:260px; white-space:pre; overflow:auto; }
+  textarea.pr-texto{ min-height:240px; line-height:1.5; resize:vertical; }
+  .pr-acoes{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .botao[disabled]{ opacity:0.45; cursor:not-allowed; }
+  .botao[disabled]:hover{ background:transparent; color:var(--texto); }
+  .botao.principal[disabled]:hover{ background:var(--texto); color:var(--offwhite); }
+  .pr-status{ font-size:0.8rem; margin-top:10px; }
+  .pr-progresso{ margin-top:14px; }
+  .pr-progresso .rotulo{ font-size:0.78rem; color:var(--texto-suave); margin-bottom:6px; }
+  .pr-resultado{ margin-top:14px; }
+  .pr-resultado .caixa-resumo{ border:1px solid var(--linha); border-radius:6px; padding:14px 16px; background:#fff; font-size:0.85rem; }
+  .pr-resultado .numeros{ display:flex; gap:18px; flex-wrap:wrap; margin-bottom:8px; }
+  .pr-resultado .numeros b{ display:block; font-family:'Tenor Sans', serif; font-weight:400; font-size:1.4rem; }
+
+  .pr-fila-cartao{ border:1px solid var(--linha); border-radius:6px; background:#fff; padding:16px; }
+  .pr-fila-cartao .linha{ font-size:0.82rem; margin-bottom:6px; }
+  .pr-fila-cartao textarea{ min-height:200px; margin:10px 0 12px; }
+  .pr-lista-optout{ max-height:130px; overflow:auto; margin-top:10px; font-size:0.78rem; color:var(--texto-suave); }
+  .pr-lista-optout div{ padding:3px 0; border-bottom:1px solid var(--linha); }
+
+  /* Prévia do e-mail */
+  .pr-previa{ position:sticky; top:16px; min-width:0; }
+  .pr-palco{
+    background:#e3dacf;
+    border:1px solid var(--linha);
+    border-radius:8px;
+    padding:22px 18px;
+  }
+  .pr-janela{
+    background:#fff;
+    border-radius:10px;
+    box-shadow:0 10px 30px rgba(58,51,44,0.18), 0 2px 6px rgba(58,51,44,0.10);
+    overflow:hidden;
+  }
+  .pr-janela-topo{ display:flex; gap:12px; align-items:center; padding:16px 18px; border-bottom:1px solid #eee; }
+  .pr-avatar{
+    width:40px; height:40px; flex-shrink:0; border-radius:50%;
+    background:var(--marrom); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Tenor Sans', serif; font-size:1.1rem;
+  }
+  .pr-janela-info{ min-width:0; }
+  .pr-janela-assunto{ font-weight:600; font-size:0.98rem; color:#222; word-break:break-word; }
+  .pr-janela-de{ font-size:0.74rem; color:#777; word-break:break-word; }
+  .pr-janela-corpo{ max-height:calc(100vh - 290px); min-height:220px; overflow:auto; }
+  .pr-janela-corpo iframe{ display:block; width:100%; border:0; min-height:220px; background:#fff; }
+  .pr-previa-rodape{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap; }
+  .pr-previa-rodape small{ font-size:0.74rem; color:var(--texto-suave); }
+  .pr-previa-exemplo{ font-size:0.72rem; color:var(--texto-suave); margin-bottom:8px; }
+  .caixa-modal.pr-grande{ max-width:760px; background:#e3dacf; }
+  .caixa-modal.pr-grande .pr-janela-corpo{ max-height:calc(88vh - 220px); }
+  .pr-aviso-vazio{ text-align:center; padding:34px 20px; }
+  .pr-aviso-vazio p{ margin:0 0 16px; }
+
+  @media (max-width: 980px){
+    .pr-layout{ grid-template-columns:1fr; }
+    .pr-previa{ position:static; }
+    .pr-janela-corpo{ max-height:none; }
+    .pr-hero-total{ text-align:left; }
+  }
 </style>
 </head>
 <body class="carregando">
@@ -500,6 +632,10 @@
         <button class="item-nav" data-secao="marcas">
           <svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><path d="M2 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14c2.6 0 6 1.5 6 6"/></svg>
           Marcas
+        </button>
+        <button class="item-nav" data-secao="prospeccao">
+          <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="0"/><polyline points="3,7 12,13 21,7"/></svg>
+          Prospecção
         </button>
       </nav>
 
@@ -605,10 +741,17 @@
           <button class="filtro-pilula-botao ativo" data-nicho="todos">Todos</button>
         </div>
       </div>
+      <div class="barra-selecao-marcas">
+        <span id="resumoSelecaoMarcas" class="resumo-selecao">0 marcas selecionadas</span>
+        <button class="botao pequeno contorno-suave" id="botaoSelecionarVisiveis">Selecionar todas as que aparecem</button>
+        <button class="botao pequeno contorno-suave" id="botaoLimparSelecao">Limpar seleção</button>
+        <span class="dica-selecao">As marcas marcadas aqui são as que aparecem na aba Prospecção.</span>
+      </div>
       <div class="tabela-scroll">
         <table>
           <thead>
             <tr>
+              <th style="width:34px;"></th>
               <th>Marca</th>
               <th>Nicho</th>
               <th>Instagram</th>
@@ -621,6 +764,173 @@
           </thead>
           <tbody id="corpoTabelaMarcas"></tbody>
         </table>
+      </div>
+    </section>
+
+    <!-- ===================== PROSPECÇÃO ===================== -->
+    <section class="secao-admin" id="secaoProspeccao" hidden>
+      <div id="avisosProspeccao"></div>
+
+      <div class="pr-hero">
+        <div class="pr-hero-topo">
+          <div class="pr-hero-icone">
+            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,7 12,13 21,7"/></svg>
+          </div>
+          <div class="pr-hero-texto">
+            <h2>Prospecção</h2>
+            <p>Escreva um e-mail, veja como vai chegar e envie para as marcas da sua base.</p>
+          </div>
+          <div class="pr-hero-total">
+            <span id="prTotalEnviados">-</span>
+            <small>enviados até agora</small>
+          </div>
+        </div>
+        <div class="pr-chips">
+          <span>Sempre envie um teste primeiro</span>
+          <span>A chave de envio fica guardada no Supabase</span>
+          <span>Quem responde SAIR sai da lista</span>
+        </div>
+      </div>
+
+      <div class="pr-kpis">
+        <div class="pr-kpi"><b id="prKpiBase">-</b><span>E-mails na base</span></div>
+        <div class="pr-kpi verde"><b id="prKpiAEnviar">-</b><span>Para enviar</span></div>
+        <div class="pr-kpi azul"><b id="prKpiRecebido">-</b><span>Já receberam</span></div>
+        <div class="pr-kpi ambar"><b id="prKpiFalhas">-</b><span>Falhas</span></div>
+        <div class="pr-kpi vermelho"><b id="prKpiSairam">-</b><span>Descadastrados</span></div>
+      </div>
+
+      <div id="prSemEmail" class="caixa pr-aviso-vazio" hidden>
+        <p id="prSemEmailTexto">Nenhuma das suas marcas tem e-mail cadastrado ainda.</p>
+        <button class="botao principal" id="prIrParaMarcasVazio">Ir para a aba Marcas</button>
+      </div>
+
+      <div id="prCorpo">
+        <div class="pr-layout">
+          <div class="pr-form">
+
+            <div class="pr-cartao">
+              <h3>1. Quem recebe</h3>
+              <p class="pr-nota">Os e-mails vêm da sua aba Marcas.</p>
+              <select id="prPublico"></select>
+              <p class="pr-contagem" id="prContagem"></p>
+              <p class="pr-detalhe" id="prDetalheContagem"></p>
+              <div id="prSemSelecao" class="aviso-caixa" style="margin:12px 0 0;" hidden>
+                Você ainda não selecionou nenhuma marca. Marque os quadradinhos na aba Marcas.
+                <div style="margin-top:10px;"><button class="botao pequeno" id="prIrParaMarcasSelecao">Ir para a aba Marcas</button></div>
+              </div>
+              <label class="pr-marcar"><input type="checkbox" id="prPular" checked> Pular quem já recebeu este mesmo assunto</label>
+            </div>
+
+            <div class="pr-cartao">
+              <h3>2. Escreva o e-mail</h3>
+              <div class="pr-pilulas" id="prModosEscrita">
+                <button class="filtro-pilula-botao ativo" data-modo="facil">Modo fácil</button>
+                <button class="filtro-pilula-botao" data-modo="html">Modo HTML</button>
+              </div>
+              <div class="campo">
+                <label for="prAssunto">Assunto</label>
+                <input type="text" id="prAssunto" placeholder="Ex: Ideia de conteúdo para a {{marca}}">
+              </div>
+              <div id="prPainelFacil">
+                <div class="campo">
+                  <label for="prTexto">Texto do e-mail</label>
+                  <textarea id="prTexto" class="pr-texto"></textarea>
+                  <p class="pr-detalhe">Use {{nome}} para o primeiro nome da marca e {{marca}} para o nome completo. Links viram clicáveis sozinhos.</p>
+                </div>
+                <div class="linha-campos">
+                  <div class="campo">
+                    <label for="prBotaoTexto">Texto do botão (opcional)</label>
+                    <input type="text" id="prBotaoTexto" placeholder="Ex: Ver meu portfólio">
+                  </div>
+                  <div class="campo">
+                    <label for="prBotaoLink">Link do botão</label>
+                    <input type="url" id="prBotaoLink" placeholder="https://...">
+                  </div>
+                </div>
+              </div>
+              <div id="prPainelHtml" hidden>
+                <div class="campo">
+                  <label for="prHtml">Código HTML do e-mail</label>
+                  <textarea id="prHtml" class="pr-codigo" spellcheck="false"></textarea>
+                  <p class="pr-detalhe">O HTML vai exatamente como está, sem nada acrescentado. {{nome}} e {{marca}} funcionam aqui também.</p>
+                </div>
+                <button class="botao pequeno contorno-suave" id="prModeloPronto">Começar do modelo pronto</button>
+              </div>
+            </div>
+
+            <div class="pr-cartao">
+              <h3>3. Enviar</h3>
+              <div class="pr-pilulas" id="prMetodos">
+                <button class="filtro-pilula-botao ativo" data-metodo="resend">Enviar pelo sistema</button>
+                <button class="filtro-pilula-botao" data-metodo="rascunho">Rascunho no Gmail</button>
+              </div>
+
+              <div id="prPainelResend">
+                <p class="pr-nota">Primeiro mande um teste pra você mesma. O botão de disparo só libera depois disso.</p>
+                <div class="pr-acoes">
+                  <button class="botao contorno-suave" id="prBotaoTeste">Enviar teste pra mim</button>
+                  <button class="botao principal" id="prBotaoDisparar" disabled>Disparar para as marcas</button>
+                </div>
+                <div class="pr-status" id="prStatusTeste"></div>
+                <div class="pr-progresso" id="prProgresso" hidden>
+                  <div class="rotulo" id="prProgressoRotulo"></div>
+                  <div class="barra-progresso-fundo"><div class="barra-progresso-preenchimento" id="prProgressoBarra" style="width:0%"></div></div>
+                </div>
+                <div class="pr-resultado" id="prResultado"></div>
+              </div>
+
+              <div id="prPainelRascunho" hidden>
+                <p class="pr-nota">Sem precisar do sistema de envio: o texto de cada marca é montado e você abre o Gmail com tudo preenchido, uma marca de cada vez.</p>
+                <button class="botao" id="prMontarFila">Montar fila de rascunhos</button>
+                <div id="prFila" style="margin-top:14px;"></div>
+              </div>
+            </div>
+
+            <div class="pr-cartao">
+              <h3>Quem pediu pra sair</h3>
+              <p class="pr-nota">Se alguém responder SAIR, coloque o e-mail da pessoa aqui. Ela nunca mais recebe nada, em nenhum disparo.</p>
+              <div class="pr-acoes">
+                <input type="email" id="prOptoutEmail" placeholder="email@dapessoa.com" style="max-width:280px;">
+                <button class="botao contorno-suave" id="prOptoutAdicionar">Adicionar à lista</button>
+              </div>
+              <div class="pr-lista-optout" id="prListaOptout"></div>
+            </div>
+          </div>
+
+          <aside class="pr-previa">
+            <div class="pr-palco">
+              <div class="pr-previa-exemplo" id="prExemplo"></div>
+              <div class="pr-janela">
+                <div class="pr-janela-topo">
+                  <div class="pr-avatar">A</div>
+                  <div class="pr-janela-info">
+                    <div class="pr-janela-assunto" id="prPrevAssunto"></div>
+                    <div class="pr-janela-de">Ana Julia Macena &lt;anajuliarmacena@gmail.com&gt; para você</div>
+                  </div>
+                </div>
+                <div class="pr-janela-corpo"><iframe id="prPrevCorpo" sandbox="allow-same-origin" title="Prévia do e-mail"></iframe></div>
+              </div>
+            </div>
+            <div class="pr-previa-rodape">
+              <small>Mande o teste pra você e abra no celular antes de disparar.</small>
+              <button class="botao pequeno contorno-suave" id="prTelaCheia">Ver em tela cheia</button>
+            </div>
+          </aside>
+        </div>
+
+        <div class="pr-cartao">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+            <h3 style="margin:0;">Histórico de envios</h3>
+            <input type="text" id="prBuscaHistorico" placeholder="Buscar por e-mail" style="max-width:260px;">
+          </div>
+          <div class="tabela-scroll">
+            <table>
+              <thead><tr><th>Para quem</th><th>Assunto</th><th>Quando</th><th>Situação</th></tr></thead>
+              <tbody id="prCorpoHistorico"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1031,14 +1341,65 @@
   </div>
 </div>
 
+<!-- Prospecção: prévia em tela cheia -->
+<div class="fundo-modal" id="modalPreviaCheia" hidden style="background:rgba(30,26,22,0.78);">
+  <div class="caixa-modal pr-grande">
+    <div class="cabecalho-modal">
+      <h2>Prévia do e-mail</h2>
+      <button class="fechar-modal" data-fechar="modalPreviaCheia" aria-label="Fechar">×</button>
+    </div>
+    <div class="pr-janela">
+      <div class="pr-janela-topo">
+        <div class="pr-avatar">A</div>
+        <div class="pr-janela-info">
+          <div class="pr-janela-assunto" id="prCheiaAssunto"></div>
+          <div class="pr-janela-de">Ana Julia Macena &lt;anajuliarmacena@gmail.com&gt; para você</div>
+        </div>
+      </div>
+      <div class="pr-janela-corpo"><iframe id="prCheiaCorpo" sandbox="allow-same-origin" title="Prévia do e-mail em tela cheia"></iframe></div>
+    </div>
+  </div>
+</div>
+
+<!-- Prospecção: confirmar o disparo -->
+<div class="fundo-modal" id="modalConfirmarEnvio" hidden>
+  <div class="caixa-modal">
+    <div class="cabecalho-modal">
+      <h2>Confirmar disparo</h2>
+      <button class="fechar-modal" data-fechar="modalConfirmarEnvio" aria-label="Fechar">×</button>
+    </div>
+    <p id="prConfirmarTexto" style="font-size:0.95rem; margin:0 0 10px;"></p>
+    <p id="prConfirmarAssunto" style="font-size:0.82rem; color:var(--texto-suave); margin:0;"></p>
+    <div class="rodape-modal">
+      <button type="button" class="botao" data-fechar="modalConfirmarEnvio">Cancelar</button>
+      <button type="button" class="botao principal" id="prConfirmarSim">Sim, enviar agora</button>
+    </div>
+  </div>
+</div>
+
+<!-- Prospecção: limpar a seleção depois do disparo -->
+<div class="fundo-modal" id="modalLimparSelecao" hidden>
+  <div class="caixa-modal">
+    <div class="cabecalho-modal">
+      <h2>Disparo concluído</h2>
+      <button class="fechar-modal" data-fechar="modalLimparSelecao" aria-label="Fechar">×</button>
+    </div>
+    <p style="font-size:0.92rem; margin:0;">Quer limpar a seleção de marcas agora? Se você manter, as mesmas marcas continuam marcadas na aba Marcas.</p>
+    <div class="rodape-modal">
+      <button type="button" class="botao" data-fechar="modalLimparSelecao">Manter seleção</button>
+      <button type="button" class="botao principal" id="prLimparSelecaoSim">Limpar seleção</button>
+    </div>
+  </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../js/banco.js?v=20261001f"></script>
-<script src="../js/biblioteca.js?v=20261001f"></script>
-<script src="../js/admin-nucleo.js?v=20261001f"></script>
-<script src="../js/admin-portfolio.js?v=20261001f"></script>
-<script src="../js/admin-marcas.js?v=20261001f"></script>
-<script src="../js/admin-calendario.js?v=20261001f"></script>
-<script src="../js/admin-campanhas.js?v=20261001f"></script>
-<script src="../js/admin-checklist.js?v=20261001f"></script>
+<script src="../js/banco.js?v=20261002a"></script>
+<script src="../js/biblioteca.js?v=20261002a"></script>
+<script src="../js/admin-nucleo.js?v=20261002a"></script>
+<script src="../js/admin-portfolio.js?v=20261002a"></script>
+<script src="../js/admin-marcas.js?v=20261002a"></script>
+<script src="../js/admin-prospeccao.js?v=20261002a"></script>
+<script src="../js/admin-calendario.js?v=20261002a"></script>
+<script src="../js/admin-campanhas.js?v=20261002a"></script>
+<script src="../js/admin-checklist.js?v=20261002a"></script>
 </body>
 </html>

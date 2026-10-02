@@ -15,6 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
+    --video-w:280px; /* largura única de todos os vídeos do site */
     --areia:#efe9e1;
     --offwhite:#fdfcfa;
     --marrom:#a3876b;
@@ -523,17 +524,21 @@
   /* ===== DESTAQUES ===== */
   .grade-destaques{
     display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:28px;
+    grid-template-columns:repeat(auto-fill, var(--video-w));
+    justify-content:start;
+    gap:24px;
   }
+  /* Contorno por dentro (outline) em vez de borda, pra o vídeo ter
+     exatamente a mesma largura dos cartões sem borda. */
   .card-destaque{
     display:block;
-    border:1px solid var(--linha);
+    outline:1px solid var(--linha);
+    outline-offset:-1px;
     background:var(--offwhite);
-    transition:border-color 0.3s ease, transform 0.3s ease;
+    transition:outline-color 0.3s ease, transform 0.3s ease;
   }
   .card-destaque:hover, .card-destaque:focus-visible{
-    border-color:var(--marrom);
+    outline-color:var(--marrom);
     transform:translateY(-4px);
   }
   .card-destaque .capa-video{
@@ -578,11 +583,6 @@
     color:var(--texto-suave);
   }
 
-  @media (max-width: 900px){
-    .grade-destaques{ grid-template-columns:1fr; }
-    .card-destaque .capa-video{ max-width:340px; margin:0 auto; }
-  }
-
   /* ===== TRABALHOS / FILTRO ===== */
   .filtros{
     display:flex;
@@ -611,17 +611,19 @@
   }
   .grade-trabalhos{
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns:repeat(auto-fill, var(--video-w));
+    justify-content:start;
     gap:24px;
   }
   .card-trabalho{
     display:block;
-    border:1px solid var(--linha);
+    outline:1px solid var(--linha);
+    outline-offset:-1px;
     background:var(--offwhite);
-    transition:opacity 0.4s ease, transform 0.4s ease, border-color 0.3s ease;
+    transition:opacity 0.4s ease, transform 0.4s ease, outline-color 0.3s ease;
   }
   .card-trabalho:hover, .card-trabalho:focus-visible{
-    border-color:var(--marrom);
+    outline-color:var(--marrom);
   }
   .card-trabalho.escondido{ display:none; }
   .texto-vazio-trabalhos{
@@ -693,8 +695,9 @@
   /* ----- Branded Content: os 3 projetos lado a lado ----- */
   #listaBrandedContent{
     display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
-    gap:clamp(28px, 4vw, 48px);
+    grid-template-columns:repeat(auto-fill, var(--video-w));
+    justify-content:start;
+    gap:clamp(24px, 4vw, 40px);
     align-items:start;
   }
   .projeto-branded-cabecalho{ margin-bottom:16px; }
@@ -709,7 +712,7 @@
   .projeto-branded-conjunto{ display:block; }
   .projeto-branded-videos{ width:100%; }
   .projeto-branded-videos.grade-destinos{ grid-template-columns:minmax(0, 1fr); }
-  .projeto-branded-videos .card-midia-editorial{ max-width:345px; }
+  .projeto-branded-videos .card-midia-editorial{ max-width:none; }
   .projeto-branded-videos:empty{ display:none; }
   .projeto-branded-midias{
     flex:1 1 320px;
@@ -734,8 +737,9 @@
   }
   .grade-destinos{
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
-    gap:22px;
+    grid-template-columns:repeat(auto-fill, var(--video-w));
+    justify-content:start;
+    gap:24px;
   }
 
   /* ===== SERVIÇOS ===== */
@@ -1082,6 +1086,8 @@
   /* ===== CELULAR: vídeos em carrossel lateral e Sobre lado a lado =====
      Fica por último de propósito, pra ganhar das regras acima. */
   @media (max-width: 700px){
+    :root{ --video-w:clamp(132px, 41vw, 190px); }
+
     /* Sobre mim: foto à esquerda, texto à direita; a lista de
        promessas e a assinatura descem pra largura inteira. */
     .sobre-grade{
@@ -1128,7 +1134,7 @@
     .grade-destaques > .card-destaque,
     .grade-trabalhos > .card-trabalho,
     .grade-destinos > .card-midia-editorial{
-      flex:0 0 clamp(132px, 41vw, 190px);
+      flex:0 0 var(--video-w);
       min-width:0;
       scroll-snap-align:start;
     }
@@ -1136,7 +1142,7 @@
 
     /* Branded Content: cada projeto vira uma coluna da fileira */
     #listaBrandedContent > .projeto-branded{
-      flex:0 0 clamp(150px, 52vw, 230px);
+      flex:0 0 var(--video-w);
       min-width:0;
       scroll-snap-align:start;
     }

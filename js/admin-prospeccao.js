@@ -13,7 +13,7 @@
   "use strict";
 
   var EMAIL_DONA = "anajuliarmacena@gmail.com";
-  var LINK_SITE = "https://anajumacena.github.io/anajuliamacena/";
+  var LINK_SITE = "https://anajuliamacena.com/";
   var CHAVE_LOCAL = "prospeccao_rascunho_v1";
   var TAMANHO_LOTE = 100;
   var ROTULOS_SITUACAO = { lead: "Lead", conversando: "Conversando", cliente: "Cliente", parada: "Parada" };
